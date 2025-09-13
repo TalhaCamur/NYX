@@ -1,13 +1,14 @@
 import React from 'react';
+import { PRODUCT_DATA } from '../constants';
 
 const Hero: React.FC = () => {
     return (
-        <section className="h-screen min-h-[800px] flex flex-col items-center text-center bg-dark">
-            <div className="container mx-auto px-4 flex flex-col items-center justify-center flex-grow pt-24 pb-12">
+        <section className="h-screen min-h-[800px] flex items-center text-center bg-dark">
+            <div className="container mx-auto px-4">
                 
                 {/* Text Content */}
-                <div className="w-full max-w-4xl">
-                    <span className="text-lg font-semibold text-brand-purple mb-2 block">NYX-1 Smart PIR Motion Sensor</span>
+                <div className="w-full max-w-4xl mx-auto">
+                    <span className="text-lg font-semibold text-brand-purple mb-2 block">{PRODUCT_DATA.name}</span>
                     <h1 className="text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tighter text-white mb-6 leading-tight">
                         Smarter light. <br/> Simpler life.
                     </h1>
@@ -25,12 +26,11 @@ const Hero: React.FC = () => {
                 </div>
 
                 {/* Product Image */}
-                <div className="relative mt-16 md:mt-20 w-full flex items-center justify-center flex-grow">
-                    <div className="absolute bottom-0 w-full h-full bg-gradient-to-t from-dark-accent via-dark-accent/50 to-transparent"></div>
+                <div className="mt-12 md:mt-16">
                     <img 
-                        src="https://i.ibb.co/bX13vj8/nyx-sensor-hero.png" 
-                        alt="NYX-1 Smart PIR Motion Sensor" 
-                        className="relative z-10 w-auto h-auto max-w-[70vw] md:max-w-[45vw] lg:max-w-[35vw] max-h-[40vh] object-contain"
+                        src={PRODUCT_DATA.images[0]} 
+                        alt={PRODUCT_DATA.name} 
+                        className="mx-auto w-auto h-auto max-w-[70vw] md:max-w-[45vw] lg:max-w-[35vw] max-h-[40vh] object-contain"
                     />
                 </div>
             </div>

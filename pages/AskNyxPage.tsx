@@ -87,8 +87,8 @@ const AskNyxPage: React.FC = () => {
                 <div className="text-left bg-dark-accent border border-white/10 p-8 rounded-lg mt-12 min-h-[250px] w-full max-w-3xl mx-auto whitespace-pre-wrap flex flex-col justify-center">
                     {isLoading && !response && (
                         <div className="flex justify-center items-center h-full">
-                            <div className="w-full bg-dark rounded-full h-1.5">
-                                <div className="bg-brand-purple h-1.5 rounded-full animate-pulse"></div>
+                            <div className="w-full bg-dark rounded-full h-1.5 overflow-hidden">
+                                <div className="bg-gradient-to-r from-brand-purple to-brand-pink h-1.5 w-1/2 animate-scanner"></div>
                             </div>
                         </div>
                     )}
@@ -102,7 +102,7 @@ const AskNyxPage: React.FC = () => {
                                     <button 
                                         key={ex} 
                                         onClick={() => handleExampleClick(ex)}
-                                        className="bg-dark border border-gray-700 text-gray-300 text-sm px-4 py-2 rounded-full hover:bg-gray-800 hover:border-brand-purple transition-colors"
+                                        className="bg-dark-accent border border-white/10 text-gray-300 text-sm px-4 py-2 rounded-full transition-all duration-300 hover:border-brand-purple/50 hover:text-white hover:shadow-lg hover:shadow-brand-purple/25 transform hover:-translate-y-px"
                                     >
                                         {ex}
                                     </button>

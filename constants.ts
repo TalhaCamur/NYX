@@ -17,10 +17,10 @@ export const PRODUCT_DATA: Product = {
   originalPrice: 99.99,
   stock: 150,
   images: [
-    'https://i.ibb.co/bX13vj8/nyx-sensor-hero.png',
-    'https://i.ibb.co/M8LzY5V/nyx-sensor-angle.png',
-    'https://i.ibb.co/27HCtSj/nyx-sensor-side.png',
-    'https://i.ibb.co/Q8r1gG7/nyx-sensor-lifestyle.png',
+    'https://m.media-amazon.com/images/I/51rG+55hL9L._AC_SL1500_.jpg',
+    'https://m.media-amazon.com/images/I/61N92qc0bOL._AC_SL1500_.jpg',
+    'https://m.media-amazon.com/images/I/61T+Nf-M7FL._AC_SL1500_.jpg',
+    'https://m.media-amazon.com/images/I/61f-jqlprGL._AC_SL1500_.jpg',
   ],
   specs: [
     { name: 'Detection Range', value: '8 meters / 26 feet' },

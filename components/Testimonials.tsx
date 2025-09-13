@@ -13,7 +13,7 @@ const Testimonials: React.FC = () => {
                 </div>
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {TESTIMONIALS_DATA.map((testimonial, index) => (
-                        <figure key={index} className="bg-dark-accent p-8 rounded-2xl flex flex-col border border-white/10 transform transition-all duration-300 hover:-translate-y-2 hover:shadow-lg hover:shadow-brand-purple/20">
+                        <figure key={index} className="bg-dark-accent p-8 rounded-2xl flex flex-col border border-white/10 transform transition-all duration-300 hover:-translate-y-2 hover:border-brand-purple/50 hover:shadow-2xl hover:shadow-brand-purple/25">
                             <blockquote className="text-lg text-gray-300 flex-grow mb-6">
                                 <p>"{testimonial.quote}"</p>
                             </blockquote>

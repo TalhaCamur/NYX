@@ -28,7 +28,7 @@ const ProductShowcase: React.FC = () => {
             <div className="container mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-start">
                 {/* Image Gallery */}
                 <div className="flex flex-col gap-4 sticky top-28">
-                    <div className="aspect-square bg-dark-accent rounded-2xl overflow-hidden flex items-center justify-center border border-white/10 shadow-2xl shadow-black/30">
+                    <div className="aspect-square bg-dark-accent rounded-2xl overflow-hidden flex items-center justify-center border border-white/10 shadow-lg shadow-brand-purple/20 transition-all duration-300 hover:shadow-xl hover:shadow-brand-purple/30">
                         <img src={mainImage} alt="Main product view" className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
                     </div>
                     {PRODUCT_DATA.images.length > 1 && (
