@@ -2,9 +2,11 @@ import React from 'react';
 
 const Hero: React.FC = () => {
     return (
-        <section className="h-screen min-h-[700px] flex flex-col justify-start items-center text-center relative overflow-hidden bg-dark pt-20">
-            <div className="relative z-10 container mx-auto px-4 flex flex-col items-center justify-start pt-16 sm:pt-24 md:pt-32">
-                <div className="max-w-4xl">
+        <section className="h-screen min-h-[800px] flex flex-col items-center text-center bg-dark">
+            <div className="container mx-auto px-4 flex flex-col items-center justify-center flex-grow pt-24 pb-12">
+                
+                {/* Text Content */}
+                <div className="w-full max-w-4xl">
                     <span className="text-lg font-semibold text-brand-purple mb-2 block">NYX-1 Smart PIR Motion Sensor</span>
                     <h1 className="text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tighter text-white mb-6 leading-tight">
                         Smarter light. <br/> Simpler life.
@@ -21,15 +23,16 @@ const Hero: React.FC = () => {
                         </a>
                     </div>
                 </div>
-            </div>
 
-            <div className="absolute inset-0 w-full h-full flex items-end justify-center z-0">
-                <div className="absolute bottom-0 w-full h-2/3 bg-gradient-to-t from-dark-accent via-dark-accent/80 to-transparent"></div>
-                <img 
-                    src="https://i.ibb.co/yYv3x0M/sensor-main.png" 
-                    alt="NYX-1 Smart PIR Motion Sensor" 
-                    className="w-auto h-auto max-w-[80vw] max-h-[50vh] object-contain mb-[-5%]"
-                />
+                {/* Product Image */}
+                <div className="relative mt-16 md:mt-20 w-full flex items-center justify-center flex-grow">
+                    <div className="absolute bottom-0 w-full h-full bg-gradient-to-t from-dark-accent via-dark-accent/50 to-transparent"></div>
+                    <img 
+                        src="https://i.ibb.co/bX13vj8/nyx-sensor-hero.png" 
+                        alt="NYX-1 Smart PIR Motion Sensor" 
+                        className="relative z-10 w-auto h-auto max-w-[70vw] md:max-w-[45vw] lg:max-w-[35vw] max-h-[40vh] object-contain"
+                    />
+                </div>
             </div>
         </section>
     );
