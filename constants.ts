@@ -1,18 +1,34 @@
 
 
+
 import React from 'react';
-import { Product, Testimonial, Feature } from './types';
+import { Product, Testimonial, Feature, FAQItem } from './types';
 
 export const NAV_LINKS = [
-  { name: 'Product', href: '#product' },
-  { name: 'Features', href: '#features' },
+  { name: 'Home', href: '/' },
+  { name: 'Products', href: '/products' },
+  {
+    name: 'Support',
+    sublinks: [
+      { name: 'How it Works', href: '/how-it-works' },
+      { name: 'Setup Videos', href: '/setup-videos' },
+      { name: 'FAQ', href: '/faq' },
+      { name: 'Contact', href: '/contact' },
+    ]
+  },
+  {
+    name: 'About Us',
+    sublinks: [
+      { name: 'Our Story', href: '/our-story' },
+      { name: 'Why Us?', href: '/why-us' },
+    ]
+  },
   { name: 'Ask NYX', href: '#ask' },
 ];
 
-// Fix: Add PRODUCT_DATA export
-export const PRODUCT_DATA: Product = {
+const NYX_SENSOR: Product = {
   name: 'NYX-1 Smart PIR Motion Sensor',
-  tagline: 'Intelligent motion sensing meets minimalist design. Illuminate your space with precision.',
+  tagline: 'Intelligent motion sensing meets minimalist design.',
   price: 79.99,
   originalPrice: 99.99,
   stock: 150,
@@ -31,6 +47,55 @@ export const PRODUCT_DATA: Product = {
     { name: 'Dimensions', value: '45mm x 45mm x 30mm' },
   ],
 };
+
+const NYX_BULB: Product = {
+  name: 'NYX-Bulb Smart LED',
+  tagline: 'Infinite colors for every mood. Brilliant illumination.',
+  price: 24.99,
+  stock: 300,
+  images: ['https://m.media-amazon.com/images/I/61Bi4iS1i3L._AC_SL1500_.jpg'],
+  specs: [
+    { name: 'Brightness', value: '800 Lumens' },
+    { name: 'Color', value: '16 Million Colors (RGBW)' },
+    { name: 'Lifetime', value: '25,000 Hours' },
+    { name: 'Connectivity', value: 'Wi-Fi 2.4GHz' },
+    { name: 'Voice Control', value: 'Alexa, Google Assistant' },
+  ],
+};
+
+const NYX_PLUG: Product = {
+  name: 'NYX-Plug Smart Outlet',
+  tagline: 'Make any appliance smart. Control from anywhere.',
+  price: 19.99,
+  stock: 450,
+  images: ['https://m.media-amazon.com/images/I/61n2MC2w4vL._AC_SL1500_.jpg'],
+  specs: [
+    { name: 'Input Voltage', value: '100-240V' },
+    { name: 'Max Current', value: '10A' },
+    { name: 'Connectivity', value: 'Wi-Fi 2.4GHz' },
+    { name: 'Features', value: 'Scheduling, Timer, Remote' },
+  ],
+};
+
+const NYX_CAM: Product = {
+  name: 'NYX-Cam Indoor Security',
+  tagline: 'Your eyes at home. Crystal clear 2K resolution.',
+  price: 59.99,
+  originalPrice: 79.99,
+  stock: 200,
+  images: ['https://m.media-amazon.com/images/I/51n8Kmqz2EL._AC_SL1000_.jpg'],
+  specs: [
+    { name: 'Resolution', value: '2K (2304x1296)' },
+    { name: 'Field of View', value: '125° Wide-Angle' },
+    { name: 'Night Vision', value: 'Color Night Vision' },
+    { name: 'Features', value: 'Two-Way Audio, AI Detection' },
+  ],
+};
+
+
+// Replaces PRODUCT_DATA with a list of all products.
+export const PRODUCTS_DATA: Product[] = [NYX_SENSOR, NYX_BULB, NYX_PLUG, NYX_CAM];
+
 
 // Placeholder icons for Features section as creating new files is not allowed.
 // FIX: Converted JSX to React.createElement calls to fix errors in .ts file.
@@ -88,4 +153,31 @@ export const TESTIMONIALS_DATA: Testimonial[] = [
     author: 'Ben Schiller',
     publication: 'Wired',
   },
+];
+
+export const FAQ_DATA: FAQItem[] = [
+  {
+    question: 'How long does the battery last on the NYX-1 Sensor?',
+    answer: 'The NYX-1 Smart PIR Motion Sensor is engineered for maximum efficiency. It features an industry-leading 24-month battery life on a single charge under typical usage conditions.'
+  },
+  {
+    question: 'Are NYX products compatible with Apple HomeKit, Google Home, and Amazon Alexa?',
+    answer: 'Yes, absolutely. Seamless integration is a core principle of our design philosophy. All NYX devices connect effortlessly with all major smart home ecosystems, including Apple HomeKit, Google Home, and Amazon Alexa, providing you with a unified control experience.'
+  },
+  {
+    question: 'What is Adaptive AI Learning?',
+    answer: 'Our proprietary Adaptive AI Learning is an onboard intelligence system within the NYX-1 Sensor. It learns your household\'s patterns and habits over time to significantly reduce false motion triggers and eventually anticipate your needs, such as adjusting lighting before you enter a room.'
+  },
+  {
+    question: 'What is the warranty period for NYX devices?',
+    answer: 'All NYX products come with a comprehensive 2-year limited warranty covering any manufacturing defects. We stand by the quality and durability of our devices.'
+  },
+  {
+    question: 'Can I control the NYX-Bulb\'s color and brightness?',
+    answer: 'Yes. The NYX-Bulb offers a palette of 16 million colors (RGBW) and full dimming capabilities. You can control the color, brightness, and set dynamic scenes directly from the NYX app or through your connected voice assistant.'
+  },
+  {
+    question: 'Do I need a separate hub for NYX products to work?',
+    answer: 'No, you do not. Our devices are designed to be simple and accessible. Each NYX product connects directly to your home\'s 2.4GHz Wi-Fi network, eliminating the need for an extra hub or bridge.'
+  }
 ];

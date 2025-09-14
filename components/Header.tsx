@@ -1,18 +1,26 @@
+
 import React, { useState, useEffect } from 'react';
 import { NAV_LINKS } from '../constants';
 import { useCart } from '../contexts/CartContext';
 import ShoppingCartIcon from './icons/ShoppingCartIcon';
 import CloseIcon from './icons/CloseIcon';
+import ChevronDownIcon from './icons/ChevronDownIcon';
 
-const Header: React.FC = () => {
+interface HeaderProps {
+    onAskNyxOpen: () => void;
+    navigateTo: (page: string) => void;
+}
+
+const Header: React.FC<HeaderProps> = ({ onAskNyxOpen, navigateTo }) => {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+    const [openMobileSubmenu, setOpenMobileSubmenu] = useState<string | null>(null);
     const { openCart, getCartTotalQuantity } = useCart();
     const totalQuantity = getCartTotalQuantity();
 
     useEffect(() => {
         const handleScroll = () => {
-            // Trigger change when user scrolls past 30% of the viewport height
             setIsScrolled(window.scrollY > window.innerHeight * 0.3);
         };
         window.addEventListener('scroll', handleScroll);
@@ -32,25 +40,152 @@ const Header: React.FC = () => {
         }
     }, [isMobileMenuOpen]);
 
-    const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string, name: string) => {
         e.preventDefault();
         setIsMobileMenuOpen(false);
-        const targetElement = document.querySelector(href);
-        if (targetElement) {
-            // A small delay to allow the menu to start closing before scrolling
-            setTimeout(() => {
-                targetElement.scrollIntoView({ behavior: 'smooth' });
-            }, 100);
+        
+        if (name === 'Ask NYX') {
+            onAskNyxOpen();
+            return;
+        }
+
+        switch (href) {
+            case '/':
+                navigateTo('home');
+                break;
+            case '/products':
+                navigateTo('products');
+                break;
+            case '/how-it-works':
+                navigateTo('how-it-works');
+                break;
+            case '/setup-videos':
+                navigateTo('setup-videos');
+                break;
+            case '/faq':
+                navigateTo('faq');
+                break;
+            case '/contact':
+                navigateTo('contact');
+                break;
+            case '/our-story':
+                navigateTo('our-story');
+                break;
+            case '/why-us':
+                navigateTo('why-us');
+                break;
+            case '#':
+                console.log(`Navigate to ${name}`);
+                break;
+            default:
+                if (href.startsWith('#')) {
+                    navigateTo('home');
+                    setTimeout(() => {
+                        const targetElement = document.querySelector(href);
+                        if (targetElement) {
+                            targetElement.scrollIntoView({ behavior: 'smooth' });
+                        }
+                    }, 100);
+                }
+                break;
         }
     };
 
      const handleLogoClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
         e.preventDefault();
         setIsMobileMenuOpen(false);
-        setTimeout(() => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }, 100);
+        navigateTo('home');
     }
+
+    const renderNavLinks = (isMobile: boolean = false) => {
+        return NAV_LINKS.map((link) => {
+            if (link.sublinks) {
+                if (isMobile) {
+                    return (
+                        <div key={link.name}>
+                            <button
+                                onClick={() => setOpenMobileSubmenu(openMobileSubmenu === link.name ? null : link.name)}
+                                className="w-full flex justify-center items-center gap-2 text-3xl font-semibold text-gray-300 hover:text-white transition-colors"
+                            >
+                                {link.name}
+                                <ChevronDownIcon className={`w-6 h-6 transition-transform ${openMobileSubmenu === link.name ? 'rotate-180' : ''}`} />
+                            </button>
+                            {openMobileSubmenu === link.name && (
+                                <div className="mt-4 space-y-4">
+                                    {link.sublinks.map(sublink => (
+                                        <a
+                                            key={sublink.name}
+                                            href={sublink.href}
+                                            onClick={(e) => handleLinkClick(e, sublink.href, sublink.name)}
+                                            className="block text-xl text-gray-400 hover:text-white"
+                                        >
+                                            {sublink.name}
+                                        </a>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    );
+                }
+                return (
+                    <div
+                        key={link.name}
+                        className="relative"
+                        onMouseEnter={() => setOpenDropdown(link.name)}
+                        onMouseLeave={() => setOpenDropdown(null)}
+                    >
+                        <button className="flex items-center gap-1 text-gray-300 hover:text-white transition-colors duration-300 cursor-pointer">
+                            {link.name}
+                            <ChevronDownIcon className={`w-4 h-4 transition-transform ${openDropdown === link.name ? 'rotate-180' : ''}`} />
+                        </button>
+                        {openDropdown === link.name && (
+                            <div className="absolute top-full left-0 pt-2 z-10">
+                                <div className="w-48 bg-dark-accent rounded-lg border border-white/10 shadow-lg py-2">
+                                    {link.sublinks.map(sublink => (
+                                        <a
+                                            key={sublink.name}
+                                            href={sublink.href}
+                                            onClick={(e) => handleLinkClick(e, sublink.href, sublink.name)}
+                                            className="block px-4 py-2 text-sm text-gray-300 hover:bg-dark hover:text-white"
+                                        >
+                                            {sublink.name}
+                                        </a>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                );
+            }
+
+            if (link.name === 'Ask NYX') {
+                return (
+                    <button
+                        key={link.name}
+                        onClick={(e) => handleLinkClick(e as any, link.href!, link.name)}
+                        className={
+                            isMobile 
+                                ? "text-3xl font-semibold animate-gradient-flow text-white py-4 px-8 rounded-full"
+                                : "animate-gradient-flow text-white font-semibold py-2 px-5 rounded-full hover:shadow-lg hover:shadow-brand-purple/20 transition-all duration-300 transform hover:scale-105"
+                        }
+                    >
+                        {link.name}
+                    </button>
+                );
+            }
+
+            return (
+                <a
+                    key={link.name}
+                    href={link.href}
+                    onClick={(e) => handleLinkClick(e, link.href!, link.name)}
+                    className={isMobile ? "text-3xl font-semibold text-gray-300 hover:text-white transition-colors" : "text-gray-300 hover:text-white transition-colors duration-300 cursor-pointer"}
+                >
+                    {link.name}
+                </a>
+            );
+        });
+    };
 
 
     return (
@@ -66,16 +201,7 @@ const Header: React.FC = () => {
                         </span>
                     </a>
                     <nav className="hidden md:flex items-center space-x-10">
-                        {NAV_LINKS.map((link) => (
-                            <a 
-                                key={link.name} 
-                                href={link.href} 
-                                onClick={(e) => handleLinkClick(e, link.href)}
-                                className="text-gray-300 hover:text-white transition-colors duration-300"
-                            >
-                                {link.name}
-                            </a>
-                        ))}
+                        {renderNavLinks()}
                     </nav>
                     <div className="flex items-center gap-4">
                         <button onClick={openCart} className="hidden md:flex relative text-gray-300 hover:text-white transition-colors">
@@ -116,16 +242,7 @@ const Header: React.FC = () => {
                         </button>
                     </div>
                     <nav className="flex flex-col items-center justify-center flex-grow text-center space-y-8">
-                        {NAV_LINKS.map((link) => (
-                            <a 
-                                key={link.name} 
-                                href={link.href} 
-                                onClick={(e) => handleLinkClick(e, link.href)}
-                                className="text-3xl font-semibold text-gray-300 hover:text-white transition-colors"
-                            >
-                                {link.name}
-                            </a>
-                        ))}
+                        {renderNavLinks(true)}
                          <a 
                             href="#" 
                             onClick={(e) => { e.preventDefault(); openCart(); setIsMobileMenuOpen(false);}}

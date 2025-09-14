@@ -2,23 +2,17 @@ import React from 'react';
 import Hero from '../components/Hero';
 import ProductShowcase from '../components/ProductShowcase';
 import Features from '../components/Features';
-import Testimonials from '../components/Testimonials';
-import EmailCapture from '../components/EmailCapture';
-import AskNyxPage from './AskNyxPage';
 
-const HomePage: React.FC = () => {
+interface HomePageProps {
+  navigateTo: (page: string) => void;
+}
+
+const HomePage: React.FC<HomePageProps> = ({ navigateTo }) => {
     return (
         <>
             <Hero />
-            <ProductShowcase />
+            <ProductShowcase navigateTo={navigateTo} />
             <Features />
-            <Testimonials />
-            <div id="ask">
-                <AskNyxPage />
-            </div>
-            <div id="email-capture">
-                <EmailCapture />
-            </div>
         </>
     );
 };
