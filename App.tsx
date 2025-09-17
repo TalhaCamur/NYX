@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -11,6 +12,7 @@ import { Product, User, UserRole } from './types';
 import EmailCapture from './components/EmailCapture';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import TermsAndConditionsPage from './pages/TermsAndConditionsPage';
+import CookieConsentBanner from './components/CookieConsentBanner';
 
 
 // Define shared icons here to avoid creating new files
@@ -1499,6 +1501,24 @@ const App: React.FC = () => {
     const [page, setPage] = useState<{name: string, params: any}>({ name: 'home', params: {} });
     const [isAskNyxOpen, setIsAskNyxOpen] = useState(false);
     const [products, setProducts] = useState<Product[]>(PRODUCTS_DATA);
+    const [showCookieBanner, setShowCookieBanner] = useState(false);
+
+    useEffect(() => {
+        const consent = localStorage.getItem('nyx-cookie-consent');
+        if (!consent) {
+            setShowCookieBanner(true);
+        }
+    }, []);
+
+    const handleAcceptCookies = () => {
+        localStorage.setItem('nyx-cookie-consent', 'accepted');
+        setShowCookieBanner(false);
+    };
+
+    const handleDeclineCookies = () => {
+        localStorage.setItem('nyx-cookie-consent', 'declined');
+        setShowCookieBanner(false);
+    };
 
     const navigateTo = (pageName: string, params: any = {}) => {
         setPage({ name: pageName, params });
@@ -1566,6 +1586,12 @@ const App: React.FC = () => {
                     <Footer navigateTo={navigateTo} />
                     <CartSidebar navigateTo={navigateTo} />
                     <AskNyx isOpen={isAskNyxOpen} onClose={() => setIsAskNyxOpen(false)} />
+                    {showCookieBanner && (
+                        <CookieConsentBanner
+                            onAccept={handleAcceptCookies}
+                            onDecline={handleDeclineCookies}
+                        />
+                    )}
                 </div>
             </CartProvider>
         </AuthProvider>
