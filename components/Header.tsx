@@ -1,10 +1,12 @@
 
+
 import React, { useState, useEffect } from 'react';
 import { NAV_LINKS } from '../constants';
 import { useCart } from '../contexts/CartContext';
 import ShoppingCartIcon from './icons/ShoppingCartIcon';
 import CloseIcon from './icons/CloseIcon';
 import ChevronDownIcon from './icons/ChevronDownIcon';
+import { useAuth } from '../contexts/AuthContext';
 
 interface HeaderProps {
     onAskNyxOpen: () => void;
@@ -17,11 +19,12 @@ const Header: React.FC<HeaderProps> = ({ onAskNyxOpen, navigateTo }) => {
     const [openDropdown, setOpenDropdown] = useState<string | null>(null);
     const [openMobileSubmenu, setOpenMobileSubmenu] = useState<string | null>(null);
     const { openCart, getCartTotalQuantity } = useCart();
+    const { user, logout } = useAuth();
     const totalQuantity = getCartTotalQuantity();
 
     useEffect(() => {
         const handleScroll = () => {
-            setIsScrolled(window.scrollY > window.innerHeight * 0.3);
+            setIsScrolled(window.scrollY > 50);
         };
         window.addEventListener('scroll', handleScroll);
         return () => {
@@ -40,54 +43,41 @@ const Header: React.FC<HeaderProps> = ({ onAskNyxOpen, navigateTo }) => {
         }
     }, [isMobileMenuOpen]);
 
-    const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string, name: string) => {
+    const handleLinkClick = (e: React.MouseEvent, href: string, name: string) => {
         e.preventDefault();
         setIsMobileMenuOpen(false);
+        setOpenDropdown(null);
         
         if (name === 'Ask NYX') {
             onAskNyxOpen();
             return;
         }
 
-        switch (href) {
-            case '/':
-                navigateTo('home');
-                break;
-            case '/products':
-                navigateTo('products');
-                break;
-            case '/how-it-works':
-                navigateTo('how-it-works');
-                break;
-            case '/setup-videos':
-                navigateTo('setup-videos');
-                break;
-            case '/faq':
-                navigateTo('faq');
-                break;
-            case '/contact':
-                navigateTo('contact');
-                break;
-            case '/our-story':
-                navigateTo('our-story');
-                break;
-            case '/why-us':
-                navigateTo('why-us');
-                break;
-            case '#':
-                console.log(`Navigate to ${name}`);
-                break;
-            default:
-                if (href.startsWith('#')) {
-                    navigateTo('home');
-                    setTimeout(() => {
-                        const targetElement = document.querySelector(href);
-                        if (targetElement) {
-                            targetElement.scrollIntoView({ behavior: 'smooth' });
-                        }
-                    }, 100);
+        const pageMapping: { [key: string]: string } = {
+            '/': 'home',
+            '/products': 'products',
+            '/how-it-works': 'how-it-works',
+            '/setup-videos': 'setup-videos',
+            '/faq': 'faq',
+            '/contact': 'contact',
+            '/our-story': 'our-story',
+            '/why-us': 'why-us',
+            '/add-product': 'add-product',
+            '/admin-dashboard': 'admin-dashboard',
+            '/login': 'login',
+        };
+
+        const page = pageMapping[href];
+        if (page) {
+            navigateTo(page);
+        } else if (href.startsWith('#')) {
+            navigateTo('home');
+            setTimeout(() => {
+                const targetElement = document.querySelector(href);
+                if (targetElement) {
+                    targetElement.scrollIntoView({ behavior: 'smooth' });
                 }
-                break;
+            }, 100);
         }
     };
 
@@ -96,8 +86,15 @@ const Header: React.FC<HeaderProps> = ({ onAskNyxOpen, navigateTo }) => {
         setIsMobileMenuOpen(false);
         navigateTo('home');
     }
+    
+    const handleLogout = async () => {
+        await logout();
+        navigateTo('home');
+    }
 
     const renderNavLinks = (isMobile: boolean = false) => {
+        const baseLinkClass = isMobile ? "text-3xl font-semibold text-gray-300 hover:text-white transition-colors" : "text-gray-300 hover:text-white transition-colors duration-300 cursor-pointer";
+
         return NAV_LINKS.map((link) => {
             if (link.sublinks) {
                 if (isMobile) {
@@ -139,7 +136,7 @@ const Header: React.FC<HeaderProps> = ({ onAskNyxOpen, navigateTo }) => {
                             <ChevronDownIcon className={`w-4 h-4 transition-transform ${openDropdown === link.name ? 'rotate-180' : ''}`} />
                         </button>
                         {openDropdown === link.name && (
-                            <div className="absolute top-full left-0 pt-2 z-10">
+                            <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2 z-10">
                                 <div className="w-48 bg-dark-accent rounded-lg border border-white/10 shadow-lg py-2">
                                     {link.sublinks.map(sublink => (
                                         <a
@@ -179,13 +176,74 @@ const Header: React.FC<HeaderProps> = ({ onAskNyxOpen, navigateTo }) => {
                     key={link.name}
                     href={link.href}
                     onClick={(e) => handleLinkClick(e, link.href!, link.name)}
-                    className={isMobile ? "text-3xl font-semibold text-gray-300 hover:text-white transition-colors" : "text-gray-300 hover:text-white transition-colors duration-300 cursor-pointer"}
+                    className={baseLinkClass}
                 >
                     {link.name}
                 </a>
             );
         });
     };
+
+    const renderAuthSection = (isMobile: boolean = false) => {
+        if (user) {
+             const baseLinkClass = "block px-4 py-2 text-sm text-gray-300 hover:bg-dark hover:text-white text-left w-full";
+            return (
+                <div 
+                    className="relative"
+                    onMouseEnter={() => setOpenDropdown('user-menu')}
+                    onMouseLeave={() => setOpenDropdown(null)}
+                >
+                    <button className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors duration-300 cursor-pointer">
+                        <span className="font-semibold">{user.name}</span>
+                        <ChevronDownIcon className={`w-4 h-4 transition-transform ${openDropdown === 'user-menu' ? 'rotate-180' : ''}`} />
+                    </button>
+                     {openDropdown === 'user-menu' && (
+                        <div className="absolute top-full right-0 pt-2 z-10">
+                            <div className="w-48 bg-dark-accent rounded-lg border border-white/10 shadow-lg py-2">
+                                <p className="px-4 py-2 text-xs text-gray-500 uppercase tracking-wider">Account</p>
+                                {(user.roles.includes('seller') || user.roles.includes('admin')) && (
+                                     <button onClick={(e) => handleLinkClick(e, '/add-product', 'Add Product')} className={baseLinkClass}>Add Product</button>
+                                )}
+                                {user.roles.includes('admin') && (
+                                     <button onClick={(e) => handleLinkClick(e, '/admin-dashboard', 'Admin Panel')} className={baseLinkClass}>Admin Panel</button>
+                                )}
+                                <div className="border-t border-white/10 my-2"></div>
+                                <button onClick={handleLogout} className={baseLinkClass}>Logout</button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+        return (
+            <button
+                onClick={(e) => handleLinkClick(e, '/login', 'Login')}
+                className="bg-brand-purple text-white font-semibold py-2 px-5 rounded-full hover:bg-brand-purple/80 transition-all duration-300 transform hover:scale-105"
+            >
+                Login
+            </button>
+        );
+    }
+    
+    const renderMobileAuthSection = () => {
+         const baseLinkClass = "text-3xl font-semibold text-gray-300 hover:text-white transition-colors";
+        if (user) {
+            return (
+                <>
+                    {(user.roles.includes('seller') || user.roles.includes('admin')) && (
+                         <a href="#" onClick={(e) => handleLinkClick(e, '/add-product', 'Add Product')} className={baseLinkClass}>Add Product</a>
+                    )}
+                     {user.roles.includes('admin') && (
+                         <a href="#" onClick={(e) => handleLinkClick(e, '/admin-dashboard', 'Admin Panel')} className={baseLinkClass}>Admin Panel</a>
+                    )}
+                    <button onClick={handleLogout} className={`${baseLinkClass} text-red-500`}>Logout</button>
+                </>
+            )
+        }
+        return (
+             <a href="#" onClick={(e) => handleLinkClick(e, '/login', 'Login')} className={baseLinkClass}>Login</a>
+        )
+    }
 
 
     return (
@@ -200,11 +258,14 @@ const Header: React.FC<HeaderProps> = ({ onAskNyxOpen, navigateTo }) => {
                             NYX
                         </span>
                     </a>
-                    <nav className="hidden md:flex items-center space-x-10">
+                    <nav className="hidden md:flex items-center space-x-8">
                         {renderNavLinks()}
                     </nav>
-                    <div className="flex items-center gap-4">
-                        <button onClick={openCart} className="hidden md:flex relative text-gray-300 hover:text-white transition-colors">
+                    <div className="flex items-center gap-6">
+                        <div className="hidden md:flex">
+                             {renderAuthSection()}
+                        </div>
+                        <button onClick={openCart} className="relative text-gray-300 hover:text-white transition-colors">
                             <ShoppingCartIcon className="w-6 h-6" />
                             {totalQuantity > 0 && (
                                 <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-brand-pink text-xs font-bold text-white">
@@ -243,6 +304,8 @@ const Header: React.FC<HeaderProps> = ({ onAskNyxOpen, navigateTo }) => {
                     </div>
                     <nav className="flex flex-col items-center justify-center flex-grow text-center space-y-8">
                         {renderNavLinks(true)}
+                        <div className="border-t border-white/10 w-1/2 my-4"></div>
+                        {renderMobileAuthSection()}
                          <a 
                             href="#" 
                             onClick={(e) => { e.preventDefault(); openCart(); setIsMobileMenuOpen(false);}}

@@ -1,4 +1,5 @@
 
+
 export interface Product {
   name: string;
   tagline: string;
@@ -24,4 +25,13 @@ export interface Feature {
 export interface FAQItem {
   question: string;
   answer: string;
+}
+
+export type UserRole = 'user' | 'seller' | 'admin' | 'super-admin' | 'Web Developer' | 'UI/UX Designer' | 'Content Writer';
+
+export interface User {
+    id: string;
+    name: string;
+    email: string;
+    roles: UserRole[];
 }

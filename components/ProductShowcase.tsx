@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { PRODUCTS_DATA } from '../constants';
 import { useCart } from '../contexts/CartContext';
@@ -28,8 +29,8 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
             <div className="p-6 flex flex-col flex-grow">
                 <h3 className="text-xl font-bold text-white mb-2">{product.name}</h3>
                 <p className="text-gray-400 text-sm flex-grow mb-4">{product.tagline}</p>
-                <div className="flex justify-between items-center mt-auto">
-                    <div>
+                 <div className="mt-auto pt-4 space-y-4">
+                    <div className="flex items-baseline">
                         <span className="text-2xl font-bold text-white">${product.price.toFixed(2)}</span>
                         {product.originalPrice && (
                             <span className="text-sm text-gray-500 line-through ml-2">${product.originalPrice.toFixed(2)}</span>
@@ -38,7 +39,7 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
                     <button
                         onClick={handleAddToCart}
                         disabled={isAdded}
-                        className={`font-semibold py-2 px-5 rounded-full transition-all duration-300 transform group-hover:scale-105 text-sm ${
+                        className={`w-full font-semibold py-3 px-5 rounded-full transition-all duration-300 transform group-hover:scale-105 text-sm ${
                             isAdded 
                                 ? 'bg-green-500 text-white cursor-default' 
                                 : 'bg-brand-purple text-white hover:bg-brand-purple/80'
@@ -54,9 +55,10 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
 
 interface ProductsSectionProps {
   navigateTo: (page: string) => void;
+  products: Product[];
 }
 
-const ProductsSection: React.FC<ProductsSectionProps> = ({ navigateTo }) => {
+const ProductsSection: React.FC<ProductsSectionProps> = ({ navigateTo, products }) => {
     return (
         <section id="products" className="py-20 md:py-32 bg-dark">
             <div className="container mx-auto px-4">
@@ -77,7 +79,7 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({ navigateTo }) => {
                     </a>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    {PRODUCTS_DATA.map((product) => (
+                    {products.slice(0, 4).map((product) => (
                         <ProductCard key={product.name} product={product} />
                     ))}
                 </div>
