@@ -1,11 +1,4 @@
-
-
-
-
-
-
-
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import HomePage from './pages/HomePage';
@@ -17,6 +10,7 @@ import { useCart } from './contexts/CartContext';
 import { Product, User, UserRole } from './types';
 import EmailCapture from './components/EmailCapture';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import TermsAndConditionsPage from './pages/TermsAndConditionsPage';
 
 
 // Define shared icons here to avoid creating new files
@@ -63,9 +57,11 @@ const PhoneIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
 
 
 // Define the Products Page components here to avoid creating new files
-const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
+const ProductCard: React.FC<{ product: Product; navigateTo: (page: string, params?: any) => void }> = ({ product, navigateTo }) => {
+    const { user } = useAuth();
     const { addToCart, openCart } = useCart();
     const [isAdded, setIsAdded] = useState(false);
+    const isAuthorized = user && (user.roles.includes('seller') || user.roles.includes('admin'));
 
     const handleAddToCart = () => {
         addToCart(product, 1);
@@ -75,7 +71,12 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
     };
 
     return (
-        <div className="bg-dark-accent rounded-2xl border border-white/10 overflow-hidden flex flex-col group">
+        <div className="bg-dark-accent rounded-2xl border border-white/10 overflow-hidden flex flex-col group relative">
+             {!product.isVisible && isAuthorized && (
+                <div className="absolute top-3 right-3 bg-yellow-500 text-black text-xs font-bold px-2 py-1 rounded-full z-10">
+                    Hidden
+                </div>
+            )}
             <div className="aspect-square overflow-hidden">
                 <img 
                     src={product.images[0]} 
@@ -86,11 +87,11 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
             <div className="p-6 flex flex-col flex-grow">
                 <h3 className="text-xl font-bold text-white mb-2">{product.name}</h3>
                 <p className="text-gray-400 text-sm flex-grow mb-4">{product.tagline}</p>
-                 <div className="mt-auto pt-4 space-y-4">
+                 <div className="mt-auto pt-4 space-y-2">
                     <div className="flex items-baseline">
-                        <span className="text-2xl font-bold text-white">${product.price.toFixed(2)}</span>
+                        <span className="text-2xl font-bold text-white">€{product.price.toFixed(2)}</span>
                         {product.originalPrice && (
-                            <span className="text-sm text-gray-500 line-through ml-2">${product.originalPrice.toFixed(2)}</span>
+                            <span className="text-sm text-gray-500 line-through ml-2">€{product.originalPrice.toFixed(2)}</span>
                         )}
                     </div>
                     <button
@@ -104,6 +105,14 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
                     >
                         {isAdded ? 'Added' : 'Add to Cart'}
                     </button>
+                     {isAuthorized && (
+                        <button
+                            onClick={() => navigateTo('edit-product', { id: product.id })}
+                            className="w-full text-center font-semibold py-3 px-5 rounded-full transition-all duration-300 text-sm bg-gray-700 text-white hover:bg-gray-600"
+                        >
+                            Edit Product
+                        </button>
+                    )}
                 </div>
             </div>
         </div>
@@ -111,25 +120,40 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
 };
 
 const ProductsPage: React.FC<{ navigateTo: (page: string) => void, products: Product[] }> = ({ navigateTo, products }) => {
+    const { user } = useAuth();
+    const isAuthorized = user && (user.roles.includes('seller') || user.roles.includes('admin'));
+
+    const visibleProducts = isAuthorized ? products : products.filter(p => p.isVisible);
+
     return (
         <div className="bg-dark pt-24 animate-fade-in">
             <div className="container mx-auto px-4 py-12 md:py-20">
-                <div className="mb-12">
-                    <button 
-                        onClick={() => navigateTo('home')}
-                        className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-8 group"
-                    >
-                        <ArrowLeftIcon className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
-                        Back to Home
-                    </button>
-                    <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-white mb-4">Our Entire Collection</h1>
-                    <p className="text-gray-300 text-lg md:text-xl max-w-3xl">
-                        Explore every piece of the NYX ecosystem. Each device is crafted to enhance your daily life with seamless intelligence and elegant design.
-                    </p>
+                <div className="flex flex-col md:flex-row justify-between md:items-start mb-12 gap-4">
+                    <div>
+                        <button 
+                            onClick={() => navigateTo('home')}
+                            className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-8 group"
+                        >
+                            <ArrowLeftIcon className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
+                            Back to Home
+                        </button>
+                        <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-white mb-4">Our Entire Collection</h1>
+                        <p className="text-gray-300 text-lg md:text-xl max-w-3xl">
+                            Explore every piece of the NYX ecosystem. Each device is crafted to enhance your daily life with seamless intelligence and elegant design.
+                        </p>
+                    </div>
+                    {isAuthorized && (
+                        <button
+                            onClick={() => navigateTo('add-product')}
+                            className="bg-brand-purple text-white font-bold py-3 px-8 rounded-full hover:bg-brand-purple/80 transition-all duration-300 transform hover:scale-105 flex-shrink-0"
+                        >
+                            Add New Product
+                        </button>
+                    )}
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                    {products.map((product) => (
-                        <ProductCard key={product.name} product={product} />
+                    {visibleProducts.map((product) => (
+                        <ProductCard key={product.id} product={product} navigateTo={navigateTo} />
                     ))}
                 </div>
             </div>
@@ -155,7 +179,7 @@ const StepIcon2: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
 );
 const StepIcon3: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-        <path d="M12 2.69l.34.26a1.5 1.5 0 0 0 1.32 0l.34-.26L15.22 2l.34.26a1.5 1.5 0 0 0 1.32 0l.34-.26L18.44 2l.34.26a1.5 1.5 0 0 0 1.32 0l.34-.26L21.66 2l-.34.26a1.5 1.5 0 0 0 0 2.68l.34.26-.34.26a1.5 1.5 0 0 0 0 2.68l.34.26-.34.26a1.5 1.5 0 0 0 0 2.68l.34.26L20.44 14l-.34.26a1.5 1.5 0 0 0 0 2.68l.34.26-.34.26a1.5 1.5 0 0 0 0 2.68l.34.26L18.44 20l-.34.26a1.5 1.5 0 0 0-1.32 0l-.34-.26L15.22 22l-.34-.26a1.5 1.5 0 0 0-1.32 0l-.34.26-1.22-1.22-.34.26a1.5 1.5 0 0 0-1.32 0l-.34-.26L8.78 22l-.34-.26a1.5 1.5 0 0 0-1.32 0l-.34.26L5.56 22l-.34-.26a1.5 1.5 0 0 0-1.32 0l-.34.26L2.34 20l.34-.26a1.5 1.5 0 0 0 0-2.68l-.34-.26.34-.26a1.5 1.5 0 0 0 0-2.68l-.34-.26.34-.26a1.5 1.5 0 0 0 0-2.68l-.34-.26L3.56 8l.34-.26a1.5 1.5 0 0 0 0-2.68L3.56 5l.34-.26a1.5 1.5 0 0 0 1.32 0l.34.26L6.78 2l.34.26a1.5 1.5 0 0 0 1.32 0l.34.26L9.66 2l.34.26a1.5 1.5 0 0 0 1.32 0l.34-.26Z"/><path d="M12 8v8"/>
+        <path d="M12 2.69l.34.26a1.5 1.5 0 0 0 1.32 0l.34-.26L15.22 2l.34.26a1.5 1.5 0 0 0 1.32 0l.34-.26L18.44 2l.34.26a1.5 1.5 0 0 0 1.32 0l.34-.26L21.66 2l-.34.26a1.5 1.5 0 0 0 0 2.68l.34.26-.34.26a1.5 1.5 0 0 0 0 2.68l.34.26-.34.26a1.5 1.5 0 0 0 0 2.68l.34.26L20.44 14l-.34.26a1.5 1.5 0 0 0 0 2.68l.34.26-.34.26a1.5 1.5 0 0 0 0 2.68l.34.26L18.44 20l-.34.26a1.5 1.5 0 0 0-1.32 0l-.34-.26L15.22 22l-.34-.26a1.5 1.5 0 0 0-1.32 0l-.34.26-1.22-1.22-.34.26a1.5 1.5 0 0 0-1.32 0l-.34-.26L8.78 22l-.34-.26a1.5 1.5 0 0 0-1.32 0l-.34.26L5.56 22l-.34-.26a1.5 1.5 0 0 0-1.32 0l-.34.26L2.34 20l.34-.26a1.5 1.5 0 0 0 0-2.68l-.34-.26.34-.26a1.5 1.5 0 0 0 0 2.68l-.34-.26.34-.26a1.5 1.5 0 0 0 0 2.68l-.34-.26L3.56 8l.34-.26a1.5 1.5 0 0 0 0-2.68L3.56 5l.34-.26a1.5 1.5 0 0 0 1.32 0l.34.26L6.78 2l.34.26a1.5 1.5 0 0 0 1.32 0l.34.26L9.66 2l.34.26a1.5 1.5 0 0 0 1.32 0l.34-.26Z"/><path d="M12 8v8"/>
         <path d="M8.5 14h7"/><path d="M8.5 10h7"/>
     </svg>
 );
@@ -505,8 +529,15 @@ const AuthForm: React.FC<{
     navigateTo: (page: string) => void;
 }> = ({ isLogin, navigateTo }) => {
     const { login, signup } = useAuth();
-    const [name, setName] = useState('');
+    // Signup states
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [nickname, setNickname] = useState('');
     const [email, setEmail] = useState('');
+    const [agreedToTerms, setAgreedToTerms] = useState(false);
+    // Login state
+    const [identifier, setIdentifier] = useState('');
+    // Common states
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -517,9 +548,9 @@ const AuthForm: React.FC<{
         setIsLoading(true);
         try {
             if (isLogin) {
-                await login(email, password);
+                await login(identifier, password);
             } else {
-                await signup(name, email, password);
+                await signup(firstName, lastName, nickname, email, password);
             }
             navigateTo('home');
         } catch (err: any) {
@@ -537,22 +568,57 @@ const AuthForm: React.FC<{
                     <p className="text-center text-gray-400 mb-8">{isLogin ? 'Sign in to continue' : 'Join the future of smart living'}</p>
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {!isLogin && (
-                            <div>
-                                <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
-                                <input type="text" id="name" value={name} onChange={e => setName(e.target.value)} required className="w-full bg-dark border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
+                            <>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label htmlFor="firstName" className="block text-sm font-medium text-gray-300 mb-2">First Name</label>
+                                        <input type="text" id="firstName" value={firstName} onChange={e => setFirstName(e.target.value)} required className="w-full bg-dark border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="lastName" className="block text-sm font-medium text-gray-300 mb-2">Surname</label>
+                                        <input type="text" id="lastName" value={lastName} onChange={e => setLastName(e.target.value)} required className="w-full bg-dark border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label htmlFor="nickname" className="block text-sm font-medium text-gray-300 mb-2">Nickname</label>
+                                    <input type="text" id="nickname" value={nickname} onChange={e => setNickname(e.target.value)} required className="w-full bg-dark border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
+                                </div>
+                                <div>
+                                    <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
+                                    <input type="email" id="email" value={email} onChange={e => setEmail(e.target.value)} required className="w-full bg-dark border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
+                                </div>
+                            </>
+                        )}
+                        {isLogin && (
+                             <div>
+                                <label htmlFor="identifier" className="block text-sm font-medium text-gray-300 mb-2">Nickname or Email</label>
+                                <input type="text" id="identifier" value={identifier} onChange={e => setIdentifier(e.target.value)} required className="w-full bg-dark border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
                             </div>
                         )}
-                        <div>
-                            <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
-                            <input type="email" id="email" value={email} onChange={e => setEmail(e.target.value)} required className="w-full bg-dark border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
-                        </div>
                         <div>
                             <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">Password</label>
                             <input type="password" id="password" value={password} onChange={e => setPassword(e.target.value)} required className="w-full bg-dark border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
                         </div>
+                        {!isLogin && (
+                            <div className="flex items-start gap-3">
+                                <input
+                                    type="checkbox"
+                                    id="terms-signup"
+                                    checked={agreedToTerms}
+                                    onChange={(e) => setAgreedToTerms(e.target.checked)}
+                                    className="mt-1 h-4 w-4 rounded border-gray-600 bg-dark text-brand-purple focus:ring-brand-purple focus:ring-offset-dark"
+                                />
+                                <label htmlFor="terms-signup" className="text-sm text-gray-400">
+                                    I have read and agree to the{' '}
+                                    <button type="button" onClick={() => navigateTo('terms-conditions')} className="font-semibold text-brand-purple hover:underline focus:outline-none">
+                                        Terms of Use
+                                    </button>.
+                                </label>
+                            </div>
+                        )}
                         {error && <p className="text-red-500 text-sm">{error}</p>}
                         <div>
-                            <button type="submit" disabled={isLoading} className="w-full bg-brand-purple text-white font-bold py-3 px-8 rounded-full hover:bg-brand-purple/80 transition-all duration-300 transform hover:scale-105 disabled:opacity-50">
+                            <button type="submit" disabled={isLoading || (!isLogin && !agreedToTerms)} className="w-full bg-brand-purple text-white font-bold py-3 px-8 rounded-full hover:bg-brand-purple/80 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed">
                                 {isLoading ? 'Processing...' : (isLogin ? 'Login' : 'Sign Up')}
                             </button>
                         </div>
@@ -570,7 +636,7 @@ const AuthForm: React.FC<{
 };
 
 const AddProductPage: React.FC<{ navigateTo: (page: string) => void, addProduct: (product: Product) => void }> = ({ navigateTo, addProduct }) => {
-    const [product, setProduct] = useState<Omit<Product, 'specs'>>({
+    const [product, setProduct] = useState<Omit<Product, 'specs' | 'id' | 'isVisible'>>({
         name: '',
         tagline: '',
         price: 0,
@@ -604,6 +670,8 @@ const AddProductPage: React.FC<{ navigateTo: (page: string) => void, addProduct:
             return;
         }
         const newProduct: Product = {
+            id: `prod-${Date.now()}`,
+            isVisible: true,
             ...product,
             images: product.images,
             specs: [ // Add dummy specs for now
@@ -665,6 +733,182 @@ const AddProductPage: React.FC<{ navigateTo: (page: string) => void, addProduct:
         </div>
     );
 };
+
+const EditProductPage: React.FC<{
+    navigateTo: (page: string, params?: any) => void,
+    products: Product[],
+    updateProduct: (product: Product) => void,
+    deleteProduct: (productId: string) => void,
+    productId: string
+}> = ({ navigateTo, products, updateProduct, deleteProduct, productId }) => {
+    const productToEdit = products.find(p => p.id === productId);
+    const [product, setProduct] = useState<Product | null>(productToEdit || null);
+    const [imagePreview, setImagePreview] = useState<string | null>(productToEdit?.images[0] || null);
+    const [isDiscounted, setIsDiscounted] = useState<boolean>(!!productToEdit?.originalPrice);
+
+    useEffect(() => {
+        const productToEdit = products.find(p => p.id === productId);
+        if (!productToEdit) {
+            alert("Product not found.");
+            navigateTo('products');
+        } else {
+            setProduct(productToEdit);
+            setIsDiscounted(!!productToEdit.originalPrice);
+            setImagePreview(productToEdit.images[0] || null);
+        }
+    }, [productId, products, navigateTo]);
+
+    if (!product) return null;
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value, type } = e.target;
+        const parsedValue = type === 'number' ? (parseFloat(value) || 0) : value;
+        setProduct(prev => prev ? { ...prev, [name]: parsedValue } : null);
+    };
+
+    const handleDiscountToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const isEnabled = e.target.checked;
+        setIsDiscounted(isEnabled);
+
+        setProduct(prev => {
+            if (!prev) return null;
+            if (isEnabled) {
+                // When enabling discount, set originalPrice to current price if it's not already set
+                return { ...prev, originalPrice: prev.originalPrice || prev.price };
+            } else {
+                // When disabling discount, restore original price and clear originalPrice field
+                return { ...prev, price: prev.originalPrice || prev.price, originalPrice: undefined };
+            }
+        });
+    };
+
+    const handleVisibilityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { checked } = e.target;
+        setProduct(prev => prev ? { ...prev, isVisible: checked } : null);
+    };
+
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                const result = reader.result as string;
+                setImagePreview(result);
+                setProduct(prev => prev ? { ...prev, images: [result] } : null);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (product) {
+            if (isDiscounted && product.originalPrice && product.price >= product.originalPrice) {
+                alert('Discounted price must be lower than the original price.');
+                return;
+            }
+            updateProduct(product);
+            alert('Product updated successfully!');
+            navigateTo('products');
+        }
+    };
+
+    const handleDelete = () => {
+        if (window.confirm(`Are you sure you want to delete "${product.name}"? This action cannot be undone.`)) {
+            deleteProduct(product.id);
+            alert('Product deleted successfully.');
+            navigateTo('products');
+        }
+    };
+
+    return (
+        <div className="bg-dark pt-24 animate-fade-in">
+            <div className="container mx-auto px-4 py-12 md:py-20">
+                <div className="max-w-2xl mx-auto">
+                    <button onClick={() => navigateTo('products')} className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-8 group">
+                        <ArrowLeftIcon className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
+                        Back to Products
+                    </button>
+                    <h1 className="text-4xl font-bold text-white mb-8">Edit Product</h1>
+                    <form onSubmit={handleSubmit} className="space-y-6 bg-dark-accent p-8 rounded-2xl border border-white/10">
+                        <div>
+                            <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">Product Name</label>
+                            <input type="text" name="name" id="name" value={product.name} onChange={handleChange} required className="w-full bg-dark border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
+                        </div>
+                        <div>
+                            <label htmlFor="tagline" className="block text-sm font-medium text-gray-300 mb-2">Tagline</label>
+                            <input type="text" name="tagline" id="tagline" value={product.tagline} onChange={handleChange} required className="w-full bg-dark border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
+                        </div>
+
+                        <div className="flex items-center justify-between bg-dark p-4 rounded-lg border border-gray-700">
+                            <div>
+                                <label htmlFor="isDiscounted" className="text-sm font-medium text-gray-300">Apply Discount</label>
+                                <p className="text-xs text-gray-500">Show a discounted price next to the original price.</p>
+                            </div>
+                            <label htmlFor="isDiscounted" className="inline-flex relative items-center cursor-pointer">
+                                <input type="checkbox" checked={isDiscounted} onChange={handleDiscountToggle} id="isDiscounted" className="sr-only peer" />
+                                <div className="w-11 h-6 bg-gray-600 rounded-full peer peer-focus:ring-2 peer-focus:ring-brand-purple peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-purple"></div>
+                            </label>
+                        </div>
+
+                        {isDiscounted ? (
+                            <div className="grid grid-cols-2 gap-6">
+                                <div>
+                                    <label htmlFor="originalPrice" className="block text-sm font-medium text-gray-300 mb-2">Original Price</label>
+                                    <input type="number" name="originalPrice" id="originalPrice" value={product.originalPrice || ''} onChange={handleChange} required min="0" step="0.01" className="w-full bg-dark border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
+                                </div>
+                                <div>
+                                    <label htmlFor="price" className="block text-sm font-medium text-gray-300 mb-2">Discounted Price</label>
+                                    <input type="number" name="price" id="price" value={product.price > 0 ? product.price : ''} onChange={handleChange} required min="0" step="0.01" className="w-full bg-dark border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
+                                </div>
+                            </div>
+                        ) : (
+                            <div>
+                                <label htmlFor="price" className="block text-sm font-medium text-gray-300 mb-2">Price</label>
+                                <input type="number" name="price" id="price" value={product.price > 0 ? product.price : ''} onChange={handleChange} required min="0" step="0.01" className="w-full bg-dark border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
+                            </div>
+                        )}
+
+                        <div>
+                            <label htmlFor="stock" className="block text-sm font-medium text-gray-300 mb-2">Stock</label>
+                            <input type="number" name="stock" id="stock" value={product.stock > 0 ? product.stock : ''} onChange={handleChange} required min="0" className="w-full bg-dark border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
+                        </div>
+
+                        <div>
+                            <label htmlFor="image" className="block text-sm font-medium text-gray-300 mb-2">Product Image</label>
+                            <input type="file" name="image" id="image" accept="image/*" onChange={handleImageChange} className="w-full bg-dark border border-gray-600 rounded-lg p-3 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-brand-purple file:text-white hover:file:bg-brand-purple/80 cursor-pointer" />
+                        </div>
+                        {imagePreview && (
+                            <div className="mt-4">
+                                <p className="text-sm font-medium text-gray-300 mb-2">Image Preview:</p>
+                                <img src={imagePreview} alt="Product Preview" className="w-32 h-32 object-cover rounded-lg border border-gray-600" />
+                            </div>
+                        )}
+                        <div className="flex items-center justify-between bg-dark p-4 rounded-lg border border-gray-700">
+                            <div>
+                                <label htmlFor="isVisible" className="text-sm font-medium text-gray-300">Product Visibility</label>
+                                <p className="text-xs text-gray-500">When hidden, product will not be visible to customers.</p>
+                            </div>
+                            <label htmlFor="isVisible" className="inline-flex relative items-center cursor-pointer">
+                                <input type="checkbox" checked={product.isVisible} onChange={handleVisibilityChange} id="isVisible" className="sr-only peer" />
+                                <div className="w-11 h-6 bg-gray-600 rounded-full peer peer-focus:ring-2 peer-focus:ring-brand-purple peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-purple"></div>
+                            </label>
+                        </div>
+                        <div className="flex gap-4">
+                            <button type="submit" className="flex-grow bg-brand-purple text-white font-bold py-3 px-8 rounded-full hover:bg-brand-purple/80 transition-all duration-300 transform hover:scale-105">
+                                Save Changes
+                            </button>
+                             <button type="button" onClick={handleDelete} className="bg-red-600 text-white font-bold py-3 px-8 rounded-full hover:bg-red-500 transition-colors duration-300">
+                                Delete
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 
 const AdminDashboard: React.FC<{ navigateTo: (page: string) => void }> = ({ navigateTo }) => {
     const { allUsers, setAllUsers, user: currentUser } = useAuth();
@@ -751,7 +995,10 @@ const AdminDashboard: React.FC<{ navigateTo: (page: string) => void }> = ({ navi
                             <tbody>
                                 {allUsers.map((user) => (
                                     <tr key={user.id} className="border-b border-gray-800 hover:bg-dark">
-                                        <td className="p-4 text-white font-medium">{user.name}</td>
+                                        <td className="p-4 text-white font-medium flex items-center gap-3">
+                                            <img src={user.profilePicture || `https://ui-avatars.com/api/?name=${user.firstName}+${user.lastName}&background=1D1D1D&color=fff`} alt={user.nickname} className="w-10 h-10 rounded-full object-cover"/>
+                                            {`${user.firstName} ${user.lastName}`}
+                                        </td>
                                         <td className="p-4 text-gray-300">{user.email}</td>
                                         <td className="p-4 text-gray-300">
                                             {user.roles.includes('super-admin') ? (
@@ -805,7 +1052,7 @@ const AdminDashboard: React.FC<{ navigateTo: (page: string) => void }> = ({ navi
                                                 onClick={() => handleDeleteUser(user.id)}
                                                 className="text-red-500 hover:text-red-400 disabled:opacity-50 disabled:cursor-not-allowed"
                                                 disabled={user.roles.includes('super-admin') || user.id === currentUser?.id}
-                                                aria-label={`Delete user ${user.name}`}
+                                                aria-label={`Delete user ${user.firstName} ${user.lastName}`}
                                             >
                                                 Delete
                                             </button>
@@ -821,23 +1068,458 @@ const AdminDashboard: React.FC<{ navigateTo: (page: string) => void }> = ({ navi
     );
 };
 
+const ImageCropModal: React.FC<{
+    imageSrc: string | null;
+    isOpen: boolean;
+    onClose: () => void;
+    onSave: (dataUrl: string) => void;
+}> = ({ imageSrc, isOpen, onClose, onSave }) => {
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const imageRef = useRef(new Image());
+    const [scale, setScale] = useState(1);
+    const [minScale, setMinScale] = useState(1);
+    const [position, setPosition] = useState({ x: 0, y: 0 });
+    const [isDragging, setIsDragging] = useState(false);
+    const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+
+    const CROP_DIAMETER = 280;
+    const CANVAS_DIM = 350;
+
+    const draw = useCallback(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+        const image = imageRef.current;
+
+        ctx.clearRect(0, 0, CANVAS_DIM, CANVAS_DIM);
+
+        // Draw the image
+        if (image.src) {
+            ctx.drawImage(
+                image,
+                position.x,
+                position.y,
+                image.width * scale,
+                image.height * scale
+            );
+        }
+
+        // Draw the overlay
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+        ctx.beginPath();
+        ctx.rect(0, 0, CANVAS_DIM, CANVAS_DIM);
+        ctx.arc(CANVAS_DIM / 2, CANVAS_DIM / 2, CROP_DIAMETER / 2, 0, Math.PI * 2, true);
+        ctx.fill();
+
+        // Draw the crop circle border
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(CANVAS_DIM / 2, CANVAS_DIM / 2, CROP_DIAMETER / 2, 0, Math.PI * 2);
+        ctx.stroke();
+
+    }, [position, scale]);
+
+    useEffect(() => {
+        if (imageSrc) {
+            const image = imageRef.current;
+            image.onload = () => {
+                const hRatio = CANVAS_DIM / image.width;
+                const vRatio = CANVAS_DIM / image.height;
+                const initialScale = Math.max(hRatio, vRatio);
+
+                const minFitScale = Math.max(CROP_DIAMETER / image.width, CROP_DIAMETER / image.height);
+                setMinScale(minFitScale);
+                setScale(minFitScale);
+
+                const initialX = (CANVAS_DIM - image.width * minFitScale) / 2;
+                const initialY = (CANVAS_DIM - image.height * minFitScale) / 2;
+                setPosition({ x: initialX, y: initialY });
+            };
+            image.src = imageSrc;
+        }
+    }, [imageSrc]);
+
+    useEffect(() => {
+        draw();
+    }, [draw]);
+    
+    const getClampedPosition = (x: number, y: number, currentScale: number) => {
+        const image = imageRef.current;
+        const cropRadius = CROP_DIAMETER / 2;
+        const centerX = CANVAS_DIM / 2;
+        const centerY = CANVAS_DIM / 2;
+
+        const scaledWidth = image.width * currentScale;
+        const scaledHeight = image.height * currentScale;
+
+        const minX = centerX - scaledWidth + cropRadius;
+        const maxX = centerX - cropRadius;
+        const minY = centerY - scaledHeight + cropRadius;
+        const maxY = centerY - cropRadius;
+
+        return {
+            x: Math.max(minX, Math.min(x, maxX)),
+            y: Math.max(minY, Math.min(y, maxY)),
+        };
+    };
+
+    const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
+        setIsDragging(true);
+        setDragStart({
+            x: e.clientX - position.x,
+            y: e.clientY - position.y,
+        });
+    };
+
+    const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
+        if (isDragging) {
+            const newX = e.clientX - dragStart.x;
+            const newY = e.clientY - dragStart.y;
+            setPosition(getClampedPosition(newX, newY, scale));
+        }
+    };
+    
+    const handleMouseUp = () => {
+        setIsDragging(false);
+    };
+    
+    const handleZoom = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newScale = parseFloat(e.target.value);
+        setScale(newScale);
+        setPosition(pos => getClampedPosition(pos.x, pos.y, newScale));
+    };
+
+    const handleSave = () => {
+        const canvas = canvasRef.current;
+        const image = imageRef.current;
+        if (!canvas || !image.src) return;
+
+        const cropCanvas = document.createElement('canvas');
+        const outputSize = 256; // High-resolution output
+        cropCanvas.width = outputSize;
+        cropCanvas.height = outputSize;
+        const cropCtx = cropCanvas.getContext('2d');
+        if (!cropCtx) return;
+
+        const sourceSize = CROP_DIAMETER / scale;
+        const sourceX = (CANVAS_DIM / 2 - position.x) / scale - (sourceSize / 2);
+        const sourceY = (CANVAS_DIM / 2 - position.y) / scale - (sourceSize / 2);
+
+        // Create a circular clipping path. This ensures the output is circular like the preview.
+        cropCtx.beginPath();
+        cropCtx.arc(outputSize / 2, outputSize / 2, outputSize / 2, 0, Math.PI * 2, true);
+        cropCtx.clip();
+
+        // Draw the cropped portion of the image onto the new canvas.
+        cropCtx.drawImage(
+            image,
+            sourceX, sourceY, sourceSize, sourceSize,
+            0, 0, outputSize, outputSize
+        );
+
+        // Return as PNG to support transparency from the circular clip.
+        onSave(cropCanvas.toDataURL('image/png'));
+    };
+
+
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 bg-black/60 z-[99] backdrop-blur-sm flex items-center justify-center" onClick={onClose}>
+            <div className="bg-dark-accent rounded-2xl border border-white/10 shadow-2xl shadow-brand-purple/20 flex flex-col p-6 w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
+                <h3 className="text-xl font-semibold text-white mb-4 text-center">Edit Profile Picture</h3>
+                <canvas
+                    ref={canvasRef}
+                    width={CANVAS_DIM}
+                    height={CANVAS_DIM}
+                    className="rounded-lg cursor-grab active:cursor-grabbing mx-auto"
+                    onMouseDown={handleMouseDown}
+                    onMouseMove={handleMouseMove}
+                    onMouseUp={handleMouseUp}
+                    onMouseLeave={handleMouseUp}
+                />
+                <div className="my-4">
+                    <label htmlFor="zoom" className="block text-sm font-medium text-gray-300 mb-2">Zoom</label>
+                    <input
+                        type="range"
+                        id="zoom"
+                        min={minScale}
+                        max={minScale * 3}
+                        step="0.01"
+                        value={scale}
+                        onChange={handleZoom}
+                        className="w-full h-2 bg-dark rounded-lg appearance-none cursor-pointer accent-brand-purple"
+                    />
+                </div>
+                <div className="flex gap-4">
+                    <button onClick={onClose} className="w-full bg-gray-700 text-white font-bold py-3 px-8 rounded-full hover:bg-gray-600 transition-colors duration-300">
+                        Cancel
+                    </button>
+                    <button onClick={handleSave} className="w-full bg-brand-purple text-white font-bold py-3 px-8 rounded-full hover:bg-brand-purple/80 transition-colors duration-300">
+                        Save
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const ProfilePage: React.FC<{ navigateTo: (page: string) => void }> = ({ navigateTo }) => {
+    const { user, updateUser, changePassword } = useAuth();
+    
+    // State for profile form
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [nickname, setNickname] = useState('');
+    const [profilePicture, setProfilePicture] = useState<string | undefined>(undefined);
+    const [profileMessage, setProfileMessage] = useState({ type: '', text: '' });
+    const [isSavingProfile, setIsSavingProfile] = useState(false);
+    
+    const [isCropModalOpen, setIsCropModalOpen] = useState(false);
+    const [imageToCrop, setImageToCrop] = useState<string | null>(null);
+
+    // State for password form
+    const [currentPassword, setCurrentPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [passwordMessage, setPasswordMessage] = useState({ type: '', text: '' });
+    const [isChangingPassword, setIsChangingPassword] = useState(false);
+
+    useEffect(() => {
+        if (user) {
+            setFirstName(user.firstName);
+            setLastName(user.lastName);
+            setNickname(user.nickname);
+            setProfilePicture(user.profilePicture);
+        } else {
+            // If user is somehow null, redirect to login
+            navigateTo('login');
+        }
+    }, [user, navigateTo]);
+    
+    const handleProfilePictureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImageToCrop(reader.result as string);
+                setIsCropModalOpen(true);
+            };
+            reader.readAsDataURL(file);
+             e.target.value = ''; // Reset file input
+        }
+    };
+    
+    const handleSaveCroppedImage = async (croppedImageDataUrl: string) => {
+        if (!user) return;
+        setProfilePicture(croppedImageDataUrl);
+        setIsCropModalOpen(false);
+        setImageToCrop(null);
+
+        try {
+            await updateUser(user.id, { profilePicture: croppedImageDataUrl });
+            setProfileMessage({ type: 'success', text: 'Profile picture updated!' });
+        } catch (err: any) {
+            setProfileMessage({ type: 'error', text: err.message });
+            setProfilePicture(user.profilePicture); // Revert on error
+        } finally {
+            setTimeout(() => setProfileMessage({ type: '', text: '' }), 3000);
+        }
+    };
+
+    const handleProfileUpdate = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!user) return;
+        
+        setIsSavingProfile(true);
+        setProfileMessage({ type: '', text: '' });
+
+        try {
+            await updateUser(user.id, { firstName, lastName, nickname });
+            setProfileMessage({ type: 'success', text: 'Profile updated successfully!' });
+        } catch (err: any) {
+            setProfileMessage({ type: 'error', text: err.message });
+        } finally {
+            setIsSavingProfile(false);
+            setTimeout(() => setProfileMessage({ type: '', text: '' }), 3000);
+        }
+    };
+
+    const handlePasswordChange = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!user) return;
+        if (newPassword !== confirmPassword) {
+            setPasswordMessage({ type: 'error', text: 'New passwords do not match.' });
+            return;
+        }
+        if (newPassword.length < 6) {
+            setPasswordMessage({ type: 'error', text: 'Password must be at least 6 characters long.' });
+            return;
+        }
+
+        setIsChangingPassword(true);
+        setPasswordMessage({ type: '', text: '' });
+
+        try {
+            await changePassword(user.id, currentPassword, newPassword);
+            setPasswordMessage({ type: 'success', text: 'Password changed successfully!' });
+            // Clear password fields
+            setCurrentPassword('');
+            setNewPassword('');
+            setConfirmPassword('');
+        } catch (err: any) {
+            setPasswordMessage({ type: 'error', text: err.message });
+        } finally {
+            setIsChangingPassword(false);
+            setTimeout(() => setPasswordMessage({ type: '', text: '' }), 3000);
+        }
+    };
+    
+    if (!user) return null; // Or a loading spinner
+
+    return (
+        <div className="bg-dark pt-24 animate-fade-in min-h-screen">
+             <ImageCropModal 
+                isOpen={isCropModalOpen}
+                imageSrc={imageToCrop}
+                onClose={() => {
+                    setIsCropModalOpen(false);
+                    setImageToCrop(null);
+                }}
+                onSave={handleSaveCroppedImage}
+            />
+            <div className="container mx-auto px-4 py-12 md:py-20">
+                <div className="max-w-4xl mx-auto">
+                    <button onClick={() => navigateTo('home')} className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-8 group">
+                        <ArrowLeftIcon className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
+                        Back to Home
+                    </button>
+                    <h1 className="text-4xl font-bold text-white mb-8">My Profile</h1>
+                    
+                    {/* Profile Picture Section */}
+                    <div className="flex justify-center mb-10">
+                        <div className="relative group">
+                            <img 
+                                src={profilePicture || `https://ui-avatars.com/api/?name=${user.firstName}+${user.lastName}&background=1D1D1D&color=fff`} 
+                                alt="Profile" 
+                                className="w-32 h-32 rounded-full object-cover border-4 border-dark-accent shadow-lg" 
+                            />
+                            <label htmlFor="profilePictureInput" className="absolute inset-0 bg-black/60 rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                                <span>Change</span>
+                            </label>
+                            <input 
+                                type="file" 
+                                id="profilePictureInput" 
+                                className="hidden" 
+                                accept="image/png, image/jpeg, image/gif"
+                                onChange={handleProfilePictureChange}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Profile Details Form */}
+                    <div className="bg-dark-accent p-8 rounded-2xl border border-white/10 mb-12">
+                        <h2 className="text-2xl font-semibold text-white mb-6">Profile Information</h2>
+                        <form onSubmit={handleProfileUpdate} className="space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label htmlFor="prof-firstName" className="block text-sm font-medium text-gray-300 mb-2">First Name</label>
+                                    <input type="text" id="prof-firstName" value={firstName} onChange={e => setFirstName(e.target.value)} required className="w-full bg-dark border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
+                                </div>
+                                <div>
+                                    <label htmlFor="prof-lastName" className="block text-sm font-medium text-gray-300 mb-2">Surname</label>
+                                    <input type="text" id="prof-lastName" value={lastName} onChange={e => setLastName(e.target.value)} required className="w-full bg-dark border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
+                                </div>
+                            </div>
+                            <div>
+                                <label htmlFor="prof-nickname" className="block text-sm font-medium text-gray-300 mb-2">Nickname</label>
+                                <input type="text" id="prof-nickname" value={nickname} onChange={e => setNickname(e.target.value)} required className="w-full bg-dark border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
+                            </div>
+                            <div>
+                                <label htmlFor="prof-email" className="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
+                                <input type="email" id="prof-email" value={user.email} disabled className="w-full bg-dark border border-gray-700 rounded-lg p-3 text-gray-400 cursor-not-allowed" />
+                            </div>
+                            
+                            {profileMessage.text && (
+                                <p className={`text-sm text-center ${profileMessage.type === 'success' ? 'text-green-500' : 'text-red-500'}`}>
+                                    {profileMessage.text}
+                                </p>
+                            )}
+
+                            <div className="flex justify-end">
+                                <button type="submit" disabled={isSavingProfile} className="bg-brand-purple text-white font-bold py-3 px-8 rounded-full hover:bg-brand-purple/80 transition-all duration-300 transform hover:scale-105 disabled:opacity-50">
+                                    {isSavingProfile ? 'Saving...' : 'Save Changes'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    {/* Change Password Form */}
+                    <div className="bg-dark-accent p-8 rounded-2xl border border-white/10">
+                        <h2 className="text-2xl font-semibold text-white mb-6">Change Password</h2>
+                         <form onSubmit={handlePasswordChange} className="space-y-6">
+                            <div>
+                                <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-300 mb-2">Current Password</label>
+                                <input type="password" id="currentPassword" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} required className="w-full bg-dark border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label htmlFor="newPassword" className="block text-sm font-medium text-gray-300 mb-2">New Password</label>
+                                    <input type="password" id="newPassword" value={newPassword} onChange={e => setNewPassword(e.target.value)} required className="w-full bg-dark border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
+                                </div>
+                                <div>
+                                    <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-300 mb-2">Confirm New Password</label>
+                                    <input type="password" id="confirmPassword" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required className="w-full bg-dark border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
+                                </div>
+                            </div>
+
+                             {passwordMessage.text && (
+                                <p className={`text-sm ${passwordMessage.type === 'success' ? 'text-green-500' : 'text-red-500'}`}>
+                                    {passwordMessage.text}
+                                </p>
+                            )}
+
+                             <div className="flex justify-end">
+                                <button type="submit" disabled={isChangingPassword} className="bg-brand-purple text-white font-bold py-3 px-8 rounded-full hover:bg-brand-purple/80 transition-all duration-300 transform hover:scale-105 disabled:opacity-50">
+                                    {isChangingPassword ? 'Updating...' : 'Change Password'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 
 const App: React.FC = () => {
-    const [currentPage, setCurrentPage] = useState('home');
+    const [page, setPage] = useState<{name: string, params: any}>({ name: 'home', params: {} });
     const [isAskNyxOpen, setIsAskNyxOpen] = useState(false);
     const [products, setProducts] = useState<Product[]>(PRODUCTS_DATA);
 
-    const navigateTo = (page: string) => {
-        setCurrentPage(page);
+    const navigateTo = (pageName: string, params: any = {}) => {
+        setPage({ name: pageName, params });
         window.scrollTo(0, 0);
     };
     
     const addProduct = (product: Product) => {
         setProducts(prev => [product, ...prev]);
-    }
+    };
+
+    const updateProduct = (updatedProduct: Product) => {
+        setProducts(prev => prev.map(p => p.id === updatedProduct.id ? updatedProduct : p));
+    };
+
+    const deleteProduct = (productId: string) => {
+        setProducts(prev => prev.filter(p => p.id !== productId));
+    };
+
 
     const renderPage = () => {
-        switch (currentPage) {
+        switch (page.name) {
             case 'home':
                 return <HomePage navigateTo={navigateTo} products={products} />;
             case 'products':
@@ -854,14 +1536,20 @@ const App: React.FC = () => {
                 return <OurStoryPage navigateTo={navigateTo} />;
             case 'why-us':
                 return <WhyUsPage navigateTo={navigateTo} />;
+            case 'terms-conditions':
+                return <TermsAndConditionsPage navigateTo={navigateTo} />;
             case 'login':
                 return <AuthForm isLogin={true} navigateTo={navigateTo} />;
             case 'signup':
                 return <AuthForm isLogin={false} navigateTo={navigateTo} />;
             case 'add-product':
                  return <AddProductPage navigateTo={navigateTo} addProduct={addProduct} />;
+            case 'edit-product':
+                 return <EditProductPage navigateTo={navigateTo} products={products} updateProduct={updateProduct} deleteProduct={deleteProduct} productId={page.params.id} />;
             case 'admin-dashboard':
                 return <AdminDashboard navigateTo={navigateTo} />;
+            case 'profile':
+                return <ProfilePage navigateTo={navigateTo} />;
             default:
                 return <HomePage navigateTo={navigateTo} products={products}/>;
         }
@@ -875,8 +1563,8 @@ const App: React.FC = () => {
                     <main>
                         {renderPage()}
                     </main>
-                    <Footer />
-                    <CartSidebar />
+                    <Footer navigateTo={navigateTo} />
+                    <CartSidebar navigateTo={navigateTo} />
                     <AskNyx isOpen={isAskNyxOpen} onClose={() => setIsAskNyxOpen(false)} />
                 </div>
             </CartProvider>

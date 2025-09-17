@@ -1,14 +1,17 @@
 
+
 import React, { useState } from 'react';
-import { PRODUCTS_DATA } from '../constants';
 import { useCart } from '../contexts/CartContext';
 import { Product } from '../types';
 import ArrowRightIcon from './icons/ArrowRightIcon';
+import { useAuth } from '../contexts/AuthContext';
 
 // Sub-component for individual product cards
-const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
+const ProductCard: React.FC<{ product: Product; navigateTo: (page: string, params?: any) => void }> = ({ product, navigateTo }) => {
+    const { user } = useAuth();
     const { addToCart, openCart } = useCart();
     const [isAdded, setIsAdded] = useState(false);
+    const isAuthorized = user && (user.roles.includes('seller') || user.roles.includes('admin'));
 
     const handleAddToCart = () => {
         addToCart(product, 1);
@@ -18,7 +21,12 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
     };
 
     return (
-        <div className="bg-dark-accent rounded-2xl border border-white/10 overflow-hidden flex flex-col group">
+        <div className="bg-dark-accent rounded-2xl border border-white/10 overflow-hidden flex flex-col group relative">
+             {!product.isVisible && isAuthorized && (
+                <div className="absolute top-3 right-3 bg-yellow-500 text-black text-xs font-bold px-2 py-1 rounded-full z-10">
+                    Hidden
+                </div>
+            )}
             <div className="aspect-square overflow-hidden">
                 <img 
                     src={product.images[0]} 
@@ -29,11 +37,11 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
             <div className="p-6 flex flex-col flex-grow">
                 <h3 className="text-xl font-bold text-white mb-2">{product.name}</h3>
                 <p className="text-gray-400 text-sm flex-grow mb-4">{product.tagline}</p>
-                 <div className="mt-auto pt-4 space-y-4">
+                 <div className="mt-auto pt-4 space-y-2">
                     <div className="flex items-baseline">
-                        <span className="text-2xl font-bold text-white">${product.price.toFixed(2)}</span>
+                        <span className="text-2xl font-bold text-white">€{product.price.toFixed(2)}</span>
                         {product.originalPrice && (
-                            <span className="text-sm text-gray-500 line-through ml-2">${product.originalPrice.toFixed(2)}</span>
+                            <span className="text-sm text-gray-500 line-through ml-2">€{product.originalPrice.toFixed(2)}</span>
                         )}
                     </div>
                     <button
@@ -47,6 +55,14 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
                     >
                         {isAdded ? 'Added' : 'Add to Cart'}
                     </button>
+                    {isAuthorized && (
+                        <button
+                            onClick={() => navigateTo('edit-product', { id: product.id })}
+                            className="w-full text-center font-semibold py-3 px-5 rounded-full transition-all duration-300 text-sm bg-gray-700 text-white hover:bg-gray-600"
+                        >
+                            Edit Product
+                        </button>
+                    )}
                 </div>
             </div>
         </div>
@@ -54,11 +70,16 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
 };
 
 interface ProductsSectionProps {
-  navigateTo: (page: string) => void;
+  navigateTo: (page: string, params?: any) => void;
   products: Product[];
 }
 
 const ProductsSection: React.FC<ProductsSectionProps> = ({ navigateTo, products }) => {
+    const { user } = useAuth();
+    const isAuthorized = user && (user.roles.includes('seller') || user.roles.includes('admin'));
+
+    const displayedProducts = (isAuthorized ? products : products.filter(p => p.isVisible)).slice(0, 4);
+    
     return (
         <section id="products" className="py-20 md:py-32 bg-dark">
             <div className="container mx-auto px-4">
@@ -79,8 +100,8 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({ navigateTo, products 
                     </a>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    {products.slice(0, 4).map((product) => (
-                        <ProductCard key={product.name} product={product} />
+                    {displayedProducts.map((product) => (
+                        <ProductCard key={product.id} product={product} navigateTo={navigateTo} />
                     ))}
                 </div>
             </div>

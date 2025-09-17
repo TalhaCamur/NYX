@@ -1,6 +1,11 @@
 
 
+
+
+
+
 export interface Product {
+  id: string;
   name: string;
   tagline: string;
   price: number;
@@ -8,6 +13,7 @@ export interface Product {
   stock: number;
   images: string[];
   specs: { name: string; value: string }[];
+  isVisible: boolean;
 }
 
 export interface Testimonial {
@@ -31,7 +37,10 @@ export type UserRole = 'user' | 'seller' | 'admin' | 'super-admin' | 'Web Develo
 
 export interface User {
     id: string;
-    name: string;
+    firstName: string;
+    lastName: string;
+    nickname: string;
     email: string;
     roles: UserRole[];
+    profilePicture?: string;
 }

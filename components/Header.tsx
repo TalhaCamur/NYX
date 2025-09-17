@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect } from 'react';
 import { NAV_LINKS } from '../constants';
 import { useCart } from '../contexts/CartContext';
@@ -64,6 +62,7 @@ const Header: React.FC<HeaderProps> = ({ onAskNyxOpen, navigateTo }) => {
             '/why-us': 'why-us',
             '/add-product': 'add-product',
             '/admin-dashboard': 'admin-dashboard',
+            '/profile': 'profile',
             '/login': 'login',
         };
 
@@ -194,13 +193,19 @@ const Header: React.FC<HeaderProps> = ({ onAskNyxOpen, navigateTo }) => {
                     onMouseLeave={() => setOpenDropdown(null)}
                 >
                     <button className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors duration-300 cursor-pointer">
-                        <span className="font-semibold">{user.name}</span>
+                        <img 
+                            src={user.profilePicture || `https://ui-avatars.com/api/?name=${user.firstName}+${user.lastName}`} 
+                            alt={user.nickname} 
+                            className="w-8 h-8 rounded-full object-cover bg-dark-accent"
+                        />
+                        <span className="font-semibold">{user.nickname}</span>
                         <ChevronDownIcon className={`w-4 h-4 transition-transform ${openDropdown === 'user-menu' ? 'rotate-180' : ''}`} />
                     </button>
                      {openDropdown === 'user-menu' && (
                         <div className="absolute top-full right-0 pt-2 z-10">
                             <div className="w-48 bg-dark-accent rounded-lg border border-white/10 shadow-lg py-2">
                                 <p className="px-4 py-2 text-xs text-gray-500 uppercase tracking-wider">Account</p>
+                                <button onClick={(e) => handleLinkClick(e, '/profile', 'Profile')} className={baseLinkClass}>My Profile</button>
                                 {(user.roles.includes('seller') || user.roles.includes('admin')) && (
                                      <button onClick={(e) => handleLinkClick(e, '/add-product', 'Add Product')} className={baseLinkClass}>Add Product</button>
                                 )}
@@ -230,6 +235,7 @@ const Header: React.FC<HeaderProps> = ({ onAskNyxOpen, navigateTo }) => {
         if (user) {
             return (
                 <>
+                    <a href="#" onClick={(e) => handleLinkClick(e, '/profile', 'Profile')} className={baseLinkClass}>My Profile</a>
                     {(user.roles.includes('seller') || user.roles.includes('admin')) && (
                          <a href="#" onClick={(e) => handleLinkClick(e, '/add-product', 'Add Product')} className={baseLinkClass}>Add Product</a>
                     )}

@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useCart } from '../contexts/CartContext';
 import CloseIcon from './icons/CloseIcon';
 import TrashIcon from './icons/TrashIcon';
 
-const CartSidebar: React.FC = () => {
+const CartSidebar: React.FC<{ navigateTo: (page: string) => void }> = ({ navigateTo }) => {
     const { isCartOpen, closeCart, cartItems, removeFromCart, updateItemQuantity, getCartTotalPrice } = useCart();
+    const [agreedToTerms, setAgreedToTerms] = useState(false);
 
     if (!isCartOpen) return null;
 
@@ -35,7 +36,7 @@ const CartSidebar: React.FC = () => {
                                     <img src={item.images[0]} alt={item.name} className="w-20 h-20 object-cover rounded-md bg-nyx-gray" />
                                     <div className="flex-grow">
                                         <h3 className="font-semibold">{item.name}</h3>
-                                        <p className="text-sm text-gray-400">${item.price.toFixed(2)}</p>
+                                        <p className="text-sm text-gray-400">€{item.price.toFixed(2)}</p>
                                         <div className="flex items-center mt-2">
                                             <div className="flex items-center border border-gray-700 rounded-full text-sm">
                                                 <button onClick={() => updateItemQuantity(item.name, item.quantity - 1)} className="px-2 py-1 hover:bg-nyx-gray/50 rounded-l-full">-</button>
@@ -45,7 +46,7 @@ const CartSidebar: React.FC = () => {
                                         </div>
                                     </div>
                                     <div className="text-right">
-                                        <p className="font-semibold">${(item.price * item.quantity).toFixed(2)}</p>
+                                        <p className="font-semibold">€{(item.price * item.quantity).toFixed(2)}</p>
                                         <button onClick={() => removeFromCart(item.name)} className="text-gray-500 hover:text-red-500 transition-colors mt-2">
                                             <TrashIcon className="w-5 h-5"/>
                                         </button>
@@ -60,11 +61,30 @@ const CartSidebar: React.FC = () => {
                     <footer className="p-6 border-t border-nyx-gray/50">
                         <div className="flex justify-between items-center mb-4 text-lg">
                             <span className="font-medium">Subtotal</span>
-                            <span className="font-bold text-nyx-blue">${getCartTotalPrice().toFixed(2)}</span>
+                            <span className="font-bold text-nyx-blue">€{getCartTotalPrice().toFixed(2)}</span>
+                        </div>
+                         <div className="flex items-start gap-3 mb-4">
+                            <input
+                                type="checkbox"
+                                id="cart-terms"
+                                checked={agreedToTerms}
+                                onChange={(e) => setAgreedToTerms(e.target.checked)}
+                                className="mt-1 h-4 w-4 shrink-0 rounded border-gray-600 bg-nyx-black text-nyx-blue focus:ring-nyx-blue focus:ring-offset-nyx-black"
+                            />
+                            <label htmlFor="cart-terms" className="text-xs text-gray-400">
+                                I agree to the{' '}
+                                <button type="button" onClick={() => { closeCart(); navigateTo('terms-conditions'); }} className="font-semibold text-nyx-blue hover:underline focus:outline-none">
+                                    Terms and Conditions
+                                </button> and{' '}
+                                <button type="button" onClick={() => alert('Privacy Policy page coming soon!')} className="font-semibold text-nyx-blue hover:underline focus:outline-none">
+                                    Privacy Policy
+                                </button>.
+                            </label>
                         </div>
                         <button 
                             onClick={() => alert('Checkout functionality is not yet implemented.')}
-                            className="w-full bg-nyx-blue text-nyx-black font-bold py-3 px-8 rounded-full hover:bg-white transition-all duration-300 transform hover:scale-105"
+                            disabled={!agreedToTerms}
+                            className="w-full bg-nyx-blue text-nyx-black font-bold py-3 px-8 rounded-full hover:bg-white transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100"
                         >
                             Proceed to Checkout
                         </button>

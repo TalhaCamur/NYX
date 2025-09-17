@@ -1,6 +1,7 @@
 
 
 
+
 import React from 'react';
 import { Product, Testimonial, Feature, FAQItem } from './types';
 
@@ -27,6 +28,7 @@ export const NAV_LINKS = [
 ];
 
 const NYX_SENSOR: Product = {
+  id: 'prod-001',
   name: 'NYX-1 Smart PIR Motion Sensor',
   tagline: 'Intelligent motion sensing meets minimalist design.',
   price: 79.99,
@@ -46,9 +48,11 @@ const NYX_SENSOR: Product = {
     { name: 'Color', value: 'Matte Onyx Black' },
     { name: 'Dimensions', value: '45mm x 45mm x 30mm' },
   ],
+  isVisible: true,
 };
 
 const NYX_BULB: Product = {
+  id: 'prod-002',
   name: 'NYX-Bulb Smart LED',
   tagline: 'Infinite colors for every mood. Brilliant illumination.',
   price: 24.99,
@@ -61,9 +65,11 @@ const NYX_BULB: Product = {
     { name: 'Connectivity', value: 'Wi-Fi 2.4GHz' },
     { name: 'Voice Control', value: 'Alexa, Google Assistant' },
   ],
+  isVisible: true,
 };
 
 const NYX_PLUG: Product = {
+  id: 'prod-003',
   name: 'NYX-Plug Smart Outlet',
   tagline: 'Make any appliance smart. Control from anywhere.',
   price: 19.99,
@@ -75,9 +81,11 @@ const NYX_PLUG: Product = {
     { name: 'Connectivity', value: 'Wi-Fi 2.4GHz' },
     { name: 'Features', value: 'Scheduling, Timer, Remote' },
   ],
+  isVisible: true,
 };
 
 const NYX_CAM: Product = {
+  id: 'prod-004',
   name: 'NYX-Cam Indoor Security',
   tagline: 'Your eyes at home. Crystal clear 2K resolution.',
   price: 59.99,
@@ -90,6 +98,7 @@ const NYX_CAM: Product = {
     { name: 'Night Vision', value: 'Color Night Vision' },
     { name: 'Features', value: 'Two-Way Audio, AI Detection' },
   ],
+  isVisible: true,
 };
 
 
