@@ -1,8 +1,16 @@
+
 import React, { useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 
 const EmailCapture: React.FC = () => {
+    const { user } = useAuth();
     const [email, setEmail] = useState('');
     const [submitted, setSubmitted] = useState(false);
+
+    const isPrivilegedUser = user && (user.roles.includes('seller') || user.roles.includes('admin') || user.roles.includes('super-admin'));
+    if (isPrivilegedUser) {
+        return null;
+    }
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();

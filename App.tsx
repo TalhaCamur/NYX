@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -57,13 +58,57 @@ const PhoneIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
     </svg>
 );
 
+// Google Icon for AuthForm
+const GoogleIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" {...props}>
+        <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C12.955 4 4 12.955 4 24s8.955 20 20 20s20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"/>
+        <path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C16.318 4 9.656 8.337 6.306 14.691z"/>
+        <path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.223 0-9.657-3.356-11.303-7.918l-6.573 5.013C9.657 39.646 16.318 44 24 44z"/>
+        <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.087 5.571l6.19 5.238C42.012 36.417 44 30.638 44 24c0-1.341-.138-2.65-.389-3.917z"/>
+    </svg>
+);
+
+// Facebook Icon for AuthForm
+const FacebookAuthIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
+    <path d="M22.675 0h-21.35C.59 0 0 .59 0 1.325v21.35C0 23.41.59 24 1.325 24H12.82v-9.294H9.692v-3.622h3.128V8.413c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12V24h6.116c.735 0 1.325-.59 1.325-1.325V1.325C24 .59 23.41 0 22.675 0z" />
+  </svg>
+);
+
+const ImageUploadIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+        <polyline points="17 8 12 3 7 8" />
+        <line x1="12" y1="3" x2="12" y2="15" />
+    </svg>
+);
+
+const Switch: React.FC<{ checked: boolean; onChange: (checked: boolean) => void; }> = ({ checked, onChange }) => (
+    <button
+        type="button"
+        role="switch"
+        aria-checked={checked}
+        onClick={() => onChange(!checked)}
+        className={`${
+            checked ? 'bg-brand-purple' : 'bg-gray-600'
+        } relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-brand-purple focus:ring-offset-2 focus:ring-offset-dark-accent`}
+    >
+        <span
+            aria-hidden="true"
+            className={`${
+                checked ? 'translate-x-5' : 'translate-x-0'
+            } pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out`}
+        />
+    </button>
+);
+
 
 // Define the Products Page components here to avoid creating new files
 const ProductCard: React.FC<{ product: Product; navigateTo: (page: string, params?: any) => void }> = ({ product, navigateTo }) => {
     const { user } = useAuth();
     const { addToCart, openCart } = useCart();
     const [isAdded, setIsAdded] = useState(false);
-    const isAuthorized = user && (user.roles.includes('seller') || user.roles.includes('admin'));
+    const isAuthorized = user && (user.roles.includes('seller') || user.roles.includes('admin') || user.roles.includes('super-admin'));
 
     const handleAddToCart = () => {
         addToCart(product, 1);
@@ -74,7 +119,7 @@ const ProductCard: React.FC<{ product: Product; navigateTo: (page: string, param
 
     return (
         <div className="bg-dark-accent rounded-2xl border border-white/10 overflow-hidden flex flex-col group relative">
-             {!product.isVisible && isAuthorized && (
+            {!product.isVisible && isAuthorized && (
                 <div className="absolute top-3 right-3 bg-yellow-500 text-black text-xs font-bold px-2 py-1 rounded-full z-10">
                     Hidden
                 </div>
@@ -107,7 +152,7 @@ const ProductCard: React.FC<{ product: Product; navigateTo: (page: string, param
                     >
                         {isAdded ? 'Added' : 'Add to Cart'}
                     </button>
-                     {isAuthorized && (
+                    {isAuthorized && (
                         <button
                             onClick={() => navigateTo('edit-product', { id: product.id })}
                             className="w-full text-center font-semibold py-3 px-5 rounded-full transition-all duration-300 text-sm bg-gray-700 text-white hover:bg-gray-600"
@@ -121,40 +166,24 @@ const ProductCard: React.FC<{ product: Product; navigateTo: (page: string, param
     );
 };
 
-const ProductsPage: React.FC<{ navigateTo: (page: string) => void, products: Product[] }> = ({ navigateTo, products }) => {
+const ProductsPage: React.FC<{ navigateTo: (page: string, params?: any) => void, products: Product[] }> = ({ navigateTo, products }) => {
     const { user } = useAuth();
-    const isAuthorized = user && (user.roles.includes('seller') || user.roles.includes('admin'));
-
-    const visibleProducts = isAuthorized ? products : products.filter(p => p.isVisible);
+    const isAuthorized = user && (user.roles.includes('seller') || user.roles.includes('admin') || user.roles.includes('super-admin'));
+    
+    // Show all products to authorized users, only visible ones to others
+    const displayedProducts = isAuthorized ? products : products.filter(p => p.isVisible);
 
     return (
         <div className="bg-dark pt-24 animate-fade-in">
             <div className="container mx-auto px-4 py-12 md:py-20">
-                <div className="flex flex-col md:flex-row justify-between md:items-start mb-12 gap-4">
-                    <div>
-                        <button 
-                            onClick={() => navigateTo('home')}
-                            className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-8 group"
-                        >
-                            <ArrowLeftIcon className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
-                            Back to Home
-                        </button>
-                        <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-white mb-4">Our Entire Collection</h1>
-                        <p className="text-gray-300 text-lg md:text-xl max-w-3xl">
-                            Explore every piece of the NYX ecosystem. Each device is crafted to enhance your daily life with seamless intelligence and elegant design.
-                        </p>
-                    </div>
-                    {isAuthorized && (
-                        <button
-                            onClick={() => navigateTo('add-product')}
-                            className="bg-brand-purple text-white font-bold py-3 px-8 rounded-full hover:bg-brand-purple/80 transition-all duration-300 transform hover:scale-105 flex-shrink-0"
-                        >
-                            Add New Product
-                        </button>
-                    )}
+                <div className="text-center max-w-3xl mx-auto mb-16">
+                    <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-white mb-4">Our Full Collection</h1>
+                    <p className="text-gray-300 text-lg md:text-xl">
+                        Explore the entire NYX ecosystem. Every device is crafted to enhance your home and simplify your life.
+                    </p>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                    {visibleProducts.map((product) => (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                     {displayedProducts.map((product) => (
                         <ProductCard key={product.id} product={product} navigateTo={navigateTo} />
                     ))}
                 </div>
@@ -163,134 +192,137 @@ const ProductsPage: React.FC<{ navigateTo: (page: string) => void, products: Pro
     );
 };
 
+// Define the How It Works Page
+const HowItWorksPage: React.FC = () => {
+  const steps = [
+    {
+      title: '1. Unbox & Power On',
+      description: 'Getting started is effortless. Unbox your NYX device, plug it in, and it will power on automatically, ready for setup.',
+      icon: (props: React.SVGProps<SVGSVGElement>) => (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+          <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line>
+        </svg>
+      )
+    },
+    {
+      title: '2. Connect with NYX App',
+      description: 'Download the NYX app, create an account, and tap "Add Device." The app will automatically detect nearby devices for a seamless pairing process.',
+      icon: (props: React.SVGProps<SVGSVGElement>) => (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+            <path d="M5 12.55a8 8 0 0 1 14.08 0"></path><path d="M1.42 9a12 12 0 0 1 21.16 0"></path><path d="M8.53 16.11a4 4 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12" y2="20"></line>
+        </svg>
+      )
+    },
+    {
+      title: '3. Create Automations',
+      description: 'Once connected, unleash the true power of NYX. Create scenes and automations to make your devices work together, like turning on lights when motion is detected.',
+      icon: (props: React.SVGProps<SVGSVGElement>) => (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+            <path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path>
+        </svg>
+      )
+    }
+  ];
 
-// Define How It Works Page components here
-const StepIcon1: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-        <path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v2"/>
-        <path d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5"/><path d="M12 15v-2"/>
-        <path d="M5 10l7-4 7 4"/><path d="M12 21a2 2 0 0 0 2-2v-2a2 2 0 0 0-4 0v2a2 2 0 0 0 2 2z"/>
-    </svg>
-);
-const StepIcon2: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-        <path d="M5 12.55a8 8 0 0 1 14.08 0"/><path d="M1.42 9a12 12 0 0 1 21.16 0"/>
-        <path d="M8.53 16.11a4 4 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12" y2="20"/>
-        <path d="M18 8.01a6 6 0 0 0-12 0"/>
-    </svg>
-);
-const StepIcon3: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-        <path d="M12 2.69l.34.26a1.5 1.5 0 0 0 1.32 0l.34-.26L15.22 2l.34.26a1.5 1.5 0 0 0 1.32 0l.34-.26L18.44 2l.34.26a1.5 1.5 0 0 0 1.32 0l.34-.26L21.66 2l-.34.26a1.5 1.5 0 0 0 0 2.68l.34.26-.34.26a1.5 1.5 0 0 0 0 2.68l.34.26-.34.26a1.5 1.5 0 0 0 0 2.68l.34.26L20.44 14l-.34.26a1.5 1.5 0 0 0 0 2.68l.34.26-.34.26a1.5 1.5 0 0 0 0 2.68l.34.26L18.44 20l-.34.26a1.5 1.5 0 0 0-1.32 0l-.34-.26L15.22 22l-.34-.26a1.5 1.5 0 0 0-1.32 0l-.34.26-1.22-1.22-.34.26a1.5 1.5 0 0 0-1.32 0l-.34-.26L8.78 22l-.34-.26a1.5 1.5 0 0 0-1.32 0l-.34.26L5.56 22l-.34-.26a1.5 1.5 0 0 0-1.32 0l-.34.26L2.34 20l.34-.26a1.5 1.5 0 0 0 0-2.68l-.34-.26.34-.26a1.5 1.5 0 0 0 0 2.68l-.34-.26.34-.26a1.5 1.5 0 0 0 0 2.68l-.34-.26L3.56 8l.34-.26a1.5 1.5 0 0 0 0-2.68L3.56 5l.34-.26a1.5 1.5 0 0 0 1.32 0l.34.26L6.78 2l.34.26a1.5 1.5 0 0 0 1.32 0l.34.26L9.66 2l.34.26a1.5 1.5 0 0 0 1.32 0l.34-.26Z"/><path d="M12 8v8"/>
-        <path d="M8.5 14h7"/><path d="M8.5 10h7"/>
-    </svg>
-);
-
-
-const HowItWorksPage: React.FC<{ navigateTo: (page: string) => void }> = ({ navigateTo }) => {
-    const steps = [
-        {
-            icon: StepIcon1,
-            title: '1. Unbox & Power On',
-            description: "Your NYX experience begins with our signature premium unboxing. Every detail is crafted to delight, from the minimalist packaging to the satisfying reveal of the device. Simply plug it in, and it's ready to integrate into your home. No complex wiring, just elegance from the very first touch.",
-        },
-        {
-            icon: StepIcon2,
-            title: '2. Connect to NYX App',
-            description: "Download the intuitive NYX app. It will automatically detect your new device. With a single tap, connect it to your Wi-Fi network and unlock its full potential.",
-        },
-        {
-            icon: StepIcon3,
-            title: '3. Automate Your World',
-            description: "Create custom scenes and schedules. Group devices, set triggers based on time or sensor data, and control your entire home from anywhere in the world.",
-        }
-    ];
-
-    return (
-        <div className="bg-dark pt-24 animate-fade-in">
-            <div className="container mx-auto px-4 py-12 md:py-20">
-                 <div className="mb-12">
-                    <button 
-                        onClick={() => navigateTo('home')}
-                        className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-8 group"
-                    >
-                        <ArrowLeftIcon className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
-                        Back to Home
-                    </button>
-                    <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-white mb-4">Simplicity in Three Steps</h1>
-                    <p className="text-gray-300 text-lg md:text-xl max-w-3xl">
-                        Experience the seamless setup and powerful control of the NYX smart home ecosystem.
-                    </p>
+  return (
+    <div className="bg-dark pt-24 animate-fade-in">
+      <div className="container mx-auto px-4 py-12 md:py-20">
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-white mb-4">Simplicity in Three Steps</h1>
+          <p className="text-gray-300 text-lg md:text-xl">
+            We've engineered the NYX experience to be intuitive from the moment you open the box.
+          </p>
+        </div>
+        <div className="max-w-4xl mx-auto">
+            <div className="relative">
+                {/* Dotted line for desktop */}
+                <div className="hidden md:block absolute top-1/2 left-0 w-full h-px bg-transparent">
+                   <svg width="100%" height="100%"><line x1="0" y1="0" x2="100%" y2="0" strokeWidth="2" strokeDasharray="8, 8" stroke="rgba(107, 114, 128, 0.5)"/></svg>
                 </div>
+                 {/* Solid line for mobile */}
+                <div className="md:hidden absolute top-0 left-12 w-px h-full bg-gray-600/50"></div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 text-center">
+                <div className="flex flex-col md:flex-row justify-between items-start gap-12 md:gap-8">
                     {steps.map((step, index) => (
-                        <div key={index} className="bg-dark-accent p-8 rounded-2xl border border-white/10 flex flex-col items-center">
-                            <div className="mb-6 flex items-center justify-center h-20 w-20 rounded-full bg-dark border border-white/10">
+                        <div key={index} className="relative flex-1 flex md:flex-col items-start md:items-center text-left md:text-center">
+                            <div className="flex-shrink-0 mb-0 md:mb-6 mr-6 md:mr-0 z-10 flex items-center justify-center h-24 w-24 rounded-full bg-dark-accent border-2 border-brand-purple/50">
                                 <step.icon className="w-10 h-10 text-brand-purple" />
                             </div>
-                            <h3 className="text-2xl font-bold mb-4 text-white">{step.title}</h3>
-                            <p className="text-gray-400 text-base flex-grow">{step.description}</p>
+                            <div>
+                                <h3 className="text-2xl font-bold mb-3 text-white">{step.title}</h3>
+                                <p className="text-gray-400">{step.description}</p>
+                            </div>
                         </div>
                     ))}
                 </div>
             </div>
         </div>
-    );
+      </div>
+    </div>
+  );
 };
 
-const SetupVideosPage: React.FC<{ navigateTo: (page: string) => void, products: Product[] }> = ({ navigateTo, products }) => {
-    const videos = products.map(product => ({
-        title: `${product.name} Setup`,
-        description: `A quick guide to unboxing, connecting, and configuring your ${product.name}.`,
-        thumbnail: product.images[0]
-    }));
+// Define the Setup Videos Page
+const SetupVideosPage: React.FC = () => {
+    const videos = [
+        { id: 'dQw4w9WgXcQ', title: 'Unboxing and First Setup of NYX-1 Sensor', duration: '3:45' },
+        { id: 'y6120QOlsfU', title: 'Connecting NYX-Bulb to Your Wi-Fi Network', duration: '2:15' },
+        { id: '3tmd-ClpJxA', title: 'Advanced Automations with NYX-Plug', duration: '5:30' },
+        { id: 'V-_O7nl0Ii0', title: 'Installing and Configuring NYX-Cam', duration: '4:10' },
+    ];
+
+    const [activeVideo, setActiveVideo] = useState(videos[0].id);
 
     return (
         <div className="bg-dark pt-24 animate-fade-in">
             <div className="container mx-auto px-4 py-12 md:py-20">
-                <div className="mb-12">
-                    <button 
-                        onClick={() => navigateTo('home')}
-                        className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-8 group"
-                    >
-                        <ArrowLeftIcon className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
-                        Back to Home
-                    </button>
-                    <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-white mb-4">Setup & Installation</h1>
-                    <p className="text-gray-300 text-lg md:text-xl max-w-3xl">
-                        Step-by-step video guides to get your NYX devices up and running in minutes.
+                <div className="text-center max-w-3xl mx-auto mb-16">
+                    <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-white mb-4">Visual Setup Guides</h1>
+                    <p className="text-gray-300 text-lg md:text-xl">
+                        Follow along with our step-by-step video tutorials to get your NYX devices up and running in minutes.
                     </p>
                 </div>
+                
+                <div className="max-w-5xl mx-auto">
+                    <div className="aspect-video bg-dark-accent rounded-2xl overflow-hidden mb-8 border border-white/10 shadow-2xl shadow-brand-purple/20">
+                        <iframe
+                            className="w-full h-full"
+                            src={`https://www.youtube.com/embed/${activeVideo}?autoplay=1&rel=0&theme=dark&color=white`}
+                            title="YouTube video player"
+                            frameBorder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen>
+                        </iframe>
+                    </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {videos.map((video, index) => (
-                        <div key={index} className="bg-dark-accent rounded-2xl border border-white/10 overflow-hidden flex flex-col group cursor-pointer" onClick={() => alert('Video player coming soon!')}>
-                            <div className="aspect-video overflow-hidden relative">
-                                <img 
-                                    src={video.thumbnail} 
-                                    alt={video.title}
-                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                />
-                                <div className="absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity duration-300 opacity-0 group-hover:opacity-100">
-                                    <div className="w-16 h-16 bg-brand-purple/70 rounded-full flex items-center justify-center backdrop-blur-sm">
-                                        <PlayIcon className="w-8 h-8 text-white" />
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        {videos.map(video => (
+                            <button 
+                                key={video.id}
+                                onClick={() => setActiveVideo(video.id)}
+                                className={`p-4 rounded-lg transition-all duration-300 text-left ${activeVideo === video.id ? 'bg-brand-purple/20 ring-2 ring-brand-purple' : 'bg-dark-accent hover:bg-dark-accent/70'}`}
+                            >
+                                <div className="flex items-center gap-3">
+                                    <div className="bg-dark p-2 rounded-full">
+                                        <PlayIcon className={`w-5 h-5 ${activeVideo === video.id ? 'text-brand-purple' : 'text-gray-400'}`} />
+                                    </div>
+                                    <div>
+                                        <p className="font-semibold text-white">{video.title}</p>
+                                        <p className="text-xs text-gray-500">{video.duration}</p>
                                     </div>
                                 </div>
-                            </div>
-                            <div className="p-6">
-                                <h3 className="text-lg font-bold text-white mb-2">{video.title}</h3>
-                                <p className="text-gray-400 text-sm">{video.description}</p>
-                            </div>
-                        </div>
-                    ))}
+                            </button>
+                        ))}
+                    </div>
                 </div>
             </div>
         </div>
     );
 };
 
-const FAQPage: React.FC<{ navigateTo: (page: string) => void }> = ({ navigateTo }) => {
+// Define FAQ Page
+const FAQPage: React.FC = () => {
     const [openIndex, setOpenIndex] = useState<number | null>(0);
 
     const toggleFAQ = (index: number) => {
@@ -300,35 +332,25 @@ const FAQPage: React.FC<{ navigateTo: (page: string) => void }> = ({ navigateTo 
     return (
         <div className="bg-dark pt-24 animate-fade-in">
             <div className="container mx-auto px-4 py-12 md:py-20">
-                <div className="mb-12">
-                    <button 
-                        onClick={() => navigateTo('home')}
-                        className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-8 group"
-                    >
-                        <ArrowLeftIcon className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
-                        Back to Home
-                    </button>
+                <div className="text-center max-w-3xl mx-auto mb-16">
                     <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-white mb-4">Frequently Asked Questions</h1>
-                    <p className="text-gray-300 text-lg md:text-xl max-w-3xl">
-                        Find answers to common questions about our products, services, and policies.
+                    <p className="text-gray-300 text-lg md:text-xl">
+                        Have questions? We've got answers. Find the information you're looking for about NYX products and services.
                     </p>
                 </div>
-                
+
                 <div className="max-w-4xl mx-auto space-y-4">
                     {FAQ_DATA.map((faq, index) => (
-                        <div key={index} className="bg-dark-accent rounded-xl border border-white/10 overflow-hidden">
+                        <div key={index} className="border border-white/10 rounded-xl overflow-hidden bg-dark-accent">
                             <button
                                 onClick={() => toggleFAQ(index)}
                                 className="w-full flex justify-between items-center text-left p-6"
-                                aria-expanded={openIndex === index}
                             >
-                                <span className="text-lg font-semibold text-white">{faq.question}</span>
+                                <h3 className="text-lg md:text-xl font-semibold text-white">{faq.question}</h3>
                                 <PlusMinusIcon isOpen={openIndex === index} className={`w-6 h-6 text-gray-400 transition-transform duration-300 flex-shrink-0 ${openIndex === index ? 'rotate-45' : ''}`} />
                             </button>
-                            <div
-                                className={`transition-all duration-300 ease-in-out overflow-hidden ${openIndex === index ? 'max-h-96' : 'max-h-0'}`}
-                            >
-                                <div className="p-6 pt-0 text-gray-300 text-base leading-relaxed">
+                             <div className={`transition-all duration-300 ease-in-out overflow-hidden ${openIndex === index ? 'max-h-96' : 'max-h-0'}`}>
+                                <div className="p-6 pt-0 text-gray-300 leading-relaxed">
                                     <p>{faq.answer}</p>
                                 </div>
                             </div>
@@ -340,124 +362,93 @@ const FAQPage: React.FC<{ navigateTo: (page: string) => void }> = ({ navigateTo 
     );
 };
 
-const ContactPage: React.FC<{ navigateTo: (page: string) => void }> = ({ navigateTo }) => {
+// Define Contact Page
+const ContactPage: React.FC = () => {
     const [submitted, setSubmitted] = useState(false);
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         setSubmitted(true);
     };
 
-    const contactInfo = [
-        { icon: MapPinIcon, label: 'Address', value: '123 Innovation Drive, Tech City, 90210' },
-        { icon: MailIcon, label: 'Email', value: 'support@nyxhome.io' },
-        { icon: PhoneIcon, label: 'Phone', value: '+1 (800) 555-0199' }
-    ];
-
     return (
         <div className="bg-dark pt-24 animate-fade-in">
             <div className="container mx-auto px-4 py-12 md:py-20">
-                <div className="mb-12">
-                    <button 
-                        onClick={() => navigateTo('home')}
-                        className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-8 group"
-                    >
-                        <ArrowLeftIcon className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
-                        Back to Home
-                    </button>
+                <div className="text-center max-w-3xl mx-auto mb-16">
                     <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-white mb-4">Get in Touch</h1>
-                    <p className="text-gray-300 text-lg md:text-xl max-w-3xl">
-                        We're here to help. Reach out with questions, feedback, or support inquiries.
+                    <p className="text-gray-300 text-lg md:text-xl">
+                        We're here to help. Whether you have a question about our products, need support, or want to partner with us, we'd love to hear from you.
                     </p>
                 </div>
-                
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-                    {/* Contact Info */}
-                    <div className="space-y-8">
-                        {contactInfo.map(info => (
-                            <div key={info.label} className="flex items-start gap-4">
-                                <div className="flex-shrink-0 w-12 h-12 bg-dark-accent border border-white/10 rounded-full flex items-center justify-center">
-                                    <info.icon className="w-6 h-6 text-brand-purple" />
-                                </div>
-                                <div>
-                                    <h3 className="text-xl font-semibold text-white">{info.label}</h3>
-                                    <p className="text-gray-400">{info.value}</p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
 
+                <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
                     {/* Contact Form */}
-                    <div className="bg-dark-accent p-8 rounded-2xl border border-white/10">
+                    <div className="bg-dark-accent p-8 md:p-12 rounded-2xl border border-white/10">
                         {submitted ? (
-                            <div className="flex flex-col items-center justify-center h-full text-center">
-                                <h3 className="text-2xl font-bold text-white mb-4">Thank You!</h3>
-                                <p className="text-gray-300">Your message has been sent. We'll get back to you shortly.</p>
+                             <div className="text-center flex flex-col justify-center items-center h-full min-h-[300px]">
+                                <h3 className="text-2xl font-semibold text-brand-purple mb-4">Thank You!</h3>
+                                <p>Your message has been sent. Our team will get back to you shortly.</p>
                             </div>
                         ) : (
                             <form onSubmit={handleSubmit} className="space-y-6">
-                                <div>
-                                    <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
-                                    <input type="text" id="name" required className="w-full bg-dark border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
+                                <h2 className="text-2xl font-bold text-white mb-6">Send Us a Message</h2>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                    <div>
+                                        <label htmlFor="name" className="block text-sm font-medium mb-2">Full Name</label>
+                                        <input type="text" id="name" required className="w-full bg-dark border border-gray-600 rounded-lg py-3 px-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="email" className="block text-sm font-medium mb-2">Email Address</label>
+                                        <input type="email" id="email" required className="w-full bg-dark border border-gray-600 rounded-lg py-3 px-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
+                                    </div>
                                 </div>
                                 <div>
-                                    <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
-                                    <input type="email" id="email" required className="w-full bg-dark border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
+                                    <label htmlFor="subject" className="block text-sm font-medium mb-2">Subject</label>
+                                    <input type="text" id="subject" required className="w-full bg-dark border border-gray-600 rounded-lg py-3 px-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
                                 </div>
                                 <div>
-                                    <label htmlFor="subject" className="block text-sm font-medium text-gray-300 mb-2">Subject</label>
-                                    <input type="text" id="subject" required className="w-full bg-dark border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
+                                    <label htmlFor="message" className="block text-sm font-medium mb-2">Message</label>
+                                    <textarea id="message" rows={5} required className="w-full bg-dark border border-gray-600 rounded-lg py-3 px-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-purple"></textarea>
                                 </div>
-                                <div>
-                                    <label htmlFor="message" className="block text-sm font-medium text-gray-300 mb-2">Message</label>
-                                    <textarea id="message" rows={5} required className="w-full bg-dark border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-purple"></textarea>
-                                </div>
-                                <div>
-                                    <button type="submit" className="w-full bg-brand-purple text-white font-bold py-3 px-8 rounded-full hover:bg-brand-purple/80 transition-all duration-300 transform hover:scale-105">
-                                        Send Message
-                                    </button>
-                                </div>
+                                <button type="submit" className="w-full bg-brand-purple text-white font-bold py-3 px-8 rounded-full hover:bg-brand-purple/80 transition-all duration-300 transform hover:scale-105">
+                                    Submit Message
+                                </button>
                             </form>
                         )}
                     </div>
-                </div>
-            </div>
-            <EmailCapture />
-        </div>
-    );
-};
-
-const OurStoryPage: React.FC<{ navigateTo: (page: string) => void }> = ({ navigateTo }) => {
-    const storyContent = [
-        <p key="p1"><strong>Discovery often begins in the most unexpected places.</strong></p>,
-        <p key="p2">Since childhood, I've always had a curious spirit - perhaps a bit too curious. While my classmates focused on their studies, I was trying to understand how the world actually worked. Yes, this sometimes meant putting lessons on the back burner, but somehow I always succeeded. It was as if I had an internal system that rejected conventional paths but still delivered results.</p>,
-        <p key="p3"><strong>During my high school years, my passion for technology began to crystallize.</strong> I had decided "I'm going to be a software developer," but I was still moving with that curious spirit of mine - spontaneous, not planned. Perhaps that's why I only made a few serious attempts at learning programming during that period.</p>,
-        <p key="p4"><strong>Then life carried me to another continent.</strong> When the opportunity to study abroad presented itself, this wasn't just an educational change for me - it was a chance to become an entirely new version of myself. My financial means were limited, which only made me more determined. "This time will be different," I told myself.</p>,
-        <p key="p5"><strong>And it truly was different.</strong></p>,
-        <p key="p6">While creating this brand, I combined the energy of that curious child from the past with an adult vision. Every product we make is a result of that impatient curiosity and perfectionism. Even when working alone, I knew I was actually working for all of us - to make your home smarter and more comfortable.</p>,
-        <p key="p7"><strong>Our goal is simple: To make you happy.</strong> Because this journey made me happy, and I want to share that happiness with you.</p>
-    ];
-
-    return (
-        <div className="bg-dark pt-24 animate-fade-in">
-            <div className="container mx-auto px-4 py-12 md:py-20">
-                <div className="mb-12">
-                    <button 
-                        onClick={() => navigateTo('home')}
-                        className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-8 group"
-                    >
-                        <ArrowLeftIcon className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
-                        Back to Home
-                    </button>
-                    <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-white mb-4">Our Story</h1>
-                    <p className="text-gray-300 text-lg md:text-xl max-w-3xl">
-                        From a curious mind to your smart home.
-                    </p>
-                </div>
-                
-                <div className="max-w-3xl mx-auto">
-                    <div className="space-y-6 text-gray-300 text-lg leading-relaxed">
-                        {storyContent}
+                    {/* Contact Info */}
+                    <div className="space-y-8 mt-8 lg:mt-0">
+                        <div className="flex items-start gap-6">
+                            <div className="flex-shrink-0 flex items-center justify-center h-16 w-16 rounded-full bg-dark-accent border border-white/10">
+                                <MapPinIcon className="w-8 h-8 text-brand-purple" />
+                            </div>
+                            <div>
+                                <h3 className="text-xl font-semibold text-white">Our Headquarters</h3>
+                                <p className="text-gray-400">123 Innovation Drive, Tech City, 90210, CA</p>
+                            </div>
+                        </div>
+                         <div className="flex items-start gap-6">
+                            <div className="flex-shrink-0 flex items-center justify-center h-16 w-16 rounded-full bg-dark-accent border border-white/10">
+                                <MailIcon className="w-8 h-8 text-brand-purple" />
+                            </div>
+                            <div>
+                                <h3 className="text-xl font-semibold text-white">Email Us</h3>
+                                <p className="text-gray-400">
+                                    <a href="mailto:support@nyxhome.io" className="hover:text-brand-purple transition-colors">support@nyxhome.io</a>
+                                </p>
+                            </div>
+                        </div>
+                         <div className="flex items-start gap-6">
+                            <div className="flex-shrink-0 flex items-center justify-center h-16 w-16 rounded-full bg-dark-accent border border-white/10">
+                                <PhoneIcon className="w-8 h-8 text-brand-purple" />
+                            </div>
+                            <div>
+                                <h3 className="text-xl font-semibold text-white">Call Us</h3>
+                                <p className="text-gray-400">
+                                    <a href="tel:+18005550199" className="hover:text-brand-purple transition-colors">+1 (800) 555-0199</a>
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -465,169 +456,1065 @@ const OurStoryPage: React.FC<{ navigateTo: (page: string) => void }> = ({ naviga
     );
 };
 
+// Define About Us / Our Story Page
+const OurStoryPage: React.FC = () => (
+    <div className="bg-dark pt-24 animate-fade-in">
+        <div className="container mx-auto px-4 py-12 md:py-20">
+            <div className="max-w-4xl mx-auto">
+                <div className="text-center mb-12">
+                    <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-white mb-4">Our Story</h1>
+                    <p className="text-lg md:text-xl text-brand-purple font-semibold">From a simple idea to a smarter reality.</p>
+                </div>
+                <div className="prose prose-lg prose-invert mx-auto text-gray-300 leading-relaxed space-y-6">
+                    <p>NYX was born from a simple observation: technology should make life easier, not more complicated. In 2022, our founders, a group of designers and engineers passionate about minimalist aesthetics and powerful technology, noticed a gap in the smart home market. Devices were either powerful but clunky and difficult to use, or beautifully designed but functionally limited.</p>
+                    <p>We asked ourselves: Why the compromise? Why can't a smart device be both intelligent and invisible, powerful and simple?</p>
+                    <figure className="my-8">
+                         <img src="https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?q=80&w=2070&auto=format&fit=crop" alt="Team working together" className="rounded-2xl shadow-lg border border-white/10" />
+                         <figcaption className="text-center text-sm text-gray-500 mt-2">The founding team brainstorming the first NYX concept.</figcaption>
+                    </figure>
+                    <p>Driven by this question, we embarked on a mission to create a new kind of smart home experience. One where devices don't just react, but anticipate. Where setup is measured in seconds, not hours. And where the technology fades into the background, allowing the experience to shine.</p>
+                    <p>Our first product, the NYX-1 sensor, was the embodiment of this philosophy. We obsessed over every detail, from its bead-blasted aluminum unibody to the custom-developed Adaptive AI that learns and adapts to a user's life. It set the standard for every product that followed: the NYX-Bulb, the NYX-Plug, and the NYX-Cam.</p>
+                    <p>Today, NYX is more than just a collection of products. It's an ecosystem built on the principles of simplicity, intelligence, and design. We are still driven by that initial question, constantly pushing the boundaries of what a smart home can be. Our journey is just beginning, and we invite you to join us in shaping the future of smart living.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+);
 
-const WhyUsPage: React.FC<{ navigateTo: (page: string) => void }> = ({ navigateTo }) => {
-    const featuresWithDetails = [
-        {
-            ...FEATURES_DATA[0], // Adaptive AI Learning
-            details: "At NYX, this isn't just a buzzword. Our proprietary algorithms analyze environmental data and user interactions to create a home that truly understands you. It's the difference between a device that follows commands and a system that anticipates your needs, optimizing comfort and energy efficiency without you lifting a finger."
-        },
-        {
-            ...FEATURES_DATA[1], // Extended Battery Life
-            details: "We believe smart technology should reduce your worries, not add to them. That's why we obsess over power management. By optimizing both hardware and software, we deliver devices that last for years, not months. This means less maintenance, less waste, and more reliable performance when you need it most."
-        },
-        {
-            ...FEATURES_DATA[2], // Minimalist Aesthetics
-            details: "Our design philosophy is simple: technology should enhance your space, not clutter it. Every NYX product is meticulously crafted with premium materials and clean lines to blend seamlessly into any environment. We believe that the most powerful technology is the one you barely notice is there."
-        },
-        {
-            ...FEATURES_DATA[3], // Seamless Integration
-            details: "Your smart home should be a unified ecosystem, not a collection of separate gadgets. We are committed to open standards and universal compatibility. This ensures that every NYX device not only works perfectly with our own app but also plays nicely with all major platforms, giving you the freedom to build your smart home your way."
+// Define Why Us? Page
+const WhyUsPage: React.FC = () => (
+    <div className="bg-dark pt-24 animate-fade-in">
+        <div className="container mx-auto px-4 py-12 md:py-20">
+            <div className="text-center max-w-3xl mx-auto mb-16">
+                <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-white mb-4">Why Choose NYX?</h1>
+                <p className="text-gray-300 text-lg md:text-xl">
+                    We believe in a better smart home experience. Here's what sets us apart.
+                </p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 text-center max-w-6xl mx-auto">
+                {FEATURES_DATA.map((feature, index) => (
+                    <div key={index} className="flex flex-col items-center p-6 bg-dark-accent rounded-2xl border border-white/10 transform transition-transform duration-300 hover:-translate-y-2">
+                        <div className="mb-6 flex items-center justify-center h-20 w-20 rounded-full bg-dark border border-white/10">
+                            <feature.icon className="w-10 h-10 text-brand-purple" />
+                        </div>
+                        <h3 className="text-xl font-bold mb-3 text-white">{feature.title}</h3>
+                        <p className="text-gray-400 text-base flex-grow">{feature.description}</p>
+                    </div>
+                ))}
+            </div>
+            <div className="text-center mt-20">
+                <p className="text-lg text-gray-400">Ready to experience the NYX difference?</p>
+                {/* This button will be handled by App's navigateTo function */}
+                <a href="/products" onClick={(e) => { e.preventDefault(); (window as any).navigateToProducts(); }} className="mt-4 inline-block bg-brand-purple text-white font-semibold py-3 px-8 rounded-full hover:bg-brand-purple/80 transition-all duration-300 transform hover:scale-105">
+                    Explore Our Products
+                </a>
+            </div>
+        </div>
+    </div>
+);
+
+// Define Add Product Page
+const AddProductPage: React.FC<{ navigateTo: (page: string) => void; setProducts: React.Dispatch<React.SetStateAction<Product[]>> }> = ({ navigateTo, setProducts }) => {
+    const [formData, setFormData] = useState<Omit<Product, 'id'>>({
+        name: '',
+        tagline: '',
+        price: 0,
+        originalPrice: undefined,
+        stock: 0,
+        images: [],
+        specs: [{ name: '', value: '' }],
+        isVisible: true,
+    });
+    
+    const [isDiscounted, setIsDiscounted] = useState(false);
+
+    const handleDiscountToggle = (checked: boolean) => {
+        setIsDiscounted(checked);
+        if (checked) {
+            // Move current price to originalPrice and prepare for discounted price entry
+            setFormData(f => ({ ...f, originalPrice: f.price, price: 0 }));
+        } else {
+            // Remove discount, restore original price as the main price
+            setFormData(f => ({ ...f, price: f.originalPrice || 0, originalPrice: undefined }));
         }
-    ];
+    };
+    
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) {
+            const files = Array.from(e.target.files);
+            const imagePromises = files.map(file => {
+                return new Promise<string>((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => resolve(reader.result as string);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+            });
+
+            Promise.all(imagePromises).then(base64Images => {
+                setFormData(prev => ({
+                    ...prev,
+                    images: [...prev.images, ...base64Images]
+                }));
+            }).catch(error => {
+                console.error("Error reading files:", error);
+                alert("There was an error uploading images.");
+            });
+        }
+    };
+    
+    const removeImage = (index: number) => {
+        setFormData(prev => ({
+            ...prev,
+            images: prev.images.filter((_, i) => i !== index)
+        }));
+    };
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
+        const type = e.target.getAttribute('type');
+        const parsedValue = type === 'number' ? (value ? parseFloat(value) : (name === 'price' || name === 'stock' ? 0 : undefined)) : value;
+        setFormData({ ...formData, [name]: parsedValue });
+    };
+    
+    const handleSpecChange = (index: number, field: 'name' | 'value', value: string) => {
+        const newSpecs = [...formData.specs];
+        newSpecs[index] = { ...newSpecs[index], [field]: value };
+        setFormData({ ...formData, specs: newSpecs });
+    };
+
+    const addSpec = () => {
+        setFormData({ ...formData, specs: [...formData.specs, { name: '', value: '' }] });
+    };
+    
+    const removeSpec = (index: number) => {
+        const newSpecs = formData.specs.filter((_, i) => i !== index);
+        setFormData({ ...formData, specs: newSpecs });
+    };
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!formData.name || formData.images.length === 0) {
+            alert('Please fill in all required fields: Name and at least one Image.');
+            return;
+        }
+        
+        const newProduct: Product = {
+            ...formData,
+            id: `prod-${Date.now()}`,
+            originalPrice: formData.originalPrice || undefined,
+        };
+
+        setProducts(prevProducts => [...prevProducts, newProduct]);
+        alert('Product added successfully!');
+        navigateTo('products');
+    };
 
     return (
         <div className="bg-dark pt-24 animate-fade-in">
             <div className="container mx-auto px-4 py-12 md:py-20">
-                <div className="mb-16">
-                    <button
-                        onClick={() => navigateTo('home')}
+                <div className="max-w-4xl mx-auto bg-dark-accent p-8 rounded-2xl border border-white/10">
+                     <button
+                        onClick={() => navigateTo('products')}
                         className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-8 group"
                     >
                         <ArrowLeftIcon className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
-                        Back to Home
+                        Back to Products
                     </button>
-                    <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-white mb-4">Why Choose NYX?</h1>
-                    <p className="text-gray-300 text-lg md:text-xl max-w-3xl">
-                        We believe in a smarter, simpler, and more beautiful way of living. Our philosophy is built on four core pillars.
-                    </p>
-                </div>
-
-                <div className="space-y-20 max-w-5xl mx-auto">
-                    {featuresWithDetails.map((feature, index) => (
-                        <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
-                            <div className="flex justify-center md:col-span-1">
-                                <div className="flex items-center justify-center h-32 w-32 rounded-full bg-dark-accent border border-white/10 shadow-lg">
-                                    <feature.icon className="w-16 h-16 text-brand-purple" />
-                                </div>
+                    <h1 className="text-3xl font-bold text-white mb-8">Add New Product</h1>
+                    
+                    <form onSubmit={handleSubmit} className="space-y-8">
+                        {/* Basic Info */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label htmlFor="name" className="block text-sm font-medium mb-2">Product Name <span className="text-red-500">*</span></label>
+                                <input type="text" name="name" value={formData.name} onChange={handleChange} className="w-full bg-dark border border-gray-600 rounded-lg py-3 px-4" required />
                             </div>
-                            <div className="md:col-span-2 text-center md:text-left">
-                                <h3 className="text-3xl font-bold mb-4 text-white">{feature.title}</h3>
-                                <p className="text-gray-300 text-lg leading-relaxed mb-4">{feature.description}</p>
-                                <p className="text-gray-400 text-base leading-relaxed">
-                                    {feature.details}
-                                </p>
+                            <div>
+                                <label htmlFor="tagline" className="block text-sm font-medium mb-2">Tagline</label>
+                                <input type="text" name="tagline" value={formData.tagline} onChange={handleChange} className="w-full bg-dark border border-gray-600 rounded-lg py-3 px-4" />
                             </div>
                         </div>
-                    ))}
+
+                        {/* Image Uploader */}
+                        <div>
+                            <label className="block text-sm font-medium mb-2">Product Images <span className="text-red-500">*</span></label>
+                            <div className="mt-2 flex justify-center rounded-lg border-2 border-dashed border-gray-600 px-6 py-10">
+                                <div className="text-center">
+                                    <ImageUploadIcon className="mx-auto h-12 w-12 text-gray-500" />
+                                    <div className="mt-4 flex text-sm leading-6 text-gray-400">
+                                        <label
+                                            htmlFor="file-upload"
+                                            className="relative cursor-pointer rounded-md font-semibold text-brand-purple focus-within:outline-none focus-within:ring-2 focus-within:ring-brand-purple focus-within:ring-offset-2 focus-within:ring-offset-dark-accent hover:text-brand-purple/80"
+                                        >
+                                            <span>Upload a file</span>
+                                            <input id="file-upload" name="file-upload" type="file" className="sr-only" multiple accept="image/*" onChange={handleImageChange} />
+                                        </label>
+                                        <p className="pl-1">or drag and drop</p>
+                                    </div>
+                                    <p className="text-xs leading-5 text-gray-500">PNG, JPG, GIF up to 10MB</p>
+                                </div>
+                            </div>
+                            {formData.images.length > 0 && (
+                                <div className="mt-4 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">
+                                    {formData.images.map((image, index) => (
+                                        <div key={index} className="relative group">
+                                            <img src={image} alt={`Preview ${index + 1}`} className="h-24 w-24 rounded-lg object-cover" />
+                                            <button
+                                                type="button"
+                                                onClick={() => removeImage(index)}
+                                                className="absolute top-0 right-0 m-1 h-6 w-6 rounded-full bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                                                aria-label="Remove image"
+                                            >
+                                                &times;
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                        
+                        {/* Pricing and Stock */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                            {/* Pricing Column */}
+                            <div className="space-y-6">
+                                <div>
+                                    <label htmlFor={isDiscounted ? "originalPrice" : "price"} className="block text-sm font-medium mb-2">
+                                        {isDiscounted ? "Original Price (€)" : "Price (€)"}
+                                        {!isDiscounted && <span className="text-red-500"> *</span>}
+                                    </label>
+                                    <input 
+                                        type="number" 
+                                        name={isDiscounted ? "originalPrice" : "price"} 
+                                        id={isDiscounted ? "originalPrice" : "price"}
+                                        step="0.01" 
+                                        value={isDiscounted ? formData.originalPrice || '' : formData.price} 
+                                        onChange={handleChange} 
+                                        className="w-full bg-dark border border-gray-600 rounded-lg py-3 px-4" 
+                                        required={!isDiscounted}
+                                    />
+                                </div>
+
+                                <div className="flex items-center justify-between">
+                                    <label className="block text-sm font-medium">Apply Discount</label>
+                                    <Switch checked={isDiscounted} onChange={handleDiscountToggle} />
+                                </div>
+
+                                {isDiscounted && (
+                                    <div className="animate-fade-in">
+                                        <label htmlFor="price" className="block text-sm font-medium mb-2">
+                                            Discounted Price (€) <span className="text-red-500">*</span>
+                                        </label>
+                                        <input 
+                                            type="number" 
+                                            name="price" 
+                                            id="price"
+                                            step="0.01" 
+                                            value={formData.price} 
+                                            onChange={handleChange} 
+                                            className="w-full bg-dark border border-gray-600 rounded-lg py-3 px-4" 
+                                            required 
+                                        />
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Stock Column */}
+                            <div>
+                                <label htmlFor="stock" className="block text-sm font-medium mb-2">Stock</label>
+                                <input type="number" name="stock" value={formData.stock} onChange={handleChange} className="w-full bg-dark border border-gray-600 rounded-lg py-3 px-4" />
+                            </div>
+                        </div>
+
+
+                        {/* Specifications */}
+                        <div>
+                            <h3 className="text-xl font-semibold mb-4 mt-4">Specifications</h3>
+                            <div className="space-y-4">
+                                {formData.specs.map((spec, index) => (
+                                    <div key={index} className="flex items-center gap-4">
+                                        <input type="text" placeholder="Spec Name" value={spec.name} onChange={(e) => handleSpecChange(index, 'name', e.target.value)} className="w-1/2 bg-dark border border-gray-600 rounded-lg py-2 px-3" />
+                                        <input type="text" placeholder="Spec Value" value={spec.value} onChange={(e) => handleSpecChange(index, 'value', e.target.value)} className="w-1/2 bg-dark border border-gray-600 rounded-lg py-2 px-3" />
+                                        <button type="button" onClick={() => removeSpec(index)} disabled={formData.specs.length <= 1} className="text-red-500 hover:text-red-400 p-2 disabled:opacity-50 disabled:cursor-not-allowed">&times;</button>
+                                    </div>
+                                ))}
+                            </div>
+                            <button type="button" onClick={addSpec} className="mt-4 text-sm text-brand-purple hover:underline">
+                                + Add Specification
+                            </button>
+                        </div>
+                        
+                        {/* Actions */}
+                        <div className="pt-6 border-t border-white/10 flex justify-between items-center">
+                            <div className="flex items-center gap-3">
+                                <label className="block text-sm font-medium">Visible to Customers</label>
+                                <Switch 
+                                    checked={formData.isVisible} 
+                                    onChange={(checked) => setFormData({ ...formData, isVisible: checked })} 
+                                />
+                            </div>
+                            <div className="flex gap-4">
+                                <button type="button" onClick={() => navigateTo('products')} className="border border-gray-600 text-white font-semibold py-2 px-6 rounded-full hover:bg-gray-700 transition-colors">
+                                    Cancel
+                                </button>
+                                <button type="submit" className="bg-brand-purple text-white font-bold py-2 px-6 rounded-full hover:bg-brand-purple/80 transition-all">
+                                    Save Product
+                                </button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
     );
 };
 
-const AuthForm: React.FC<{
-    isLogin: boolean;
-    navigateTo: (page: string) => void;
-}> = ({ isLogin, navigateTo }) => {
-    const { login, signup } = useAuth();
-    // Signup states
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
-    const [nickname, setNickname] = useState('');
-    const [email, setEmail] = useState('');
-    const [agreedToTerms, setAgreedToTerms] = useState(false);
-    // Login state
-    const [identifier, setIdentifier] = useState('');
-    // Common states
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
 
-    const handleSubmit = async (e: React.FormEvent) => {
+// Define Edit Product Page
+const EditProductPage: React.FC<{ navigateTo: (page: string) => void; productId: string; products: Product[]; setProducts: React.Dispatch<React.SetStateAction<Product[]>> }> = ({ navigateTo, productId, products, setProducts }) => {
+    const productToEdit = products.find(p => p.id === productId);
+    const [formData, setFormData] = useState<Product | null>(productToEdit ? { ...productToEdit } : null);
+    const [isDiscounted, setIsDiscounted] = useState(!!productToEdit?.originalPrice);
+
+    if (!formData) {
+        return (
+            <div className="bg-dark pt-24 min-h-screen flex items-center justify-center">
+                <p className="text-red-500">Product not found!</p>
+            </div>
+        );
+    }
+
+    const handleDiscountToggle = (checked: boolean) => {
+        setIsDiscounted(checked);
+        if (checked) {
+            setFormData(f => f ? { ...f, originalPrice: f.price, price: 0 } : null);
+        } else {
+            setFormData(f => f ? { ...f, price: f.originalPrice || 0, originalPrice: undefined } : null);
+        }
+    };
+    
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (!formData) return;
+        if (e.target.files) {
+            const files = Array.from(e.target.files);
+            const imagePromises = files.map(file => {
+                return new Promise<string>((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => resolve(reader.result as string);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+            });
+
+            Promise.all(imagePromises).then(base64Images => {
+                setFormData(prev => prev ? ({
+                    ...prev,
+                    images: [...prev.images, ...base64Images]
+                }) : null);
+            });
+        }
+    };
+    
+    const removeImage = (index: number) => {
+        if (!formData) return;
+        setFormData(prev => prev ? ({
+            ...prev,
+            images: prev.images.filter((_, i) => i !== index)
+        }) : null);
+    };
+    
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        if (!formData) return;
+        const { name, value } = e.target;
+        const type = e.target.getAttribute('type');
+        const parsedValue = type === 'number' ? (value ? parseFloat(value) : (name === 'price' || name === 'stock' ? 0 : undefined)) : value;
+        setFormData({ ...formData, [name]: parsedValue });
+    };
+    
+    const handleSpecChange = (index: number, field: 'name' | 'value', value: string) => {
+        if (!formData) return;
+        const newSpecs = [...formData.specs];
+        newSpecs[index] = { ...newSpecs[index], [field]: value };
+        setFormData({ ...formData, specs: newSpecs });
+    };
+
+    const addSpec = () => {
+         if (!formData) return;
+        setFormData({ ...formData, specs: [...formData.specs, { name: '', value: '' }] });
+    };
+    
+    const removeSpec = (index: number) => {
+        if (!formData) return;
+        const newSpecs = formData.specs.filter((_, i) => i !== index);
+        setFormData({ ...formData, specs: newSpecs });
+    };
+
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        setError('');
-        setIsLoading(true);
-        try {
-            if (isLogin) {
-                await login(identifier, password);
-            } else {
-                await signup(firstName, lastName, nickname, email, password);
-            }
-            navigateTo('home');
-        } catch (err: any) {
-            setError(err.message);
-        } finally {
-            setIsLoading(false);
+        if (formData) {
+            setProducts(products.map(p => p.id === productId ? formData : p));
+            alert('Product updated successfully!');
+            navigateTo('products');
         }
     };
 
     return (
-        <div className="bg-dark pt-24 animate-fade-in min-h-screen flex items-center justify-center">
-            <div className="container mx-auto px-4 py-12 md:py-20 max-w-md">
-                <div className="bg-dark-accent p-8 rounded-2xl border border-white/10">
-                    <h1 className="text-3xl font-bold text-center text-white mb-2">{isLogin ? 'Welcome Back' : 'Create Account'}</h1>
-                    <p className="text-center text-gray-400 mb-8">{isLogin ? 'Sign in to continue' : 'Join the future of smart living'}</p>
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        {!isLogin && (
-                            <>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label htmlFor="firstName" className="block text-sm font-medium text-gray-300 mb-2">First Name</label>
-                                        <input type="text" id="firstName" value={firstName} onChange={e => setFirstName(e.target.value)} required className="w-full bg-dark border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
-                                    </div>
-                                    <div>
-                                        <label htmlFor="lastName" className="block text-sm font-medium text-gray-300 mb-2">Surname</label>
-                                        <input type="text" id="lastName" value={lastName} onChange={e => setLastName(e.target.value)} required className="w-full bg-dark border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
-                                    </div>
-                                </div>
-                                <div>
-                                    <label htmlFor="nickname" className="block text-sm font-medium text-gray-300 mb-2">Nickname</label>
-                                    <input type="text" id="nickname" value={nickname} onChange={e => setNickname(e.target.value)} required className="w-full bg-dark border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
-                                </div>
-                                <div>
-                                    <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
-                                    <input type="email" id="email" value={email} onChange={e => setEmail(e.target.value)} required className="w-full bg-dark border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
-                                </div>
-                            </>
-                        )}
-                        {isLogin && (
-                             <div>
-                                <label htmlFor="identifier" className="block text-sm font-medium text-gray-300 mb-2">Nickname or Email</label>
-                                <input type="text" id="identifier" value={identifier} onChange={e => setIdentifier(e.target.value)} required className="w-full bg-dark border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
+        <div className="bg-dark pt-24 animate-fade-in">
+            <div className="container mx-auto px-4 py-12 md:py-20">
+                <div className="max-w-4xl mx-auto bg-dark-accent p-8 rounded-2xl border border-white/10">
+                     <button
+                        onClick={() => navigateTo('products')}
+                        className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-8 group"
+                    >
+                        <ArrowLeftIcon className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
+                        Back to Products
+                    </button>
+                    <h1 className="text-3xl font-bold text-white mb-8">Edit: {formData.name}</h1>
+                    
+                    <form onSubmit={handleSubmit} className="space-y-8">
+                        {/* Basic Info */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label htmlFor="name" className="block text-sm font-medium mb-2">Product Name</label>
+                                <input type="text" name="name" value={formData.name} onChange={handleChange} className="w-full bg-dark border border-gray-600 rounded-lg py-3 px-4" />
                             </div>
-                        )}
-                        <div>
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">Password</label>
-                            <input type="password" id="password" value={password} onChange={e => setPassword(e.target.value)} required className="w-full bg-dark border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
+                            <div>
+                                <label htmlFor="tagline" className="block text-sm font-medium mb-2">Tagline</label>
+                                <input type="text" name="tagline" value={formData.tagline} onChange={handleChange} className="w-full bg-dark border border-gray-600 rounded-lg py-3 px-4" />
+                            </div>
                         </div>
-                        {!isLogin && (
-                            <div className="flex items-start gap-3">
-                                <input
-                                    type="checkbox"
-                                    id="terms-signup"
-                                    checked={agreedToTerms}
-                                    onChange={(e) => setAgreedToTerms(e.target.checked)}
-                                    className="mt-1 h-4 w-4 rounded border-gray-600 bg-dark text-brand-purple focus:ring-brand-purple focus:ring-offset-dark"
-                                />
-                                <label htmlFor="terms-signup" className="text-sm text-gray-400">
-                                    I have read and agree to the{' '}
-                                    <button type="button" onClick={() => navigateTo('terms-conditions')} className="font-semibold text-brand-purple hover:underline focus:outline-none">
-                                        Terms of Use
-                                    </button>.
-                                </label>
-                            </div>
-                        )}
-                        {error && <p className="text-red-500 text-sm">{error}</p>}
+                        
+                        {/* Image Uploader */}
                         <div>
-                            <button type="submit" disabled={isLoading || (!isLogin && !agreedToTerms)} className="w-full bg-brand-purple text-white font-bold py-3 px-8 rounded-full hover:bg-brand-purple/80 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed">
-                                {isLoading ? 'Processing...' : (isLogin ? 'Login' : 'Sign Up')}
+                            <label className="block text-sm font-medium mb-2">Product Images</label>
+                            <div className="mt-2 flex justify-center rounded-lg border-2 border-dashed border-gray-600 px-6 py-10">
+                                <div className="text-center">
+                                    <ImageUploadIcon className="mx-auto h-12 w-12 text-gray-500" />
+                                    <div className="mt-4 flex text-sm leading-6 text-gray-400">
+                                        <label
+                                            htmlFor="file-upload-edit"
+                                            className="relative cursor-pointer rounded-md font-semibold text-brand-purple focus-within:outline-none focus-within:ring-2 focus-within:ring-brand-purple focus-within:ring-offset-2 focus-within:ring-offset-dark-accent hover:text-brand-purple/80"
+                                        >
+                                            <span>Add more images</span>
+                                            <input id="file-upload-edit" name="file-upload" type="file" className="sr-only" multiple accept="image/*" onChange={handleImageChange} />
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            {formData.images.length > 0 && (
+                                <div className="mt-4 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">
+                                    {formData.images.map((image, index) => (
+                                        <div key={index} className="relative group">
+                                            <img src={image} alt={`Preview ${index + 1}`} className="h-24 w-24 rounded-lg object-cover" />
+                                            <button
+                                                type="button"
+                                                onClick={() => removeImage(index)}
+                                                className="absolute top-0 right-0 m-1 h-6 w-6 rounded-full bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                                                aria-label="Remove image"
+                                            >
+                                                &times;
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Pricing, Stock, and Visibility */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                            {/* Pricing Column */}
+                            <div className="space-y-6">
+                                <div>
+                                    <label htmlFor={isDiscounted ? "originalPrice" : "price"} className="block text-sm font-medium mb-2">
+                                        {isDiscounted ? "Original Price (€)" : "Price (€)"}
+                                        {!isDiscounted && <span className="text-red-500"> *</span>}
+                                    </label>
+                                    <input 
+                                        type="number" 
+                                        name={isDiscounted ? "originalPrice" : "price"} 
+                                        id={isDiscounted ? "originalPrice" : "price"}
+                                        step="0.01" 
+                                        value={isDiscounted ? formData.originalPrice || '' : formData.price} 
+                                        onChange={handleChange} 
+                                        className="w-full bg-dark border border-gray-600 rounded-lg py-3 px-4" 
+                                        required={!isDiscounted}
+                                    />
+                                </div>
+
+                                <div className="flex items-center justify-between">
+                                    <label className="block text-sm font-medium">Apply Discount</label>
+                                    <Switch checked={isDiscounted} onChange={handleDiscountToggle} />
+                                </div>
+
+                                {isDiscounted && (
+                                    <div className="animate-fade-in">
+                                        <label htmlFor="price" className="block text-sm font-medium mb-2">
+                                            Discounted Price (€) <span className="text-red-500">*</span>
+                                        </label>
+                                        <input 
+                                            type="number" 
+                                            name="price" 
+                                            id="price"
+                                            step="0.01" 
+                                            value={formData.price} 
+                                            onChange={handleChange} 
+                                            className="w-full bg-dark border border-gray-600 rounded-lg py-3 px-4" 
+                                            required 
+                                        />
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Stock Column */}
+                            <div>
+                                <label htmlFor="stock" className="block text-sm font-medium mb-2">Stock</label>
+                                <input type="number" name="stock" value={formData.stock} onChange={handleChange} className="w-full bg-dark border border-gray-600 rounded-lg py-3 px-4" />
+                            </div>
+                        </div>
+
+                        {/* Specifications */}
+                        <div>
+                            <h3 className="text-xl font-semibold mb-4 mt-4">Specifications</h3>
+                            <div className="space-y-4">
+                                {formData.specs.map((spec, index) => (
+                                    <div key={index} className="flex items-center gap-4">
+                                        <input type="text" placeholder="Spec Name" value={spec.name} onChange={(e) => handleSpecChange(index, 'name', e.target.value)} className="w-1/2 bg-dark border border-gray-600 rounded-lg py-2 px-3" />
+                                        <input type="text" placeholder="Spec Value" value={spec.value} onChange={(e) => handleSpecChange(index, 'value', e.target.value)} className="w-1/2 bg-dark border border-gray-600 rounded-lg py-2 px-3" />
+                                        <button type="button" onClick={() => removeSpec(index)} className="text-red-500 hover:text-red-400 p-2">&times;</button>
+                                    </div>
+                                ))}
+                            </div>
+                            <button type="button" onClick={addSpec} className="mt-4 text-sm text-brand-purple hover:underline">
+                                + Add Specification
                             </button>
                         </div>
+
+                        {/* Actions */}
+                        <div className="pt-6 border-t border-white/10 flex justify-between items-center">
+                            <div className="flex items-center gap-3">
+                                <label className="block text-sm font-medium">Visible to Customers</label>
+                                <Switch 
+                                    checked={formData.isVisible} 
+                                    onChange={(checked) => setFormData(f => f ? { ...f, isVisible: checked } : null)} 
+                                />
+                            </div>
+                            <div className="flex gap-4">
+                                <button type="button" onClick={() => navigateTo('products')} className="border border-gray-600 text-white font-semibold py-2 px-6 rounded-full hover:bg-gray-700 transition-colors">
+                                    Cancel
+                                </button>
+                                <button type="submit" className="bg-brand-purple text-white font-bold py-2 px-6 rounded-full hover:bg-brand-purple/80 transition-all">
+                                    Save Changes
+                                </button>
+                            </div>
+                        </div>
                     </form>
-                    <p className="text-center text-gray-400 text-sm mt-6">
-                        {isLogin ? "Don't have an account? " : "Already have an account? "}
-                        <button onClick={() => navigateTo(isLogin ? 'signup' : 'login')} className="font-semibold text-brand-purple hover:underline">
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const AdminDashboardPage: React.FC<{ navigateTo: (page: string) => void }> = ({ navigateTo }) => {
+    const { fetchAllUsers, updateUserRoles, deleteUserAsAdmin, user: currentUser } = useAuth();
+    const [users, setUsers] = useState<User[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
+
+    const [editingUser, setEditingUser] = useState<User | null>(null);
+    const [menuPosition, setMenuPosition] = useState<{ top: number, left: number } | null>(null);
+    const menuRef = useRef<HTMLDivElement>(null);
+    
+    const [selectedRoles, setSelectedRoles] = useState<UserRole[]>([]);
+    const [isSaving, setIsSaving] = useState(false);
+
+    const availableRoles: UserRole[] = ['user', 'seller', 'Content Writer', 'UI/UX Designer', 'Web Developer', 'admin', 'super-admin'];
+
+    const loadUsers = useCallback(async () => {
+        setLoading(true);
+        setError('');
+        try {
+            const allUsers = await fetchAllUsers();
+            setUsers(allUsers);
+        } catch (err: any) {
+            setError(err.message || 'Failed to fetch users.');
+        } finally {
+            setLoading(false);
+        }
+    }, [fetchAllUsers]);
+
+    useEffect(() => {
+        loadUsers();
+    }, [loadUsers]);
+    
+    useEffect(() => {
+        if (!editingUser) return;
+
+        const closeMenu = () => {
+            setEditingUser(null);
+            setMenuPosition(null);
+        };
+
+        const handleClickOutside = (event: MouseEvent) => {
+            const target = event.target as HTMLElement;
+            if (target.closest('[data-manage-button-id]')) {
+                return;
+            }
+            if (menuRef.current && !menuRef.current.contains(target)) {
+                closeMenu();
+            }
+        };
+        
+        const handleInteraction = () => closeMenu();
+        
+        window.addEventListener('scroll', handleInteraction, true);
+        window.addEventListener('resize', handleInteraction);
+        document.addEventListener('mousedown', handleClickOutside);
+
+        return () => {
+            window.removeEventListener('scroll', handleInteraction, true);
+            window.removeEventListener('resize', handleInteraction);
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [editingUser]);
+
+    const handleEditClick = (user: User, event: React.MouseEvent<HTMLButtonElement>) => {
+        if (editingUser?.id === user.id) {
+            setEditingUser(null);
+            setMenuPosition(null);
+        } else {
+            const rect = event.currentTarget.getBoundingClientRect();
+            // Position the menu using fixed positioning, relative to the viewport
+            setMenuPosition({
+                top: rect.bottom + window.scrollY + 4,
+                left: rect.right + window.scrollX,
+            });
+            setEditingUser(user);
+            setSelectedRoles(user.roles);
+        }
+    };
+
+    const handleRoleChange = (role: UserRole, isChecked: boolean) => {
+        if (isChecked) {
+            setSelectedRoles(prev => [...prev, role]);
+        } else {
+            setSelectedRoles(prev => prev.filter(r => r !== role));
+        }
+    };
+
+    const handleSaveRoles = async () => {
+        if (!editingUser || !currentUser) return;
+
+        const canManagePrivilegedRoles = currentUser.roles.includes('super-admin');
+
+        // Client-side check to prevent privilege escalation by non-super-admins
+        if (!canManagePrivilegedRoles) {
+            const isTryingToGrantAdmin = selectedRoles.includes('admin') && !editingUser.roles.includes('admin');
+            const isTryingToGrantSuperAdmin = selectedRoles.includes('super-admin') && !editingUser.roles.includes('super-admin');
+            
+            if (isTryingToGrantAdmin || isTryingToGrantSuperAdmin) {
+                alert('You do not have permission to grant Admin or Super-admin roles.');
+                return;
+            }
+        }
+
+        setIsSaving(true);
+        try {
+            await updateUserRoles(editingUser.id, selectedRoles);
+            // Refresh the entire user list from the database to ensure data consistency
+            await loadUsers();
+            setEditingUser(null);
+            setMenuPosition(null);
+        } catch (err: any) {
+            alert(`Error saving roles: ${err.message}`);
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    const handleDeleteUser = async (userId: string) => {
+        if (window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+            try {
+                await deleteUserAsAdmin(userId);
+                setUsers(users.filter(u => u.id !== userId));
+            } catch (err: any) {
+                alert(`Error deleting user: ${err.message}`);
+            }
+        }
+    };
+
+    return (
+        <div className="bg-dark pt-24 animate-fade-in min-h-screen">
+            <div className="container mx-auto px-4 py-12 md:py-16">
+                <div className="flex justify-between items-center mb-10">
+                    <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-white">Admin Dashboard</h1>
+                    <button onClick={loadUsers} disabled={loading} className="text-sm border border-gray-600 text-white font-semibold py-2 px-5 rounded-full hover:bg-gray-700 transition-colors disabled:opacity-50">
+                        {loading ? 'Refreshing...' : 'Refresh Users'}
+                    </button>
+                </div>
+                {error && <p className="text-red-500 bg-red-500/10 p-4 rounded-lg mb-6">{error}</p>}
+                
+                <div className="overflow-x-auto -mx-4 sm:-mx-6 lg:-mx-8">
+                    <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+                        <div className="shadow overflow-hidden border-b border-gray-700 sm:rounded-lg">
+                            <table className="min-w-full divide-y divide-gray-700">
+                                <thead className="bg-dark-accent">
+                                    <tr>
+                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Name</th>
+                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Email</th>
+                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Roles</th>
+                                        <th scope="col" className="relative px-6 py-3"><span className="sr-only">Actions</span></th>
+                                    </tr>
+                                </thead>
+                                <tbody className="bg-dark divide-y divide-gray-800">
+                                    {loading ? (
+                                        <tr><td colSpan={4} className="text-center py-8 text-gray-500">Loading users...</td></tr>
+                                    ) : (
+                                        users.map((user) => (
+                                            <tr key={user.id}>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <div className="flex items-center">
+                                                        <div className="flex-shrink-0 h-10 w-10">
+                                                            <img className="h-10 w-10 rounded-full object-cover" src={user.profilePicture || `https://ui-avatars.com/api/?name=${user.firstName}+${user.lastName}`} alt="" />
+                                                        </div>
+                                                        <div className="ml-4">
+                                                            <div className="text-sm font-medium text-white">{user.firstName} {user.lastName}</div>
+                                                            <div className="text-sm text-gray-400">{user.nickname}</div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">{user.email}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
+                                                    <div className="flex flex-wrap gap-1">
+                                                        {user.roles.map(role => (
+                                                             <span key={role} className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${role === 'super-admin' ? 'bg-purple-500/30 text-purple-300' : role === 'admin' ? 'bg-blue-500/30 text-blue-300' : 'bg-gray-700 text-gray-300'}`}>
+                                                                {role}
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                    {currentUser?.id !== user.id && !user.roles.includes('super-admin') ? (
+                                                        <div className="flex gap-2 justify-end">
+                                                            <button
+                                                                data-manage-button-id={user.id}
+                                                                onClick={(e) => handleEditClick(user, e)}
+                                                                className="text-brand-purple hover:text-brand-purple/80"
+                                                            >
+                                                                Manage
+                                                            </button>
+                                                            <button onClick={() => handleDeleteUser(user.id)} className="text-red-500 hover:text-red-400">Delete</button>
+                                                        </div>
+                                                    ) : (
+                                                         <span className="text-xs text-gray-500 italic pr-4">
+                                                            {user.roles.includes('super-admin') ? 'Cannot edit super-admin' : 'Current User'}
+                                                         </span>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            {editingUser && menuPosition && (
+                 <div
+                    ref={menuRef}
+                    className="fixed w-64 rounded-lg shadow-lg bg-dark-accent ring-1 ring-white/10 focus:outline-none z-[101] flex flex-col"
+                    style={{
+                        top: `${menuPosition.top}px`,
+                        left: `${menuPosition.left}px`,
+                        transform: 'translateX(-100%)',
+                    }}
+                    role="menu"
+                    aria-orientation="vertical"
+                    aria-labelledby="menu-button"
+                >
+                    <div className="p-4 border-b border-white/10">
+                        <h3 className="font-semibold text-white">Edit Roles for</h3>
+                        <p className="text-sm text-gray-400">{editingUser.nickname}</p>
+                    </div>
+                    <div className="p-4 space-y-3 flex-grow overflow-y-auto max-h-60">
+                        {availableRoles.map(role => {
+                            const isPrivilegedRole = role === 'admin' || role === 'super-admin';
+                            const canManagePrivilegedRoles = currentUser?.roles.includes('super-admin');
+                            const isDisabled = isPrivilegedRole && !canManagePrivilegedRoles;
+
+                            return (
+                                <label key={role} className={`flex items-center gap-3 text-sm ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
+                                    <input
+                                        type="checkbox"
+                                        checked={selectedRoles.includes(role)}
+                                        onChange={(e) => handleRoleChange(role, e.target.checked)}
+                                        disabled={isDisabled}
+                                        className="h-4 w-4 rounded border-gray-600 bg-dark text-brand-purple focus:ring-brand-purple focus:ring-offset-dark-accent disabled:cursor-not-allowed"
+                                        aria-label={`Assign ${role} role`}
+                                    />
+                                    <span>{role}</span>
+                                </label>
+                            );
+                        })}
+                    </div>
+                     <div className="p-4 flex justify-end gap-3 bg-dark/50 rounded-b-lg">
+                        <button onClick={() => setEditingUser(null)} className="text-sm text-gray-300 hover:text-white px-3 py-1.5 rounded-md">Cancel</button>
+                        <button onClick={handleSaveRoles} disabled={isSaving} className="text-sm bg-brand-purple text-white font-semibold px-4 py-1.5 rounded-md hover:bg-brand-purple/80 disabled:opacity-50">
+                            {isSaving ? 'Saving...' : 'Save'}
+                        </button>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+
+// Define Profile Page
+const ProfilePage: React.FC<{ navigateTo: (page: string) => void }> = ({ navigateTo }) => {
+    const { user, updateUser, changePassword } = useAuth();
+    const [isEditing, setIsEditing] = useState(false);
+    
+    // Form state
+    const [firstName, setFirstName] = useState(user?.firstName || '');
+    const [lastName, setLastName] = useState(user?.lastName || '');
+    const [nickname, setNickname] = useState(user?.nickname || '');
+    const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+
+    // Password change state
+    const [currentPassword, setCurrentPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+
+    if (!user) {
+        return <div className="bg-dark pt-24 text-center py-20">Loading profile...</div>;
+    }
+
+    const handleProfileUpdate = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setMessage(null);
+        try {
+            await updateUser(user.id, { firstName, lastName, nickname });
+            setMessage({ type: 'success', text: 'Profile updated successfully!' });
+            setIsEditing(false);
+        } catch (err: any) {
+             setMessage({ type: 'error', text: err.message || 'Failed to update profile.' });
+        }
+    };
+    
+    const handlePasswordChange = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setMessage(null);
+        if (newPassword !== confirmPassword) {
+            setMessage({ type: 'error', text: 'New passwords do not match.' });
+            return;
+        }
+        try {
+            await changePassword(user.id, currentPassword, newPassword);
+            setMessage({ type: 'success', text: 'Password changed successfully!' });
+            // Clear fields
+            setCurrentPassword('');
+            setNewPassword('');
+            setConfirmPassword('');
+        } catch (err: any) {
+            setMessage({ type: 'error', text: err.message || 'Failed to change password.' });
+        }
+    }
+
+    return (
+        <div className="bg-dark pt-24 animate-fade-in min-h-screen">
+            <div className="container mx-auto px-4 py-12 md:py-16">
+                 <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-white mb-10">My Profile</h1>
+                 {message && (
+                    <div className={`p-4 rounded-lg mb-6 text-sm ${message.type === 'success' ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300'}`}>
+                        {message.text}
+                    </div>
+                 )}
+                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                    {/* Profile Details */}
+                    <div className="lg:col-span-2 bg-dark-accent p-8 rounded-2xl border border-white/10">
+                        <form onSubmit={handleProfileUpdate}>
+                             <div className="flex justify-between items-center mb-8">
+                                <h2 className="text-2xl font-bold text-white">Account Details</h2>
+                                <button type="button" onClick={() => setIsEditing(!isEditing)} className="text-sm border border-gray-600 text-white font-semibold py-2 px-5 rounded-full hover:bg-gray-700 transition-colors">
+                                    {isEditing ? 'Cancel' : 'Edit Profile'}
+                                </button>
+                            </div>
+                            <div className="space-y-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-400 mb-2">First Name</label>
+                                        <input type="text" value={firstName} onChange={e => setFirstName(e.target.value)} disabled={!isEditing} className="w-full bg-dark border border-gray-600 rounded-lg py-3 px-4 disabled:opacity-50" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-400 mb-2">Last Name</label>
+                                        <input type="text" value={lastName} onChange={e => setLastName(e.target.value)} disabled={!isEditing} className="w-full bg-dark border border-gray-600 rounded-lg py-3 px-4 disabled:opacity-50" />
+                                    </div>
+                                </div>
+                                 <div>
+                                    <label className="block text-sm font-medium text-gray-400 mb-2">Nickname</label>
+                                    <input type="text" value={nickname} onChange={e => setNickname(e.target.value)} disabled={!isEditing} className="w-full bg-dark border border-gray-600 rounded-lg py-3 px-4 disabled:opacity-50" />
+                                </div>
+                                 <div>
+                                    <label className="block text-sm font-medium text-gray-400 mb-2">Email</label>
+                                    <input type="email" value={user.email} disabled className="w-full bg-dark border border-gray-600 rounded-lg py-3 px-4 disabled:opacity-50" />
+                                </div>
+                                {isEditing && (
+                                     <div className="flex justify-end pt-4">
+                                         <button type="submit" className="bg-brand-purple text-white font-bold py-2 px-6 rounded-full hover:bg-brand-purple/80 transition-all">Save Changes</button>
+                                     </div>
+                                )}
+                            </div>
+                        </form>
+                    </div>
+                    {/* Password Change */}
+                     <div className="bg-dark-accent p-8 rounded-2xl border border-white/10">
+                         <h2 className="text-2xl font-bold text-white mb-8">Change Password</h2>
+                         <form onSubmit={handlePasswordChange} className="space-y-6">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-400 mb-2">Current Password</label>
+                                <input type="password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} required className="w-full bg-dark border border-gray-600 rounded-lg py-3 px-4" />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-400 mb-2">New Password</label>
+                                <input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} required className="w-full bg-dark border border-gray-600 rounded-lg py-3 px-4" />
+                            </div>
+                             <div>
+                                <label className="block text-sm font-medium text-gray-400 mb-2">Confirm New Password</label>
+                                <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required className="w-full bg-dark border border-gray-600 rounded-lg py-3 px-4" />
+                            </div>
+                            <div className="pt-4">
+                                <button type="submit" className="w-full bg-brand-purple text-white font-bold py-3 px-6 rounded-full hover:bg-brand-purple/80 transition-all">Update Password</button>
+                            </div>
+                         </form>
+                     </div>
+                 </div>
+            </div>
+        </div>
+    );
+};
+
+// Define Login/Signup Page (AuthForm)
+const AuthForm: React.FC<{ navigateTo: (page: string) => void }> = ({ navigateTo }) => {
+    const [isLogin, setIsLogin] = useState(true);
+    const { login, signup, signInWithProvider } = useAuth();
+    const [error, setError] = useState('');
+    const [message, setMessage] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+
+    // Form fields
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [nickname, setNickname] = useState('');
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError('');
+        setMessage('');
+        setIsLoading(true);
+        try {
+            if (isLogin) {
+                await login(email.trim(), password);
+                navigateTo('home');
+            } else {
+                await signup(firstName.trim(), lastName.trim(), nickname.trim(), email.trim(), password);
+                setMessage('Signup successful! Please check your email to verify your account.');
+                // Clear fields and switch to login view
+                setEmail('');
+                setPassword('');
+                setFirstName('');
+                setLastName('');
+                setNickname('');
+                setIsLogin(true); 
+            }
+        } catch (err: any) {
+            setError(err.message || 'An unknown error occurred.');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+    
+    const handleProviderSignIn = async (provider: 'google' | 'facebook') => {
+        setError('');
+        try {
+            await signInWithProvider(provider);
+            // The onAuthStateChange listener will handle navigation/state updates
+        } catch (err: any) {
+            setError(err.message);
+        }
+    };
+
+    return (
+        <div className="bg-dark pt-24 min-h-screen flex items-center justify-center animate-fade-in">
+            <div className="container mx-auto px-4 py-12">
+                <div className="max-w-md mx-auto bg-dark-accent p-8 md:p-10 rounded-2xl border border-white/10 shadow-2xl shadow-brand-purple/10">
+                    <h1 className="text-3xl font-bold text-white text-center mb-2">{isLogin ? 'Welcome Back' : 'Create Account'}</h1>
+                    <p className="text-gray-400 text-center mb-8">{isLogin ? 'Sign in to continue to NYX' : 'Join the future of smart living'}</p>
+                    
+                    {error && <p className="bg-red-500/20 text-red-300 text-sm p-3 rounded-lg mb-4">{error}</p>}
+                    {message && <p className="bg-green-500/20 text-green-300 text-sm p-3 rounded-lg mb-4">{message}</p>}
+
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        {!isLogin && (
+                             <>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium mb-2">First Name</label>
+                                        <input type="text" value={firstName} onChange={e => setFirstName(e.target.value)} required className="w-full bg-dark border border-gray-600 rounded-lg py-3 px-4" />
+                                    </div>
+                                     <div>
+                                        <label className="block text-sm font-medium mb-2">Last Name</label>
+                                        <input type="text" value={lastName} onChange={e => setLastName(e.target.value)} required className="w-full bg-dark border border-gray-600 rounded-lg py-3 px-4" />
+                                    </div>
+                                </div>
+                                 <div>
+                                    <label className="block text-sm font-medium mb-2">Nickname</label>
+                                    <input type="text" value={nickname} onChange={e => setNickname(e.target.value)} required className="w-full bg-dark border border-gray-600 rounded-lg py-3 px-4" />
+                                </div>
+                             </>
+                        )}
+                        <div>
+                            <label className="block text-sm font-medium mb-2">{isLogin ? 'Email or Nickname' : 'Email'}</label>
+                            <input
+                                type={isLogin ? 'text' : 'email'}
+                                value={email}
+                                onChange={e => setEmail(e.target.value)}
+                                required
+                                className="w-full bg-dark border border-gray-600 rounded-lg py-3 px-4"
+                             />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium mb-2">Password</label>
+                            <input type="password" value={password} onChange={e => setPassword(e.target.value)} required className="w-full bg-dark border border-gray-600 rounded-lg py-3 px-4" />
+                        </div>
+                        <button type="submit" disabled={isLoading} className="w-full bg-brand-purple text-white font-bold py-3 px-8 rounded-full hover:bg-brand-purple/80 transition-all duration-300 disabled:opacity-50">
+                            {isLoading ? 'Processing...' : (isLogin ? 'Login' : 'Sign Up')}
+                        </button>
+                    </form>
+                    
+                     <div className="flex items-center my-6">
+                        <div className="flex-grow border-t border-gray-700"></div>
+                        <span className="flex-shrink mx-4 text-gray-500 text-sm">OR</span>
+                        <div className="flex-grow border-t border-gray-700"></div>
+                    </div>
+                    
+                    <div className="space-y-4">
+                         <button onClick={() => handleProviderSignIn('google')} className="w-full flex items-center justify-center gap-3 bg-dark border border-gray-600 rounded-full py-3 px-4 hover:bg-dark-accent/50 transition-colors">
+                            <GoogleIcon className="w-6 h-6"/>
+                            <span>Continue with Google</span>
+                        </button>
+                        <button onClick={() => handleProviderSignIn('facebook')} className="w-full flex items-center justify-center gap-3 bg-dark border border-gray-600 rounded-full py-3 px-4 hover:bg-dark-accent/50 transition-colors">
+                            <FacebookAuthIcon className="w-6 h-6 text-[#1877F2]"/>
+                            <span>Continue with Facebook</span>
+                        </button>
+                    </div>
+
+                    <p className="text-center text-sm text-gray-400 mt-8">
+                        {isLogin ? "Don't have an account?" : "Already have an account?"}
+                        <button onClick={() => { setIsLogin(!isLogin); setError(''); }} className="font-semibold text-brand-purple hover:underline ml-1">
                             {isLogin ? 'Sign Up' : 'Login'}
                         </button>
                     </p>
@@ -637,941 +1524,75 @@ const AuthForm: React.FC<{
     );
 };
 
-const AddProductPage: React.FC<{ navigateTo: (page: string) => void, addProduct: (product: Product) => void }> = ({ navigateTo, addProduct }) => {
-    const [product, setProduct] = useState<Omit<Product, 'specs' | 'id' | 'isVisible'>>({
-        name: '',
-        tagline: '',
-        price: 0,
-        stock: 0,
-        images: [],
-    });
-    const [imagePreview, setImagePreview] = useState<string | null>(null);
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
-        setProduct(prev => ({ ...prev, [name]: name === 'price' || name === 'stock' ? parseFloat(value) : value }));
-    };
-
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            const file = e.target.files[0];
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                const result = reader.result as string;
-                setImagePreview(result);
-                setProduct(prev => ({ ...prev, images: [result] }));
-            };
-            reader.readAsDataURL(file);
-        }
-    };
-    
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (product.images.length === 0) {
-            alert('Please upload an image for the product.');
-            return;
-        }
-        const newProduct: Product = {
-            id: `prod-${Date.now()}`,
-            isVisible: true,
-            ...product,
-            images: product.images,
-            specs: [ // Add dummy specs for now
-                { name: 'Connectivity', value: 'Wi-Fi 2.4GHz' },
-                { name: 'Color', value: 'Matte Onyx Black' },
-            ]
-        };
-        addProduct(newProduct);
-        alert('Product added successfully!');
-        navigateTo('products');
-    };
-
-    return (
-        <div className="bg-dark pt-24 animate-fade-in">
-            <div className="container mx-auto px-4 py-12 md:py-20">
-                <div className="max-w-2xl mx-auto">
-                    <button onClick={() => navigateTo('home')} className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-8 group">
-                        <ArrowLeftIcon className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
-                        Back to Home
-                    </button>
-                    <h1 className="text-4xl font-bold text-white mb-8">Add New Product</h1>
-                    <form onSubmit={handleSubmit} className="space-y-6 bg-dark-accent p-8 rounded-2xl border border-white/10">
-                        <div>
-                            <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">Product Name</label>
-                            <input type="text" name="name" id="name" value={product.name} onChange={handleChange} required className="w-full bg-dark border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
-                        </div>
-                        <div>
-                            <label htmlFor="tagline" className="block text-sm font-medium text-gray-300 mb-2">Tagline</label>
-                            <input type="text" name="tagline" id="tagline" value={product.tagline} onChange={handleChange} required className="w-full bg-dark border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
-                        </div>
-                        <div className="grid grid-cols-2 gap-6">
-                            <div>
-                                <label htmlFor="price" className="block text-sm font-medium text-gray-300 mb-2">Price</label>
-                                <input type="number" name="price" id="price" value={product.price > 0 ? product.price : ''} onChange={handleChange} required min="0" step="0.01" className="w-full bg-dark border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
-                            </div>
-                            <div>
-                                <label htmlFor="stock" className="block text-sm font-medium text-gray-300 mb-2">Stock</label>
-                                <input type="number" name="stock" id="stock" value={product.stock > 0 ? product.stock : ''} onChange={handleChange} required min="0" className="w-full bg-dark border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
-                            </div>
-                        </div>
-                        <div>
-                            <label htmlFor="image" className="block text-sm font-medium text-gray-300 mb-2">Product Image</label>
-                            <input type="file" name="image" id="image" accept="image/*" onChange={handleImageChange} required className="w-full bg-dark border border-gray-600 rounded-lg p-3 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-brand-purple file:text-white hover:file:bg-brand-purple/80 cursor-pointer" />
-                        </div>
-                        {imagePreview && (
-                            <div className="mt-4">
-                                <p className="text-sm font-medium text-gray-300 mb-2">Image Preview:</p>
-                                <img src={imagePreview} alt="Product Preview" className="w-32 h-32 object-cover rounded-lg border border-gray-600" />
-                            </div>
-                        )}
-                        <div>
-                            <button type="submit" className="w-full bg-brand-purple text-white font-bold py-3 px-8 rounded-full hover:bg-brand-purple/80 transition-all duration-300 transform hover:scale-105">
-                                Add Product
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-const EditProductPage: React.FC<{
-    navigateTo: (page: string, params?: any) => void,
-    products: Product[],
-    updateProduct: (product: Product) => void,
-    deleteProduct: (productId: string) => void,
-    productId: string
-}> = ({ navigateTo, products, updateProduct, deleteProduct, productId }) => {
-    const productToEdit = products.find(p => p.id === productId);
-    const [product, setProduct] = useState<Product | null>(productToEdit || null);
-    const [imagePreview, setImagePreview] = useState<string | null>(productToEdit?.images[0] || null);
-    const [isDiscounted, setIsDiscounted] = useState<boolean>(!!productToEdit?.originalPrice);
-
-    useEffect(() => {
-        const productToEdit = products.find(p => p.id === productId);
-        if (!productToEdit) {
-            alert("Product not found.");
-            navigateTo('products');
-        } else {
-            setProduct(productToEdit);
-            setIsDiscounted(!!productToEdit.originalPrice);
-            setImagePreview(productToEdit.images[0] || null);
-        }
-    }, [productId, products, navigateTo]);
-
-    if (!product) return null;
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value, type } = e.target;
-        const parsedValue = type === 'number' ? (parseFloat(value) || 0) : value;
-        setProduct(prev => prev ? { ...prev, [name]: parsedValue } : null);
-    };
-
-    const handleDiscountToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const isEnabled = e.target.checked;
-        setIsDiscounted(isEnabled);
-
-        setProduct(prev => {
-            if (!prev) return null;
-            if (isEnabled) {
-                // When enabling discount, set originalPrice to current price if it's not already set
-                return { ...prev, originalPrice: prev.originalPrice || prev.price };
-            } else {
-                // When disabling discount, restore original price and clear originalPrice field
-                return { ...prev, price: prev.originalPrice || prev.price, originalPrice: undefined };
-            }
-        });
-    };
-
-    const handleVisibilityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { checked } = e.target;
-        setProduct(prev => prev ? { ...prev, isVisible: checked } : null);
-    };
-
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            const file = e.target.files[0];
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                const result = reader.result as string;
-                setImagePreview(result);
-                setProduct(prev => prev ? { ...prev, images: [result] } : null);
-            };
-            reader.readAsDataURL(file);
-        }
-    };
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (product) {
-            if (isDiscounted && product.originalPrice && product.price >= product.originalPrice) {
-                alert('Discounted price must be lower than the original price.');
-                return;
-            }
-            updateProduct(product);
-            alert('Product updated successfully!');
-            navigateTo('products');
-        }
-    };
-
-    const handleDelete = () => {
-        if (window.confirm(`Are you sure you want to delete "${product.name}"? This action cannot be undone.`)) {
-            deleteProduct(product.id);
-            alert('Product deleted successfully.');
-            navigateTo('products');
-        }
-    };
-
-    return (
-        <div className="bg-dark pt-24 animate-fade-in">
-            <div className="container mx-auto px-4 py-12 md:py-20">
-                <div className="max-w-2xl mx-auto">
-                    <button onClick={() => navigateTo('products')} className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-8 group">
-                        <ArrowLeftIcon className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
-                        Back to Products
-                    </button>
-                    <h1 className="text-4xl font-bold text-white mb-8">Edit Product</h1>
-                    <form onSubmit={handleSubmit} className="space-y-6 bg-dark-accent p-8 rounded-2xl border border-white/10">
-                        <div>
-                            <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">Product Name</label>
-                            <input type="text" name="name" id="name" value={product.name} onChange={handleChange} required className="w-full bg-dark border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
-                        </div>
-                        <div>
-                            <label htmlFor="tagline" className="block text-sm font-medium text-gray-300 mb-2">Tagline</label>
-                            <input type="text" name="tagline" id="tagline" value={product.tagline} onChange={handleChange} required className="w-full bg-dark border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
-                        </div>
-
-                        <div className="flex items-center justify-between bg-dark p-4 rounded-lg border border-gray-700">
-                            <div>
-                                <label htmlFor="isDiscounted" className="text-sm font-medium text-gray-300">Apply Discount</label>
-                                <p className="text-xs text-gray-500">Show a discounted price next to the original price.</p>
-                            </div>
-                            <label htmlFor="isDiscounted" className="inline-flex relative items-center cursor-pointer">
-                                <input type="checkbox" checked={isDiscounted} onChange={handleDiscountToggle} id="isDiscounted" className="sr-only peer" />
-                                <div className="w-11 h-6 bg-gray-600 rounded-full peer peer-focus:ring-2 peer-focus:ring-brand-purple peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-purple"></div>
-                            </label>
-                        </div>
-
-                        {isDiscounted ? (
-                            <div className="grid grid-cols-2 gap-6">
-                                <div>
-                                    <label htmlFor="originalPrice" className="block text-sm font-medium text-gray-300 mb-2">Original Price</label>
-                                    <input type="number" name="originalPrice" id="originalPrice" value={product.originalPrice || ''} onChange={handleChange} required min="0" step="0.01" className="w-full bg-dark border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
-                                </div>
-                                <div>
-                                    <label htmlFor="price" className="block text-sm font-medium text-gray-300 mb-2">Discounted Price</label>
-                                    <input type="number" name="price" id="price" value={product.price > 0 ? product.price : ''} onChange={handleChange} required min="0" step="0.01" className="w-full bg-dark border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
-                                </div>
-                            </div>
-                        ) : (
-                            <div>
-                                <label htmlFor="price" className="block text-sm font-medium text-gray-300 mb-2">Price</label>
-                                <input type="number" name="price" id="price" value={product.price > 0 ? product.price : ''} onChange={handleChange} required min="0" step="0.01" className="w-full bg-dark border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
-                            </div>
-                        )}
-
-                        <div>
-                            <label htmlFor="stock" className="block text-sm font-medium text-gray-300 mb-2">Stock</label>
-                            <input type="number" name="stock" id="stock" value={product.stock > 0 ? product.stock : ''} onChange={handleChange} required min="0" className="w-full bg-dark border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
-                        </div>
-
-                        <div>
-                            <label htmlFor="image" className="block text-sm font-medium text-gray-300 mb-2">Product Image</label>
-                            <input type="file" name="image" id="image" accept="image/*" onChange={handleImageChange} className="w-full bg-dark border border-gray-600 rounded-lg p-3 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-brand-purple file:text-white hover:file:bg-brand-purple/80 cursor-pointer" />
-                        </div>
-                        {imagePreview && (
-                            <div className="mt-4">
-                                <p className="text-sm font-medium text-gray-300 mb-2">Image Preview:</p>
-                                <img src={imagePreview} alt="Product Preview" className="w-32 h-32 object-cover rounded-lg border border-gray-600" />
-                            </div>
-                        )}
-                        <div className="flex items-center justify-between bg-dark p-4 rounded-lg border border-gray-700">
-                            <div>
-                                <label htmlFor="isVisible" className="text-sm font-medium text-gray-300">Product Visibility</label>
-                                <p className="text-xs text-gray-500">When hidden, product will not be visible to customers.</p>
-                            </div>
-                            <label htmlFor="isVisible" className="inline-flex relative items-center cursor-pointer">
-                                <input type="checkbox" checked={product.isVisible} onChange={handleVisibilityChange} id="isVisible" className="sr-only peer" />
-                                <div className="w-11 h-6 bg-gray-600 rounded-full peer peer-focus:ring-2 peer-focus:ring-brand-purple peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-purple"></div>
-                            </label>
-                        </div>
-                        <div className="flex gap-4">
-                            <button type="submit" className="flex-grow bg-brand-purple text-white font-bold py-3 px-8 rounded-full hover:bg-brand-purple/80 transition-all duration-300 transform hover:scale-105">
-                                Save Changes
-                            </button>
-                             <button type="button" onClick={handleDelete} className="bg-red-600 text-white font-bold py-3 px-8 rounded-full hover:bg-red-500 transition-colors duration-300">
-                                Delete
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-
-const AdminDashboard: React.FC<{ navigateTo: (page: string) => void }> = ({ navigateTo }) => {
-    const { allUsers, setAllUsers, user: currentUser } = useAuth();
-    const [editingUserId, setEditingUserId] = useState<string | null>(null);
-    const editingUserRef = useRef<HTMLDivElement>(null);
-
-    const availableRoles: UserRole[] = ['user', 'seller', 'admin', 'Web Developer', 'UI/UX Designer', 'Content Writer'];
-
-    const handleDeleteUser = (userId: string) => {
-        const userToDelete = allUsers.find(u => u.id === userId);
-        if (userToDelete?.roles.includes('super-admin')) {
-            alert("The Super Admin account cannot be deleted.");
-            return;
-        }
-        if (userId === currentUser?.id) {
-            alert("You cannot delete your own account.");
-            return;
-        }
-        if (window.confirm('Are you sure you want to delete this user?')) {
-            setAllUsers(prev => prev.filter(u => u.id !== userId));
-        }
-    };
-
-    const handleRoleChange = (userId: string, role: UserRole, isChecked: boolean) => {
-        const userToChange = allUsers.find(u => u.id === userId);
-        if (userToChange?.roles.includes('super-admin')) {
-            alert("The Super Admin's roles cannot be changed.");
-            return;
-        }
-
-        setAllUsers(prevUsers =>
-            prevUsers.map(u => {
-                if (u.id === userId) {
-                    if (!isChecked && u.roles.length === 1 && u.roles.includes(role)) {
-                         alert("A user must have at least one role.");
-                         return u;
-                    }
-                    const newRoles = isChecked
-                        ? Array.from(new Set([...u.roles, role]))
-                        : u.roles.filter(r => r !== role);
-                    return { ...u, roles: newRoles };
-                }
-                return u;
-            })
-        );
-    };
-
-    const formatRoleName = (role: string) => {
-        return role.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-    };
-
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (editingUserRef.current && !editingUserRef.current.contains(event.target as Node)) {
-                setEditingUserId(null);
-            }
-        };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, []);
-
-    return (
-        <div className="bg-dark pt-24 animate-fade-in min-h-screen">
-            <div className="container mx-auto px-4 py-12 md:py-20">
-                <button onClick={() => navigateTo('home')} className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-8 group">
-                    <ArrowLeftIcon className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
-                    Back to Home
-                </button>
-                <h1 className="text-4xl font-bold text-white mb-8">Admin Dashboard</h1>
-                <div className="bg-dark-accent p-8 rounded-2xl border border-white/10">
-                    <h2 className="text-2xl font-semibold text-white mb-6">User Management</h2>
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left">
-                            <thead>
-                                <tr className="border-b border-gray-700">
-                                    <th className="p-4 text-sm font-semibold text-gray-400 uppercase tracking-wider">Name</th>
-                                    <th className="p-4 text-sm font-semibold text-gray-400 uppercase tracking-wider">Email</th>
-                                    <th className="p-4 text-sm font-semibold text-gray-400 uppercase tracking-wider">Role</th>
-                                    <th className="p-4 text-sm font-semibold text-gray-400 uppercase tracking-wider text-right">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {allUsers.map((user) => (
-                                    <tr key={user.id} className="border-b border-gray-800 hover:bg-dark">
-                                        <td className="p-4 text-white font-medium flex items-center gap-3">
-                                            <img src={user.profilePicture || `https://ui-avatars.com/api/?name=${user.firstName}+${user.lastName}&background=1D1D1D&color=fff`} alt={user.nickname} className="w-10 h-10 rounded-full object-cover"/>
-                                            {`${user.firstName} ${user.lastName}`}
-                                        </td>
-                                        <td className="p-4 text-gray-300">{user.email}</td>
-                                        <td className="p-4 text-gray-300">
-                                            {user.roles.includes('super-admin') ? (
-                                                <span className="bg-brand-pink text-white text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full">
-                                                    Super Admin
-                                                </span>
-                                            ) : (
-                                                <div className="relative" ref={editingUserId === user.id ? editingUserRef : null}>
-                                                    <button
-                                                        onClick={() => setEditingUserId(editingUserId === user.id ? null : user.id)}
-                                                        disabled={user.id === currentUser?.id}
-                                                        className="w-full text-left bg-dark border border-gray-600 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-brand-purple disabled:opacity-50 disabled:cursor-not-allowed min-w-[200px]"
-                                                    >
-                                                        <span className="flex flex-wrap gap-1">
-                                                            {user.roles.length > 0 ? (
-                                                                user.roles.map(role => (
-                                                                    <span key={role} className="bg-gray-700 text-gray-200 text-xs font-semibold px-2 py-0.5 rounded-full">
-                                                                        {formatRoleName(role)}
-                                                                    </span>
-                                                                ))
-                                                            ) : (
-                                                                <span className="text-gray-500">No Roles</span>
-                                                            )}
-                                                        </span>
-                                                    </button>
-
-                                                    {editingUserId === user.id && (
-                                                        <div className="absolute z-10 mt-1 w-64 bg-dark-accent rounded-lg border border-white/10 shadow-lg p-4 right-0">
-                                                            <p className="text-sm font-semibold text-white mb-2">Assign Roles</p>
-                                                            <div className="space-y-2">
-                                                                {availableRoles.map(role => (
-                                                                    <label key={role} htmlFor={`${user.id}-${role}`} className="flex items-center gap-3 cursor-pointer">
-                                                                        <input
-                                                                            type="checkbox"
-                                                                            id={`${user.id}-${role}`}
-                                                                            checked={user.roles.includes(role)}
-                                                                            onChange={(e) => handleRoleChange(user.id, role, e.target.checked)}
-                                                                            className="w-4 h-4 text-brand-purple bg-gray-700 border-gray-600 rounded focus:ring-brand-purple focus:ring-2"
-                                                                        />
-                                                                        <span className="text-gray-300">{formatRoleName(role)}</span>
-                                                                    </label>
-                                                                ))}
-                                                            </div>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            )}
-                                        </td>
-                                        <td className="p-4 text-right">
-                                            <button 
-                                                onClick={() => handleDeleteUser(user.id)}
-                                                className="text-red-500 hover:text-red-400 disabled:opacity-50 disabled:cursor-not-allowed"
-                                                disabled={user.roles.includes('super-admin') || user.id === currentUser?.id}
-                                                aria-label={`Delete user ${user.firstName} ${user.lastName}`}
-                                            >
-                                                Delete
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-const ImageCropModal: React.FC<{
-    imageSrc: string | null;
-    isOpen: boolean;
-    onClose: () => void;
-    onSave: (dataUrl: string) => void;
-}> = ({ imageSrc, isOpen, onClose, onSave }) => {
-    const canvasRef = useRef<HTMLCanvasElement>(null);
-    const imageRef = useRef(new Image());
-    const [scale, setScale] = useState(1);
-    const [minScale, setMinScale] = useState(1);
-    const [position, setPosition] = useState({ x: 0, y: 0 });
-    const [isDragging, setIsDragging] = useState(false);
-    const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-
-    const CROP_DIAMETER = 280;
-    const CANVAS_DIM = 350;
-
-    const draw = useCallback(() => {
-        const canvas = canvasRef.current;
-        if (!canvas) return;
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return;
-        const image = imageRef.current;
-
-        ctx.clearRect(0, 0, CANVAS_DIM, CANVAS_DIM);
-
-        // Draw the image
-        if (image.src) {
-            ctx.drawImage(
-                image,
-                position.x,
-                position.y,
-                image.width * scale,
-                image.height * scale
-            );
-        }
-
-        // Draw the overlay
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
-        ctx.beginPath();
-        ctx.rect(0, 0, CANVAS_DIM, CANVAS_DIM);
-        ctx.arc(CANVAS_DIM / 2, CANVAS_DIM / 2, CROP_DIAMETER / 2, 0, Math.PI * 2, true);
-        ctx.fill();
-
-        // Draw the crop circle border
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.arc(CANVAS_DIM / 2, CANVAS_DIM / 2, CROP_DIAMETER / 2, 0, Math.PI * 2);
-        ctx.stroke();
-
-    }, [position, scale]);
-
-    useEffect(() => {
-        if (imageSrc) {
-            const image = imageRef.current;
-            image.onload = () => {
-                const hRatio = CANVAS_DIM / image.width;
-                const vRatio = CANVAS_DIM / image.height;
-                const initialScale = Math.max(hRatio, vRatio);
-
-                const minFitScale = Math.max(CROP_DIAMETER / image.width, CROP_DIAMETER / image.height);
-                setMinScale(minFitScale);
-                setScale(minFitScale);
-
-                const initialX = (CANVAS_DIM - image.width * minFitScale) / 2;
-                const initialY = (CANVAS_DIM - image.height * minFitScale) / 2;
-                setPosition({ x: initialX, y: initialY });
-            };
-            image.src = imageSrc;
-        }
-    }, [imageSrc]);
-
-    useEffect(() => {
-        draw();
-    }, [draw]);
-    
-    const getClampedPosition = (x: number, y: number, currentScale: number) => {
-        const image = imageRef.current;
-        const cropRadius = CROP_DIAMETER / 2;
-        const centerX = CANVAS_DIM / 2;
-        const centerY = CANVAS_DIM / 2;
-
-        const scaledWidth = image.width * currentScale;
-        const scaledHeight = image.height * currentScale;
-
-        const minX = centerX - scaledWidth + cropRadius;
-        const maxX = centerX - cropRadius;
-        const minY = centerY - scaledHeight + cropRadius;
-        const maxY = centerY - cropRadius;
-
-        return {
-            x: Math.max(minX, Math.min(x, maxX)),
-            y: Math.max(minY, Math.min(y, maxY)),
-        };
-    };
-
-    const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
-        setIsDragging(true);
-        setDragStart({
-            x: e.clientX - position.x,
-            y: e.clientY - position.y,
-        });
-    };
-
-    const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
-        if (isDragging) {
-            const newX = e.clientX - dragStart.x;
-            const newY = e.clientY - dragStart.y;
-            setPosition(getClampedPosition(newX, newY, scale));
-        }
-    };
-    
-    const handleMouseUp = () => {
-        setIsDragging(false);
-    };
-    
-    const handleZoom = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const newScale = parseFloat(e.target.value);
-        setScale(newScale);
-        setPosition(pos => getClampedPosition(pos.x, pos.y, newScale));
-    };
-
-    const handleSave = () => {
-        const canvas = canvasRef.current;
-        const image = imageRef.current;
-        if (!canvas || !image.src) return;
-
-        const cropCanvas = document.createElement('canvas');
-        const outputSize = 256; // High-resolution output
-        cropCanvas.width = outputSize;
-        cropCanvas.height = outputSize;
-        const cropCtx = cropCanvas.getContext('2d');
-        if (!cropCtx) return;
-
-        const sourceSize = CROP_DIAMETER / scale;
-        const sourceX = (CANVAS_DIM / 2 - position.x) / scale - (sourceSize / 2);
-        const sourceY = (CANVAS_DIM / 2 - position.y) / scale - (sourceSize / 2);
-
-        // Create a circular clipping path. This ensures the output is circular like the preview.
-        cropCtx.beginPath();
-        cropCtx.arc(outputSize / 2, outputSize / 2, outputSize / 2, 0, Math.PI * 2, true);
-        cropCtx.clip();
-
-        // Draw the cropped portion of the image onto the new canvas.
-        cropCtx.drawImage(
-            image,
-            sourceX, sourceY, sourceSize, sourceSize,
-            0, 0, outputSize, outputSize
-        );
-
-        // Return as PNG to support transparency from the circular clip.
-        onSave(cropCanvas.toDataURL('image/png'));
-    };
-
-
-    if (!isOpen) return null;
-
-    return (
-        <div className="fixed inset-0 bg-black/60 z-[99] backdrop-blur-sm flex items-center justify-center" onClick={onClose}>
-            <div className="bg-dark-accent rounded-2xl border border-white/10 shadow-2xl shadow-brand-purple/20 flex flex-col p-6 w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
-                <h3 className="text-xl font-semibold text-white mb-4 text-center">Edit Profile Picture</h3>
-                <canvas
-                    ref={canvasRef}
-                    width={CANVAS_DIM}
-                    height={CANVAS_DIM}
-                    className="rounded-lg cursor-grab active:cursor-grabbing mx-auto"
-                    onMouseDown={handleMouseDown}
-                    onMouseMove={handleMouseMove}
-                    onMouseUp={handleMouseUp}
-                    onMouseLeave={handleMouseUp}
-                />
-                <div className="my-4">
-                    <label htmlFor="zoom" className="block text-sm font-medium text-gray-300 mb-2">Zoom</label>
-                    <input
-                        type="range"
-                        id="zoom"
-                        min={minScale}
-                        max={minScale * 3}
-                        step="0.01"
-                        value={scale}
-                        onChange={handleZoom}
-                        className="w-full h-2 bg-dark rounded-lg appearance-none cursor-pointer accent-brand-purple"
-                    />
-                </div>
-                <div className="flex gap-4">
-                    <button onClick={onClose} className="w-full bg-gray-700 text-white font-bold py-3 px-8 rounded-full hover:bg-gray-600 transition-colors duration-300">
-                        Cancel
-                    </button>
-                    <button onClick={handleSave} className="w-full bg-brand-purple text-white font-bold py-3 px-8 rounded-full hover:bg-brand-purple/80 transition-colors duration-300">
-                        Save
-                    </button>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-const ProfilePage: React.FC<{ navigateTo: (page: string) => void }> = ({ navigateTo }) => {
-    const { user, updateUser, changePassword } = useAuth();
-    
-    // State for profile form
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
-    const [nickname, setNickname] = useState('');
-    const [profilePicture, setProfilePicture] = useState<string | undefined>(undefined);
-    const [profileMessage, setProfileMessage] = useState({ type: '', text: '' });
-    const [isSavingProfile, setIsSavingProfile] = useState(false);
-    
-    const [isCropModalOpen, setIsCropModalOpen] = useState(false);
-    const [imageToCrop, setImageToCrop] = useState<string | null>(null);
-
-    // State for password form
-    const [currentPassword, setCurrentPassword] = useState('');
-    const [newPassword, setNewPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [passwordMessage, setPasswordMessage] = useState({ type: '', text: '' });
-    const [isChangingPassword, setIsChangingPassword] = useState(false);
-
-    useEffect(() => {
-        if (user) {
-            setFirstName(user.firstName);
-            setLastName(user.lastName);
-            setNickname(user.nickname);
-            setProfilePicture(user.profilePicture);
-        } else {
-            // If user is somehow null, redirect to login
-            navigateTo('login');
-        }
-    }, [user, navigateTo]);
-    
-    const handleProfilePictureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            const file = e.target.files[0];
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setImageToCrop(reader.result as string);
-                setIsCropModalOpen(true);
-            };
-            reader.readAsDataURL(file);
-             e.target.value = ''; // Reset file input
-        }
-    };
-    
-    const handleSaveCroppedImage = async (croppedImageDataUrl: string) => {
-        if (!user) return;
-        setProfilePicture(croppedImageDataUrl);
-        setIsCropModalOpen(false);
-        setImageToCrop(null);
-
-        try {
-            await updateUser(user.id, { profilePicture: croppedImageDataUrl });
-            setProfileMessage({ type: 'success', text: 'Profile picture updated!' });
-        } catch (err: any) {
-            setProfileMessage({ type: 'error', text: err.message });
-            setProfilePicture(user.profilePicture); // Revert on error
-        } finally {
-            setTimeout(() => setProfileMessage({ type: '', text: '' }), 3000);
-        }
-    };
-
-    const handleProfileUpdate = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!user) return;
-        
-        setIsSavingProfile(true);
-        setProfileMessage({ type: '', text: '' });
-
-        try {
-            await updateUser(user.id, { firstName, lastName, nickname });
-            setProfileMessage({ type: 'success', text: 'Profile updated successfully!' });
-        } catch (err: any) {
-            setProfileMessage({ type: 'error', text: err.message });
-        } finally {
-            setIsSavingProfile(false);
-            setTimeout(() => setProfileMessage({ type: '', text: '' }), 3000);
-        }
-    };
-
-    const handlePasswordChange = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!user) return;
-        if (newPassword !== confirmPassword) {
-            setPasswordMessage({ type: 'error', text: 'New passwords do not match.' });
-            return;
-        }
-        if (newPassword.length < 6) {
-            setPasswordMessage({ type: 'error', text: 'Password must be at least 6 characters long.' });
-            return;
-        }
-
-        setIsChangingPassword(true);
-        setPasswordMessage({ type: '', text: '' });
-
-        try {
-            await changePassword(user.id, currentPassword, newPassword);
-            setPasswordMessage({ type: 'success', text: 'Password changed successfully!' });
-            // Clear password fields
-            setCurrentPassword('');
-            setNewPassword('');
-            setConfirmPassword('');
-        } catch (err: any) {
-            setPasswordMessage({ type: 'error', text: err.message });
-        } finally {
-            setIsChangingPassword(false);
-            setTimeout(() => setPasswordMessage({ type: '', text: '' }), 3000);
-        }
-    };
-    
-    if (!user) return null; // Or a loading spinner
-
-    return (
-        <div className="bg-dark pt-24 animate-fade-in min-h-screen">
-             <ImageCropModal 
-                isOpen={isCropModalOpen}
-                imageSrc={imageToCrop}
-                onClose={() => {
-                    setIsCropModalOpen(false);
-                    setImageToCrop(null);
-                }}
-                onSave={handleSaveCroppedImage}
-            />
-            <div className="container mx-auto px-4 py-12 md:py-20">
-                <div className="max-w-4xl mx-auto">
-                    <button onClick={() => navigateTo('home')} className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-8 group">
-                        <ArrowLeftIcon className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
-                        Back to Home
-                    </button>
-                    <h1 className="text-4xl font-bold text-white mb-8">My Profile</h1>
-                    
-                    {/* Profile Picture Section */}
-                    <div className="flex justify-center mb-10">
-                        <div className="relative group">
-                            <img 
-                                src={profilePicture || `https://ui-avatars.com/api/?name=${user.firstName}+${user.lastName}&background=1D1D1D&color=fff`} 
-                                alt="Profile" 
-                                className="w-32 h-32 rounded-full object-cover border-4 border-dark-accent shadow-lg" 
-                            />
-                            <label htmlFor="profilePictureInput" className="absolute inset-0 bg-black/60 rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
-                                <span>Change</span>
-                            </label>
-                            <input 
-                                type="file" 
-                                id="profilePictureInput" 
-                                className="hidden" 
-                                accept="image/png, image/jpeg, image/gif"
-                                onChange={handleProfilePictureChange}
-                            />
-                        </div>
-                    </div>
-
-                    {/* Profile Details Form */}
-                    <div className="bg-dark-accent p-8 rounded-2xl border border-white/10 mb-12">
-                        <h2 className="text-2xl font-semibold text-white mb-6">Profile Information</h2>
-                        <form onSubmit={handleProfileUpdate} className="space-y-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label htmlFor="prof-firstName" className="block text-sm font-medium text-gray-300 mb-2">First Name</label>
-                                    <input type="text" id="prof-firstName" value={firstName} onChange={e => setFirstName(e.target.value)} required className="w-full bg-dark border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
-                                </div>
-                                <div>
-                                    <label htmlFor="prof-lastName" className="block text-sm font-medium text-gray-300 mb-2">Surname</label>
-                                    <input type="text" id="prof-lastName" value={lastName} onChange={e => setLastName(e.target.value)} required className="w-full bg-dark border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
-                                </div>
-                            </div>
-                            <div>
-                                <label htmlFor="prof-nickname" className="block text-sm font-medium text-gray-300 mb-2">Nickname</label>
-                                <input type="text" id="prof-nickname" value={nickname} onChange={e => setNickname(e.target.value)} required className="w-full bg-dark border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
-                            </div>
-                            <div>
-                                <label htmlFor="prof-email" className="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
-                                <input type="email" id="prof-email" value={user.email} disabled className="w-full bg-dark border border-gray-700 rounded-lg p-3 text-gray-400 cursor-not-allowed" />
-                            </div>
-                            
-                            {profileMessage.text && (
-                                <p className={`text-sm text-center ${profileMessage.type === 'success' ? 'text-green-500' : 'text-red-500'}`}>
-                                    {profileMessage.text}
-                                </p>
-                            )}
-
-                            <div className="flex justify-end">
-                                <button type="submit" disabled={isSavingProfile} className="bg-brand-purple text-white font-bold py-3 px-8 rounded-full hover:bg-brand-purple/80 transition-all duration-300 transform hover:scale-105 disabled:opacity-50">
-                                    {isSavingProfile ? 'Saving...' : 'Save Changes'}
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-
-                    {/* Change Password Form */}
-                    <div className="bg-dark-accent p-8 rounded-2xl border border-white/10">
-                        <h2 className="text-2xl font-semibold text-white mb-6">Change Password</h2>
-                         <form onSubmit={handlePasswordChange} className="space-y-6">
-                            <div>
-                                <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-300 mb-2">Current Password</label>
-                                <input type="password" id="currentPassword" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} required className="w-full bg-dark border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label htmlFor="newPassword" className="block text-sm font-medium text-gray-300 mb-2">New Password</label>
-                                    <input type="password" id="newPassword" value={newPassword} onChange={e => setNewPassword(e.target.value)} required className="w-full bg-dark border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
-                                </div>
-                                <div>
-                                    <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-300 mb-2">Confirm New Password</label>
-                                    <input type="password" id="confirmPassword" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required className="w-full bg-dark border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
-                                </div>
-                            </div>
-
-                             {passwordMessage.text && (
-                                <p className={`text-sm ${passwordMessage.type === 'success' ? 'text-green-500' : 'text-red-500'}`}>
-                                    {passwordMessage.text}
-                                </p>
-                            )}
-
-                             <div className="flex justify-end">
-                                <button type="submit" disabled={isChangingPassword} className="bg-brand-purple text-white font-bold py-3 px-8 rounded-full hover:bg-brand-purple/80 transition-all duration-300 transform hover:scale-105 disabled:opacity-50">
-                                    {isChangingPassword ? 'Updating...' : 'Change Password'}
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
-
 
 const App: React.FC = () => {
-    const [page, setPage] = useState<{name: string, params: any}>({ name: 'home', params: {} });
+    const [currentPage, setCurrentPage] = useState('home');
+    const [pageParams, setPageParams] = useState<any>(null);
     const [isAskNyxOpen, setIsAskNyxOpen] = useState(false);
     const [products, setProducts] = useState<Product[]>(PRODUCTS_DATA);
+    
+    // Cookie consent state
     const [showCookieBanner, setShowCookieBanner] = useState(false);
 
     useEffect(() => {
-        const consent = localStorage.getItem('nyx-cookie-consent');
-        if (!consent) {
+        const consent = localStorage.getItem('cookie-consent');
+        if (consent === null) {
             setShowCookieBanner(true);
         }
     }, []);
 
-    const handleAcceptCookies = () => {
-        localStorage.setItem('nyx-cookie-consent', 'accepted');
+    const handleCookieAccept = () => {
+        localStorage.setItem('cookie-consent', 'true');
         setShowCookieBanner(false);
     };
 
-    const handleDeclineCookies = () => {
-        localStorage.setItem('nyx-cookie-consent', 'declined');
+    const handleCookieDecline = () => {
+        localStorage.setItem('cookie-consent', 'false');
         setShowCookieBanner(false);
     };
 
-    const navigateTo = (pageName: string, params: any = {}) => {
-        setPage({ name: pageName, params });
+    const navigateTo = (page: string, params?: any) => {
+        setCurrentPage(page);
+        setPageParams(params);
         window.scrollTo(0, 0);
     };
     
-    const addProduct = (product: Product) => {
-        setProducts(prev => [product, ...prev]);
-    };
-
-    const updateProduct = (updatedProduct: Product) => {
-        setProducts(prev => prev.map(p => p.id === updatedProduct.id ? updatedProduct : p));
-    };
-
-    const deleteProduct = (productId: string) => {
-        setProducts(prev => prev.filter(p => p.id !== productId));
-    };
+    // This allows the Why Us page button to navigate
+    (window as any).navigateToProducts = () => navigateTo('products');
 
 
     const renderPage = () => {
-        switch (page.name) {
+        switch (currentPage) {
             case 'home':
                 return <HomePage navigateTo={navigateTo} products={products} />;
             case 'products':
                 return <ProductsPage navigateTo={navigateTo} products={products} />;
             case 'how-it-works':
-                return <HowItWorksPage navigateTo={navigateTo} />;
+                return <HowItWorksPage />;
             case 'setup-videos':
-                return <SetupVideosPage navigateTo={navigateTo} products={products}/>;
+                return <SetupVideosPage />;
             case 'faq':
-                return <FAQPage navigateTo={navigateTo} />;
+                return <FAQPage />;
             case 'contact':
-                return <ContactPage navigateTo={navigateTo} />;
+                return <ContactPage />;
             case 'our-story':
-                return <OurStoryPage navigateTo={navigateTo} />;
+                return <OurStoryPage />;
             case 'why-us':
-                return <WhyUsPage navigateTo={navigateTo} />;
-            case 'terms-conditions':
-                return <TermsAndConditionsPage navigateTo={navigateTo} />;
-            case 'login':
-                return <AuthForm isLogin={true} navigateTo={navigateTo} />;
-            case 'signup':
-                return <AuthForm isLogin={false} navigateTo={navigateTo} />;
+                return <WhyUsPage />;
             case 'add-product':
-                 return <AddProductPage navigateTo={navigateTo} addProduct={addProduct} />;
+                 return <AddProductPage navigateTo={navigateTo} setProducts={setProducts} />;
             case 'edit-product':
-                 return <EditProductPage navigateTo={navigateTo} products={products} updateProduct={updateProduct} deleteProduct={deleteProduct} productId={page.params.id} />;
+                return pageParams?.id ? <EditProductPage navigateTo={navigateTo} productId={pageParams.id} products={products} setProducts={setProducts} /> : <HomePage navigateTo={navigateTo} products={products} />;
             case 'admin-dashboard':
-                return <AdminDashboard navigateTo={navigateTo} />;
+                return <AdminDashboardPage navigateTo={navigateTo} />;
             case 'profile':
                 return <ProfilePage navigateTo={navigateTo} />;
+            case 'login':
+                return <AuthForm navigateTo={navigateTo} />;
+            case 'terms-conditions':
+                return <TermsAndConditionsPage navigateTo={navigateTo} />;
             default:
-                return <HomePage navigateTo={navigateTo} products={products}/>;
+                return <HomePage navigateTo={navigateTo} products={products} />;
         }
     };
 
@@ -1583,15 +1604,11 @@ const App: React.FC = () => {
                     <main>
                         {renderPage()}
                     </main>
+                    <EmailCapture />
                     <Footer navigateTo={navigateTo} />
                     <CartSidebar navigateTo={navigateTo} />
                     <AskNyx isOpen={isAskNyxOpen} onClose={() => setIsAskNyxOpen(false)} />
-                    {showCookieBanner && (
-                        <CookieConsentBanner
-                            onAccept={handleAcceptCookies}
-                            onDecline={handleDeclineCookies}
-                        />
-                    )}
+                    {showCookieBanner && <CookieConsentBanner onAccept={handleCookieAccept} onDecline={handleCookieDecline} />}
                 </div>
             </CartProvider>
         </AuthProvider>

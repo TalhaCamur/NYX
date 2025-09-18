@@ -1,7 +1,3 @@
-
-
-
-
 import React from 'react';
 import { Product, Testimonial, Feature, FAQItem } from './types';
 
@@ -115,7 +111,11 @@ const BatteryIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
     React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", width: "24", height: "24", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", ...props }, React.createElement('rect', { x: "1", y: "6", width: "18", height: "12", rx: "2", ry: "2" }), React.createElement('line', { x1: "23", y1: "13", x2: "23", y2: "11" }))
 );
 const DesignIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
-    React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", width: "24", height: "24", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", ...props }, React.createElement('path', { d: "M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" }))
+    React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", width: "24", height: "24", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", ...props },
+        React.createElement('path', { d: "M12 2L2 7l10 5 10-5-10-5z" }),
+        React.createElement('path', { d: "M2 17l10 5 10-5" }),
+        React.createElement('path', { d: "M2 12l10 5 10-5" })
+    )
 );
 const ConnectivityIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
     React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", width: "24", height: "24", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", ...props }, React.createElement('path', { d: "M5 12.55a8 8 0 0 1 14.08 0" }), React.createElement('path', { d: "M1.42 9a12 12 0 0 1 21.16 0" }), React.createElement('path', { d: "M8.53 16.11a4 4 0 0 1 6.95 0" }), React.createElement('line', { x1: "12", y1: "20", x2: "12", y2: "20" }))

@@ -206,10 +206,10 @@ const Header: React.FC<HeaderProps> = ({ onAskNyxOpen, navigateTo }) => {
                             <div className="w-48 bg-dark-accent rounded-lg border border-white/10 shadow-lg py-2">
                                 <p className="px-4 py-2 text-xs text-gray-500 uppercase tracking-wider">Account</p>
                                 <button onClick={(e) => handleLinkClick(e, '/profile', 'Profile')} className={baseLinkClass}>My Profile</button>
-                                {(user.roles.includes('seller') || user.roles.includes('admin')) && (
+                                {(user.roles.includes('seller') || user.roles.includes('admin') || user.roles.includes('super-admin')) && (
                                      <button onClick={(e) => handleLinkClick(e, '/add-product', 'Add Product')} className={baseLinkClass}>Add Product</button>
                                 )}
-                                {user.roles.includes('admin') && (
+                                {(user.roles.includes('admin') || user.roles.includes('super-admin')) && (
                                      <button onClick={(e) => handleLinkClick(e, '/admin-dashboard', 'Admin Panel')} className={baseLinkClass}>Admin Panel</button>
                                 )}
                                 <div className="border-t border-white/10 my-2"></div>
@@ -236,10 +236,10 @@ const Header: React.FC<HeaderProps> = ({ onAskNyxOpen, navigateTo }) => {
             return (
                 <>
                     <a href="#" onClick={(e) => handleLinkClick(e, '/profile', 'Profile')} className={baseLinkClass}>My Profile</a>
-                    {(user.roles.includes('seller') || user.roles.includes('admin')) && (
+                    {(user.roles.includes('seller') || user.roles.includes('admin') || user.roles.includes('super-admin')) && (
                          <a href="#" onClick={(e) => handleLinkClick(e, '/add-product', 'Add Product')} className={baseLinkClass}>Add Product</a>
                     )}
-                     {user.roles.includes('admin') && (
+                     {(user.roles.includes('admin') || user.roles.includes('super-admin')) && (
                          <a href="#" onClick={(e) => handleLinkClick(e, '/admin-dashboard', 'Admin Panel')} className={baseLinkClass}>Admin Panel</a>
                     )}
                     <button onClick={handleLogout} className={`${baseLinkClass} text-red-500`}>Logout</button>

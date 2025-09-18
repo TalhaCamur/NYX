@@ -11,7 +11,7 @@ const ProductCard: React.FC<{ product: Product; navigateTo: (page: string, param
     const { user } = useAuth();
     const { addToCart, openCart } = useCart();
     const [isAdded, setIsAdded] = useState(false);
-    const isAuthorized = user && (user.roles.includes('seller') || user.roles.includes('admin'));
+    const isAuthorized = user && (user.roles.includes('seller') || user.roles.includes('admin') || user.roles.includes('super-admin'));
 
     const handleAddToCart = () => {
         addToCart(product, 1);
@@ -69,14 +69,14 @@ const ProductCard: React.FC<{ product: Product; navigateTo: (page: string, param
     );
 };
 
-interface ProductsSectionProps {
+interface ProductShowcaseProps {
   navigateTo: (page: string, params?: any) => void;
   products: Product[];
 }
 
-const ProductsSection: React.FC<ProductsSectionProps> = ({ navigateTo, products }) => {
+const ProductShowcase: React.FC<ProductShowcaseProps> = ({ navigateTo, products }) => {
     const { user } = useAuth();
-    const isAuthorized = user && (user.roles.includes('seller') || user.roles.includes('admin'));
+    const isAuthorized = user && (user.roles.includes('seller') || user.roles.includes('admin') || user.roles.includes('super-admin'));
 
     const displayedProducts = (isAuthorized ? products : products.filter(p => p.isVisible)).slice(0, 4);
     
@@ -109,4 +109,4 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({ navigateTo, products 
     );
 };
 
-export default ProductsSection;
+export default ProductShowcase;
