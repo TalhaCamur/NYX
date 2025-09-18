@@ -1,9 +1,4 @@
 
-
-
-
-
-
 export interface Product {
   id: string;
   name: string;
@@ -14,6 +9,7 @@ export interface Product {
   images: string[];
   specs: { name: string; value: string }[];
   isVisible: boolean;
+  ownerId?: string;
 }
 
 export interface Testimonial {

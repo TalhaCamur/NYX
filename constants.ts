@@ -23,83 +23,8 @@ export const NAV_LINKS = [
   { name: 'Ask NYX', href: '#ask' },
 ];
 
-const NYX_SENSOR: Product = {
-  id: 'prod-001',
-  name: 'NYX-1 Smart PIR Motion Sensor',
-  tagline: 'Intelligent motion sensing meets minimalist design.',
-  price: 79.99,
-  originalPrice: 99.99,
-  stock: 150,
-  images: [
-    'https://m.media-amazon.com/images/I/51rG+55hL9L._AC_SL1500_.jpg',
-    'https://m.media-amazon.com/images/I/61N92qc0bOL._AC_SL1500_.jpg',
-    'https://m.media-amazon.com/images/I/61T+Nf-M7FL._AC_SL1500_.jpg',
-    'https://m.media-amazon.com/images/I/61f-jqlprGL._AC_SL1500_.jpg',
-  ],
-  specs: [
-    { name: 'Detection Range', value: '8 meters / 26 feet' },
-    { name: 'Detection Angle', value: '120 degrees' },
-    { name: 'Battery Life', value: 'Up to 24 months' },
-    { name: 'Connectivity', value: 'Wi-Fi 2.4GHz / Bluetooth 5.0' },
-    { name: 'Color', value: 'Matte Onyx Black' },
-    { name: 'Dimensions', value: '45mm x 45mm x 30mm' },
-  ],
-  isVisible: true,
-};
-
-const NYX_BULB: Product = {
-  id: 'prod-002',
-  name: 'NYX-Bulb Smart LED',
-  tagline: 'Infinite colors for every mood. Brilliant illumination.',
-  price: 24.99,
-  stock: 300,
-  images: ['https://m.media-amazon.com/images/I/61Bi4iS1i3L._AC_SL1500_.jpg'],
-  specs: [
-    { name: 'Brightness', value: '800 Lumens' },
-    { name: 'Color', value: '16 Million Colors (RGBW)' },
-    { name: 'Lifetime', value: '25,000 Hours' },
-    { name: 'Connectivity', value: 'Wi-Fi 2.4GHz' },
-    { name: 'Voice Control', value: 'Alexa, Google Assistant' },
-  ],
-  isVisible: true,
-};
-
-const NYX_PLUG: Product = {
-  id: 'prod-003',
-  name: 'NYX-Plug Smart Outlet',
-  tagline: 'Make any appliance smart. Control from anywhere.',
-  price: 19.99,
-  stock: 450,
-  images: ['https://m.media-amazon.com/images/I/61n2MC2w4vL._AC_SL1500_.jpg'],
-  specs: [
-    { name: 'Input Voltage', value: '100-240V' },
-    { name: 'Max Current', value: '10A' },
-    { name: 'Connectivity', value: 'Wi-Fi 2.4GHz' },
-    { name: 'Features', value: 'Scheduling, Timer, Remote' },
-  ],
-  isVisible: true,
-};
-
-const NYX_CAM: Product = {
-  id: 'prod-004',
-  name: 'NYX-Cam Indoor Security',
-  tagline: 'Your eyes at home. Crystal clear 2K resolution.',
-  price: 59.99,
-  originalPrice: 79.99,
-  stock: 200,
-  images: ['https://m.media-amazon.com/images/I/51n8Kmqz2EL._AC_SL1000_.jpg'],
-  specs: [
-    { name: 'Resolution', value: '2K (2304x1296)' },
-    { name: 'Field of View', value: '125° Wide-Angle' },
-    { name: 'Night Vision', value: 'Color Night Vision' },
-    { name: 'Features', value: 'Two-Way Audio, AI Detection' },
-  ],
-  isVisible: true,
-};
-
-
 // Replaces PRODUCT_DATA with a list of all products.
-export const PRODUCTS_DATA: Product[] = [NYX_SENSOR, NYX_BULB, NYX_PLUG, NYX_CAM];
+export const PRODUCTS_DATA: Product[] = [];
 
 
 // Placeholder icons for Features section as creating new files is not allowed.

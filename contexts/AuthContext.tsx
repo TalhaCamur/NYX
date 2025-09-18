@@ -6,7 +6,7 @@ import { createClient, Session, User as SupabaseUser } from '@supabase/supabase-
 // In a real production app, these would be in environment variables.
 const supabaseUrl = 'https://dpbyrvnvxjlhvtooyuru.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwYnlydm52eGpsaHZ0b295dXJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxMTExODAsImV4cCI6MjA3MzY4NzE4MH0.txkD2Awid_RJhWhFJb0I13QBseIHdrDqHfeGgXrG0EE';
-const supabase = createClient(supabaseUrl, supabaseKey);
+export const supabase = createClient(supabaseUrl, supabaseKey);
 
 // --- Helper Functions ---
 const mapProfileToUser = (profile: any, authUser: SupabaseUser | null): User => ({

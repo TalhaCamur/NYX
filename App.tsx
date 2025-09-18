@@ -7,11 +7,11 @@ import HomePage from './pages/HomePage';
 import { CartProvider } from './contexts/CartContext';
 import CartSidebar from './components/CartSidebar';
 import AskNyx from './pages/AskNyxPage';
-import { PRODUCTS_DATA, FAQ_DATA, FEATURES_DATA } from './constants';
+import { FAQ_DATA, FEATURES_DATA } from './constants';
 import { useCart } from './contexts/CartContext';
 import { Product, User, UserRole } from './types';
 import EmailCapture from './components/EmailCapture';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { AuthProvider, useAuth, supabase } from './contexts/AuthContext';
 import TermsAndConditionsPage from './pages/TermsAndConditionsPage';
 import CookieConsentBanner from './components/CookieConsentBanner';
 
@@ -166,15 +166,14 @@ const ProductCard: React.FC<{ product: Product; navigateTo: (page: string, param
     );
 };
 
-const ProductsPage: React.FC<{ navigateTo: (page: string, params?: any) => void, products: Product[] }> = ({ navigateTo, products }) => {
+const ProductsPage: React.FC<{ navigateTo: (page: string, params?: any) => void, products: Product[], loading: boolean, error: string | null }> = ({ navigateTo, products, loading, error }) => {
     const { user } = useAuth();
     const isAuthorized = user && (user.roles.includes('seller') || user.roles.includes('admin') || user.roles.includes('super-admin'));
     
-    // Show all products to authorized users, only visible ones to others
     const displayedProducts = isAuthorized ? products : products.filter(p => p.isVisible);
 
     return (
-        <div className="bg-dark pt-24 animate-fade-in">
+        <div className="bg-dark pt-24 animate-fade-in min-h-screen">
             <div className="container mx-auto px-4 py-12 md:py-20">
                 <div className="text-center max-w-3xl mx-auto mb-16">
                     <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-white mb-4">Our Full Collection</h1>
@@ -182,15 +181,26 @@ const ProductsPage: React.FC<{ navigateTo: (page: string, params?: any) => void,
                         Explore the entire NYX ecosystem. Every device is crafted to enhance your home and simplify your life.
                     </p>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                     {displayedProducts.map((product) => (
-                        <ProductCard key={product.id} product={product} navigateTo={navigateTo} />
-                    ))}
-                </div>
+                {loading && <p className="text-center text-gray-400 text-xl">Loading products...</p>}
+                {error && <p className="text-center text-red-500 bg-red-500/10 p-4 rounded-lg">{error}</p>}
+                {!loading && !error && displayedProducts.length === 0 && (
+                    <div className="text-center text-gray-500 py-16">
+                        <h2 className="text-2xl font-semibold mb-2">No Products Yet</h2>
+                        <p>Check back soon, or if you're a seller, add a new product!</p>
+                    </div>
+                )}
+                {!loading && displayedProducts.length > 0 && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                        {displayedProducts.map((product) => (
+                            <ProductCard key={product.id} product={product} navigateTo={navigateTo} />
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );
 };
+
 
 // Define the How It Works Page
 const HowItWorksPage: React.FC = () => {
@@ -199,7 +209,7 @@ const HowItWorksPage: React.FC = () => {
       title: '1. Unbox & Power On',
       description: 'Getting started is effortless. Unbox your NYX device, plug it in, and it will power on automatically, ready for setup.',
       icon: (props: React.SVGProps<SVGSVGElement>) => (
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
           <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
           <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line>
         </svg>
@@ -209,7 +219,7 @@ const HowItWorksPage: React.FC = () => {
       title: '2. Connect with NYX App',
       description: 'Download the NYX app, create an account, and tap "Add Device." The app will automatically detect nearby devices for a seamless pairing process.',
       icon: (props: React.SVGProps<SVGSVGElement>) => (
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
             <path d="M5 12.55a8 8 0 0 1 14.08 0"></path><path d="M1.42 9a12 12 0 0 1 21.16 0"></path><path d="M8.53 16.11a4 4 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12" y2="20"></line>
         </svg>
       )
@@ -218,7 +228,7 @@ const HowItWorksPage: React.FC = () => {
       title: '3. Create Automations',
       description: 'Once connected, unleash the true power of NYX. Create scenes and automations to make your devices work together, like turning on lights when motion is detected.',
       icon: (props: React.SVGProps<SVGSVGElement>) => (
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
             <path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path>
         </svg>
       )
@@ -514,8 +524,11 @@ const WhyUsPage: React.FC = () => (
 );
 
 // Define Add Product Page
-const AddProductPage: React.FC<{ navigateTo: (page: string) => void; setProducts: React.Dispatch<React.SetStateAction<Product[]>> }> = ({ navigateTo, setProducts }) => {
-    const [formData, setFormData] = useState<Omit<Product, 'id'>>({
+const AddProductPage: React.FC<{ 
+    navigateTo: (page: string) => void; 
+    addProduct: (productData: Omit<Product, 'id' | 'ownerId'>) => Promise<void>; 
+}> = ({ navigateTo, addProduct }) => {
+    const [formData, setFormData] = useState<Omit<Product, 'id' | 'ownerId'>>({
         name: '',
         tagline: '',
         price: 0,
@@ -527,14 +540,13 @@ const AddProductPage: React.FC<{ navigateTo: (page: string) => void; setProducts
     });
     
     const [isDiscounted, setIsDiscounted] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
 
     const handleDiscountToggle = (checked: boolean) => {
         setIsDiscounted(checked);
         if (checked) {
-            // Move current price to originalPrice and prepare for discounted price entry
             setFormData(f => ({ ...f, originalPrice: f.price, price: 0 }));
         } else {
-            // Remove discount, restore original price as the main price
             setFormData(f => ({ ...f, price: f.originalPrice || 0, originalPrice: undefined }));
         }
     };
@@ -592,22 +604,27 @@ const AddProductPage: React.FC<{ navigateTo: (page: string) => void; setProducts
         setFormData({ ...formData, specs: newSpecs });
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!formData.name || formData.images.length === 0) {
             alert('Please fill in all required fields: Name and at least one Image.');
             return;
         }
         
-        const newProduct: Product = {
-            ...formData,
-            id: `prod-${Date.now()}`,
-            originalPrice: formData.originalPrice || undefined,
-        };
-
-        setProducts(prevProducts => [...prevProducts, newProduct]);
-        alert('Product added successfully!');
-        navigateTo('products');
+        setIsSaving(true);
+        try {
+            await addProduct({
+                ...formData,
+                originalPrice: isDiscounted ? formData.originalPrice : undefined,
+            });
+            alert('Product added successfully!');
+            navigateTo('products');
+        } catch (error: any) {
+            console.error("Failed to add product:", error);
+            alert(`Error adding product: ${error.message}`);
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     return (
@@ -757,8 +774,8 @@ const AddProductPage: React.FC<{ navigateTo: (page: string) => void; setProducts
                                 <button type="button" onClick={() => navigateTo('products')} className="border border-gray-600 text-white font-semibold py-2 px-6 rounded-full hover:bg-gray-700 transition-colors">
                                     Cancel
                                 </button>
-                                <button type="submit" className="bg-brand-purple text-white font-bold py-2 px-6 rounded-full hover:bg-brand-purple/80 transition-all">
-                                    Save Product
+                                <button type="submit" disabled={isSaving} className="bg-brand-purple text-white font-bold py-2 px-6 rounded-full hover:bg-brand-purple/80 transition-all disabled:opacity-50 disabled:cursor-wait">
+                                    {isSaving ? 'Saving...' : 'Save Product'}
                                 </button>
                             </div>
                         </div>
@@ -771,25 +788,65 @@ const AddProductPage: React.FC<{ navigateTo: (page: string) => void; setProducts
 
 
 // Define Edit Product Page
-const EditProductPage: React.FC<{ navigateTo: (page: string) => void; productId: string; products: Product[]; setProducts: React.Dispatch<React.SetStateAction<Product[]>> }> = ({ navigateTo, productId, products, setProducts }) => {
+const EditProductPage: React.FC<{ 
+    navigateTo: (page: string) => void; 
+    productId: string; 
+    products: Product[]; 
+    updateProduct: (productId: string, updates: Partial<Product>) => Promise<void>;
+    deleteProduct: (productId: string) => Promise<void>;
+}> = ({ navigateTo, productId, products, updateProduct, deleteProduct }) => {
+    
+    const { user } = useAuth();
     const productToEdit = products.find(p => p.id === productId);
+    
     const [formData, setFormData] = useState<Product | null>(productToEdit ? { ...productToEdit } : null);
     const [isDiscounted, setIsDiscounted] = useState(!!productToEdit?.originalPrice);
+    const [isSaving, setIsSaving] = useState(false);
 
-    if (!formData) {
+    const canEdit = user && productToEdit && (productToEdit.ownerId === user.id || user.roles.includes('admin') || user.roles.includes('super-admin'));
+
+    useEffect(() => {
+        if (productToEdit) {
+            setFormData({ ...productToEdit });
+            setIsDiscounted(!!productToEdit.originalPrice);
+        }
+    }, [productToEdit]);
+    
+    if (!productToEdit) {
         return (
             <div className="bg-dark pt-24 min-h-screen flex items-center justify-center">
-                <p className="text-red-500">Product not found!</p>
+                <p className="text-xl text-gray-400">Loading product details...</p>
             </div>
         );
+    }
+    
+    if (!formData) return null; // Should be covered by above, but for type safety
+
+    if (!canEdit) {
+        return (
+            <div className="bg-dark pt-24 min-h-screen flex items-center justify-center text-center">
+                <div>
+                    <h1 className="text-2xl font-bold text-red-500 mb-4">Access Denied</h1>
+                    <p className="text-gray-400">You do not have permission to edit this product.</p>
+                     <button
+                        onClick={() => navigateTo('products')}
+                        className="mt-8 flex items-center mx-auto gap-2 text-gray-400 hover:text-white transition-colors group"
+                    >
+                        <ArrowLeftIcon className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
+                        Back to Products
+                    </button>
+                </div>
+            </div>
+        )
     }
 
     const handleDiscountToggle = (checked: boolean) => {
         setIsDiscounted(checked);
+        if (!formData) return;
         if (checked) {
-            setFormData(f => f ? { ...f, originalPrice: f.price, price: 0 } : null);
+            setFormData({ ...formData, originalPrice: formData.price, price: formData.price });
         } else {
-            setFormData(f => f ? { ...f, price: f.originalPrice || 0, originalPrice: undefined } : null);
+            setFormData({ ...formData, price: formData.originalPrice || formData.price, originalPrice: undefined });
         }
     };
     
@@ -849,14 +906,44 @@ const EditProductPage: React.FC<{ navigateTo: (page: string) => void; productId:
         setFormData({ ...formData, specs: newSpecs });
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (formData) {
-            setProducts(products.map(p => p.id === productId ? formData : p));
-            alert('Product updated successfully!');
-            navigateTo('products');
+            setIsSaving(true);
+            try {
+                const updateData: Partial<Product> = {
+                    ...formData,
+                    originalPrice: isDiscounted ? formData.originalPrice : undefined,
+                };
+                delete (updateData as any).id; // Don't try to update the ID
+                
+                await updateProduct(productId, updateData);
+                alert('Product updated successfully!');
+                navigateTo('products');
+            } catch (error: any) {
+                console.error('Failed to update product:', error);
+                alert(`Error updating product: ${error.message}`);
+            } finally {
+                setIsSaving(false);
+            }
         }
     };
+
+    const handleDelete = async () => {
+        if (window.confirm('Are you sure you want to permanently delete this product? This action cannot be undone.')) {
+            setIsSaving(true);
+            try {
+                await deleteProduct(productId);
+                alert('Product deleted successfully!');
+                navigateTo('products');
+            } catch (error: any) {
+                console.error('Failed to delete product:', error);
+                alert(`Error deleting product: ${error.message}`);
+            } finally {
+                setIsSaving(false);
+            }
+        }
+    }
 
     return (
         <div className="bg-dark pt-24 animate-fade-in">
@@ -998,12 +1085,15 @@ const EditProductPage: React.FC<{ navigateTo: (page: string) => void; productId:
                                     onChange={(checked) => setFormData(f => f ? { ...f, isVisible: checked } : null)} 
                                 />
                             </div>
-                            <div className="flex gap-4">
+                            <div className="flex gap-4 items-center">
+                                <button type="button" onClick={handleDelete} disabled={isSaving} className="bg-red-600 text-white font-bold py-2 px-6 rounded-full hover:bg-red-500 transition-all disabled:opacity-50 disabled:cursor-wait">
+                                    Delete
+                                </button>
                                 <button type="button" onClick={() => navigateTo('products')} className="border border-gray-600 text-white font-semibold py-2 px-6 rounded-full hover:bg-gray-700 transition-colors">
                                     Cancel
                                 </button>
-                                <button type="submit" className="bg-brand-purple text-white font-bold py-2 px-6 rounded-full hover:bg-brand-purple/80 transition-all">
-                                    Save Changes
+                                <button type="submit" disabled={isSaving} className="bg-brand-purple text-white font-bold py-2 px-6 rounded-full hover:bg-brand-purple/80 transition-all disabled:opacity-50 disabled:cursor-wait">
+                                    {isSaving ? 'Saving...' : 'Save Changes'}
                                 </button>
                             </div>
                         </div>
@@ -1013,6 +1103,7 @@ const EditProductPage: React.FC<{ navigateTo: (page: string) => void; productId:
         </div>
     );
 };
+
 
 const AdminDashboardPage: React.FC<{ navigateTo: (page: string) => void }> = ({ navigateTo }) => {
     const { fetchAllUsers, updateUserRoles, deleteUserAsAdmin, user: currentUser } = useAuth();
@@ -1524,14 +1615,167 @@ const AuthForm: React.FC<{ navigateTo: (page: string) => void }> = ({ navigateTo
     );
 };
 
+const MOCK_PRODUCTS: Product[] = [
+  {
+    id: 'mock-001',
+    name: 'NYX-1 Sensor (Sample)',
+    tagline: 'Adaptive AI motion sensor for intelligent homes.',
+    price: 69.99,
+    originalPrice: 89.99,
+    stock: 100,
+    images: ['https://images.unsplash.com/photo-1617802113945-9f5d13b446a8?q=80&w=2070&auto=format&fit=crop'],
+    specs: [{ name: 'Range', value: '12m' }, { name: 'Battery', value: '24 months' }],
+    isVisible: true,
+    ownerId: 'mock-owner',
+  },
+  {
+    id: 'mock-002',
+    name: 'NYX-Bulb (Sample)',
+    tagline: '16 million colors at your command.',
+    price: 49.99,
+    stock: 150,
+    images: ['https://images.unsplash.com/photo-1588881964894-52642e3a789a?q=80&w=1974&auto=format&fit=crop'],
+    specs: [{ name: 'Brightness', value: '1100 Lumens' }, { name: 'Colors', value: 'RGBW' }],
+    isVisible: true,
+    ownerId: 'mock-owner',
+  },
+  {
+    id: 'mock-003',
+    name: 'NYX-Plug (Sample)',
+    tagline: 'Make any device smart instantly.',
+    price: 29.99,
+    stock: 200,
+    images: ['https://images.unsplash.com/photo-1588275261099-2a453535174a?q=80&w=2070&auto=format&fit=crop'],
+    specs: [{ name: 'Max Load', value: '15A' }, { name: 'Connectivity', value: 'Wi-Fi 2.4GHz' }],
+    isVisible: true,
+    ownerId: 'mock-owner',
+  },
+  {
+    id: 'mock-004',
+    name: 'NYX-Cam (Sample)',
+    tagline: 'Secure your home with crystal clear vision.',
+    price: 129.99,
+    stock: 50,
+    images: ['https://images.unsplash.com/photo-1599933310336-8a6241470123?q=80&w=2070&auto=format&fit=crop'],
+    specs: [{ name: 'Resolution', value: '4K HDR' }, { name: 'Field of View', value: '160°' }],
+    isVisible: false,
+    ownerId: 'mock-owner',
+  }
+];
 
 const App: React.FC = () => {
     const [currentPage, setCurrentPage] = useState('home');
     const [pageParams, setPageParams] = useState<any>(null);
     const [isAskNyxOpen, setIsAskNyxOpen] = useState(false);
-    const [products, setProducts] = useState<Product[]>(PRODUCTS_DATA);
     
-    // Cookie consent state
+    // Product State Management
+    const [products, setProducts] = useState<Product[]>([]);
+    const [loadingProducts, setLoadingProducts] = useState(true);
+    const [productError, setProductError] = useState<string | null>(null);
+    const { user } = useAuth(); // Needed for addProduct
+
+    // Helper for mapping DB schema to App schema
+    const mapProductToCamelCase = (dbProduct: any): Product => ({
+      id: dbProduct.id,
+      name: dbProduct.name,
+      tagline: dbProduct.tagline,
+      price: dbProduct.price,
+      originalPrice: dbProduct.original_price,
+      stock: dbProduct.stock,
+      images: dbProduct.images,
+      specs: dbProduct.specs,
+      isVisible: dbProduct.is_visible,
+      ownerId: dbProduct.owner_id,
+    });
+
+    const mapProductToSnakeCase = (appProduct: Partial<Product> | Omit<Product, 'id' | 'ownerId'>) => {
+        const dbProduct: { [key: string]: any } = {};
+        if ('id' in appProduct && appProduct.id) dbProduct.id = appProduct.id;
+        if (appProduct.name) dbProduct.name = appProduct.name;
+        if (appProduct.tagline) dbProduct.tagline = appProduct.tagline;
+        if (appProduct.price !== undefined) dbProduct.price = appProduct.price;
+        if ('originalPrice' in appProduct) dbProduct.original_price = appProduct.originalPrice ?? null;
+        if (appProduct.stock !== undefined) dbProduct.stock = appProduct.stock;
+        if (appProduct.images) dbProduct.images = appProduct.images;
+        if (appProduct.specs) dbProduct.specs = appProduct.specs;
+        if (appProduct.isVisible !== undefined) dbProduct.is_visible = appProduct.isVisible;
+        if ('ownerId' in appProduct && appProduct.ownerId) dbProduct.owner_id = appProduct.ownerId;
+        return dbProduct;
+    };
+
+    useEffect(() => {
+        const fetchProducts = async () => {
+            setLoadingProducts(true);
+            setProductError(null);
+            try {
+                const { data, error } = await supabase.from('products').select('*').order('created_at', { ascending: false });
+
+                if (error) {
+                    throw error;
+                }
+
+                if (data) {
+                    setProducts(data.map(mapProductToCamelCase));
+                } else {
+                    setProducts([]); // Handle case where data is null
+                }
+            } catch (err: unknown) {
+                console.error("Error fetching products:", err);
+
+                let errorMessage = 'An unknown error occurred while fetching products.';
+                let messageForLog = '';
+
+                if (err instanceof Error) {
+                    errorMessage = err.message;
+                    messageForLog = err.message;
+                } else if (err && typeof err === 'object' && 'message' in err && typeof (err as any).message === 'string') {
+                    errorMessage = (err as any).message;
+                    messageForLog = (err as any).message;
+                } else if (typeof err === 'string') {
+                    errorMessage = err;
+                    messageForLog = err;
+                }
+
+                // Check for specific "table not found" errors
+                if (messageForLog.includes('relation "public.products" does not exist') || messageForLog.includes('Could not find the table')) {
+                    console.warn("DATABASE WARNING: 'products' table not found. Falling back to mock data. Please ensure your Supabase database is set up correctly.");
+                    setProductError("Database connection failed. Displaying sample products for demonstration.");
+                    setProducts(MOCK_PRODUCTS); // Use mock data as a fallback
+                } else {
+                    setProductError(errorMessage);
+                }
+            } finally {
+                setLoadingProducts(false);
+            }
+        };
+        fetchProducts();
+    }, []);
+
+    const addProduct = async (productData: Omit<Product, 'id' | 'ownerId'>): Promise<void> => {
+        if (!user) throw new Error("You must be logged in to add a product.");
+        const newProductForDb = {
+            ...mapProductToSnakeCase(productData),
+            id: `prod-${Date.now()}`,
+            owner_id: user.id,
+        };
+        
+        const { data, error } = await supabase.from('products').insert(newProductForDb).select().single();
+        if (error) throw error;
+        setProducts(prev => [mapProductToCamelCase(data), ...prev]);
+    };
+
+    const updateProduct = async (productId: string, updates: Partial<Product>): Promise<void> => {
+        const { data, error } = await supabase.from('products').update(mapProductToSnakeCase(updates)).eq('id', productId).select().single();
+        if (error) throw error;
+        setProducts(prev => prev.map(p => p.id === productId ? mapProductToCamelCase(data) : p));
+    };
+
+    const deleteProduct = async (productId: string): Promise<void> => {
+        const { error } = await supabase.from('products').delete().eq('id', productId);
+        if (error) throw error;
+        setProducts(prev => prev.filter(p => p.id !== productId));
+    };
+
     const [showCookieBanner, setShowCookieBanner] = useState(false);
 
     useEffect(() => {
@@ -1557,16 +1801,14 @@ const App: React.FC = () => {
         window.scrollTo(0, 0);
     };
     
-    // This allows the Why Us page button to navigate
     (window as any).navigateToProducts = () => navigateTo('products');
-
 
     const renderPage = () => {
         switch (currentPage) {
             case 'home':
                 return <HomePage navigateTo={navigateTo} products={products} />;
             case 'products':
-                return <ProductsPage navigateTo={navigateTo} products={products} />;
+                return <ProductsPage navigateTo={navigateTo} products={products} loading={loadingProducts} error={productError} />;
             case 'how-it-works':
                 return <HowItWorksPage />;
             case 'setup-videos':
@@ -1580,9 +1822,9 @@ const App: React.FC = () => {
             case 'why-us':
                 return <WhyUsPage />;
             case 'add-product':
-                 return <AddProductPage navigateTo={navigateTo} setProducts={setProducts} />;
+                 return <AddProductPage navigateTo={navigateTo} addProduct={addProduct} />;
             case 'edit-product':
-                return pageParams?.id ? <EditProductPage navigateTo={navigateTo} productId={pageParams.id} products={products} setProducts={setProducts} /> : <HomePage navigateTo={navigateTo} products={products} />;
+                return pageParams?.id ? <EditProductPage navigateTo={navigateTo} productId={pageParams.id} products={products} updateProduct={updateProduct} deleteProduct={deleteProduct} /> : <HomePage navigateTo={navigateTo} products={products} />;
             case 'admin-dashboard':
                 return <AdminDashboardPage navigateTo={navigateTo} />;
             case 'profile':
@@ -1595,24 +1837,28 @@ const App: React.FC = () => {
                 return <HomePage navigateTo={navigateTo} products={products} />;
         }
     };
-
+    
     return (
-        <AuthProvider>
-            <CartProvider>
-                <div className="bg-dark text-gray-200 font-sans">
-                    <Header onAskNyxOpen={() => setIsAskNyxOpen(true)} navigateTo={navigateTo} />
-                    <main>
-                        {renderPage()}
-                    </main>
-                    <EmailCapture />
-                    <Footer navigateTo={navigateTo} />
-                    <CartSidebar navigateTo={navigateTo} />
-                    <AskNyx isOpen={isAskNyxOpen} onClose={() => setIsAskNyxOpen(false)} />
-                    {showCookieBanner && <CookieConsentBanner onAccept={handleCookieAccept} onDecline={handleCookieDecline} />}
-                </div>
-            </CartProvider>
-        </AuthProvider>
+        <div className="bg-dark text-gray-200 font-sans">
+            <Header onAskNyxOpen={() => setIsAskNyxOpen(true)} navigateTo={navigateTo} />
+            <main>
+                {renderPage()}
+            </main>
+            <EmailCapture />
+            <Footer navigateTo={navigateTo} />
+            <CartSidebar navigateTo={navigateTo} />
+            <AskNyx isOpen={isAskNyxOpen} onClose={() => setIsAskNyxOpen(false)} />
+            {showCookieBanner && <CookieConsentBanner onAccept={handleCookieAccept} onDecline={handleCookieDecline} />}
+        </div>
     );
 };
 
-export default App;
+const RootApp: React.FC = () => (
+    <AuthProvider>
+        <CartProvider>
+            <App />
+        </CartProvider>
+    </AuthProvider>
+);
+
+export default RootApp;
