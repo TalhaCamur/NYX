@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -1553,6 +1554,49 @@ const AddBlogPostPage: React.FC<{
 
 // --- END OF BLOG COMPONENTS ---
 
+// A new placeholder component for Login/Signup
+const AuthPage: React.FC<{ navigateTo: (page: string) => void }> = ({ navigateTo }) => {
+    return (
+        <div className="bg-dark pt-24 animate-fade-in min-h-screen flex items-center justify-center">
+            <div className="text-center p-8 bg-dark-accent rounded-2xl border border-white/10 max-w-md w-full mx-4">
+                <h1 className="text-3xl font-bold text-white mb-4">Authentication</h1>
+                <p className="text-gray-400 mb-8">The login and sign-up functionality is currently under construction. Please check back later.</p>
+                <button
+                    onClick={() => navigateTo('home')}
+                    className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors group mx-auto border border-gray-600 px-4 py-2 rounded-full"
+                >
+                    <ArrowLeftIcon className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
+                    Back to Home
+                </button>
+            </div>
+        </div>
+    );
+};
+
+// A new placeholder component for the User Profile
+const ProfilePage: React.FC<{ navigateTo: (page: string) => void }> = ({ navigateTo }) => {
+    const { user } = useAuth();
+    return (
+        <div className="bg-dark pt-24 animate-fade-in min-h-screen flex items-center justify-center">
+            <div className="text-center p-8 bg-dark-accent rounded-2xl border border-white/10 max-w-md w-full mx-4">
+                <h1 className="text-3xl font-bold text-white mb-4">Profile</h1>
+                 {user ? (
+                    <p className="text-gray-400 mb-8">Welcome, {user.nickname}! The profile management page is currently under construction.</p>
+                ) : (
+                    <p className="text-gray-400 mb-8">You are not logged in. Please log in to view your profile.</p>
+                )}
+                <button
+                    onClick={() => navigateTo('home')}
+                    className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors group mx-auto border border-gray-600 px-4 py-2 rounded-full"
+                >
+                    <ArrowLeftIcon className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
+                    Back to Home
+                </button>
+            </div>
+        </div>
+    );
+};
+
 
 const AppContent: React.FC = () => {
     const { user, login, signup } = useAuth();
@@ -1703,6 +1747,10 @@ const AppContent: React.FC = () => {
     } else if (currentPage === 'add-blog-post') {
         const canWrite = user && (user.roles.includes('Content Writer') || user.roles.includes('admin') || user.roles.includes('super-admin'));
         content = canWrite ? <AddBlogPostPage navigateTo={navigateTo} addBlogPost={addBlogPost} /> : <HomePage navigateTo={navigateTo} products={products} />;
+    } else if (currentPage === 'login') {
+        content = <AuthPage navigateTo={navigateTo} />;
+    } else if (currentPage === 'profile') {
+        content = <ProfilePage navigateTo={navigateTo} />;
     }
      else {
         content = <HomePage navigateTo={navigateTo} products={products} />;

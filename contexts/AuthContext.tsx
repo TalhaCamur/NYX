@@ -40,14 +40,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     useEffect(() => {
         const getSession = async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session?.user) {
-                const { data: profile } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
-                if (profile) {
-                    setUser(mapProfileToUser(profile, session.user));
+            try {
+                const { data: { session }, error } = await supabase.auth.getSession();
+                if (error) throw error;
+                if (session?.user) {
+                    const { data: profile, error: profileError } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
+                    if (profileError) throw profileError;
+                    if (profile) {
+                        setUser(mapProfileToUser(profile, session.user));
+                    }
                 }
+            } catch (error) {
+                console.error("Error fetching initial session:", error);
+            } finally {
+                setLoading(false);
             }
-            setLoading(false);
         };
         getSession();
 
