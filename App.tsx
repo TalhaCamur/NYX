@@ -1,6 +1,8 @@
 
 
 
+
+
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -533,7 +535,7 @@ const AddProductPage: React.FC<{
         name: '',
         tagline: '',
         price: 0,
-        originalPrice: undefined,
+        originalPrice: null,
         stock: 0,
         images: [],
         specs: [{ name: '', value: '' }],
@@ -548,7 +550,7 @@ const AddProductPage: React.FC<{
         if (checked) {
             setFormData(f => ({ ...f, originalPrice: f.price, price: 0 }));
         } else {
-            setFormData(f => ({ ...f, price: f.originalPrice || 0, originalPrice: undefined }));
+            setFormData(f => ({ ...f, price: f.originalPrice || 0, originalPrice: null }));
         }
     };
     
@@ -616,13 +618,13 @@ const AddProductPage: React.FC<{
         try {
             await addProduct({
                 ...formData,
-                originalPrice: isDiscounted ? formData.originalPrice : undefined,
+                originalPrice: isDiscounted ? formData.originalPrice : null,
             });
             alert('Product added successfully!');
             navigateTo('products');
         } catch (error: any) {
             console.error("Failed to add product:", error);
-            alert(`Error adding product: ${error.message}`);
+            alert(`Error adding product: ${error.message || 'An unknown error occurred.'}`);
         } finally {
             setIsSaving(false);
         }
@@ -847,7 +849,7 @@ const EditProductPage: React.FC<{
         if (checked) {
             setFormData({ ...formData, originalPrice: formData.price, price: formData.price });
         } else {
-            setFormData({ ...formData, price: formData.originalPrice || formData.price, originalPrice: undefined });
+            setFormData({ ...formData, price: formData.originalPrice || formData.price, originalPrice: null });
         }
     };
     
@@ -914,7 +916,7 @@ const EditProductPage: React.FC<{
             try {
                 const updateData: Partial<Product> = {
                     ...formData,
-                    originalPrice: isDiscounted ? formData.originalPrice : undefined,
+                    originalPrice: isDiscounted ? formData.originalPrice : null,
                 };
                 delete (updateData as any).id; // Don't try to update the ID
                 
@@ -923,7 +925,7 @@ const EditProductPage: React.FC<{
                 navigateTo('products');
             } catch (error: any) {
                 console.error('Failed to update product:', error);
-                alert(`Error updating product: ${error.message}`);
+                alert(`Error updating product: ${error.message || 'An unknown error occurred.'}`);
             } finally {
                 setIsSaving(false);
             }
@@ -1705,6 +1707,33 @@ const ProfilePage: React.FC<{ navigateTo: (page: string) => void }> = ({ navigat
     );
 };
 
+const productToCamel = (product: any): Product => ({
+    id: product.id,
+    name: product.name,
+    tagline: product.tagline,
+    price: product.price,
+    originalPrice: product.original_price,
+    stock: product.stock,
+    images: product.images,
+    specs: product.specs,
+    isVisible: product.is_visible,
+    ownerId: product.owner_id,
+});
+
+const productToSnake = (product: Partial<Product>): any => {
+    const snakeProduct: any = {};
+    if (product.name !== undefined) snakeProduct.name = product.name;
+    if (product.tagline !== undefined) snakeProduct.tagline = product.tagline;
+    if (product.price !== undefined) snakeProduct.price = product.price;
+    if (product.hasOwnProperty('originalPrice')) snakeProduct.original_price = product.originalPrice;
+    if (product.stock !== undefined) snakeProduct.stock = product.stock;
+    if (product.images !== undefined) snakeProduct.images = product.images;
+    if (product.specs !== undefined) snakeProduct.specs = product.specs;
+    if (product.isVisible !== undefined) snakeProduct.is_visible = product.isVisible;
+    if (product.ownerId !== undefined) snakeProduct.owner_id = product.ownerId;
+    return snakeProduct;
+};
+
 
 const AppContent: React.FC = () => {
     const { user, login, signup } = useAuth();
@@ -1743,7 +1772,7 @@ const AppContent: React.FC = () => {
             console.error('Error fetching products:', error);
             setError('Could not fetch products. Please try again later.');
         } else {
-            setProducts(data || []);
+            setProducts((data || []).map(productToCamel));
         }
         setLoading(false);
     }, []);
@@ -1756,27 +1785,28 @@ const AppContent: React.FC = () => {
         if (!user) {
             throw new Error('You must be logged in to add a product.');
         }
+        const fullProductData = { ...productData, ownerId: user.id };
         const { data, error } = await supabase
             .from('products')
-            .insert([{ ...productData, ownerId: user.id }])
+            .insert([productToSnake(fullProductData)])
             .select()
             .single();
 
         if (error) throw error;
-        if (data) setProducts(prev => [data, ...prev]);
+        if (data) setProducts(prev => [productToCamel(data), ...prev]);
     };
 
     const updateProduct = async (productId: string, updates: Partial<Product>): Promise<void> => {
         const { data, error } = await supabase
             .from('products')
-            .update(updates)
+            .update(productToSnake(updates))
             .eq('id', productId)
             .select()
             .single();
 
         if (error) throw error;
         if (data) {
-            setProducts(prev => prev.map(p => (p.id === productId ? data : p)));
+            setProducts(prev => prev.map(p => (p.id === productId ? productToCamel(data) : p)));
         }
     };
     

@@ -1,10 +1,11 @@
 
+
 export interface Product {
   id: string;
   name: string;
   tagline: string;
   price: number;
-  originalPrice?: number;
+  originalPrice?: number | null;
   stock: number;
   images: string[];
   specs: { name: string; value: string }[];
