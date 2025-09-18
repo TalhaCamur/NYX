@@ -54,6 +54,8 @@ const Header: React.FC<HeaderProps> = ({ onAskNyxOpen, navigateTo }) => {
         const pageMapping: { [key: string]: string } = {
             '/': 'home',
             '/products': 'products',
+            '/blog': 'blog',
+            '/blog/new': 'add-blog-post',
             '/how-it-works': 'how-it-works',
             '/setup-videos': 'setup-videos',
             '/faq': 'faq',
@@ -209,6 +211,9 @@ const Header: React.FC<HeaderProps> = ({ onAskNyxOpen, navigateTo }) => {
                                 {(user.roles.includes('seller') || user.roles.includes('admin') || user.roles.includes('super-admin')) && (
                                      <button onClick={(e) => handleLinkClick(e, '/add-product', 'Add Product')} className={baseLinkClass}>Add Product</button>
                                 )}
+                                {(user.roles.includes('Content Writer') || user.roles.includes('admin') || user.roles.includes('super-admin')) && (
+                                     <button onClick={(e) => handleLinkClick(e, '/blog/new', 'Add Blog Post')} className={baseLinkClass}>Add Blog Post</button>
+                                )}
                                 {(user.roles.includes('admin') || user.roles.includes('super-admin')) && (
                                      <button onClick={(e) => handleLinkClick(e, '/admin-dashboard', 'Admin Panel')} className={baseLinkClass}>Admin Panel</button>
                                 )}
@@ -238,6 +243,9 @@ const Header: React.FC<HeaderProps> = ({ onAskNyxOpen, navigateTo }) => {
                     <a href="#" onClick={(e) => handleLinkClick(e, '/profile', 'Profile')} className={baseLinkClass}>My Profile</a>
                     {(user.roles.includes('seller') || user.roles.includes('admin') || user.roles.includes('super-admin')) && (
                          <a href="#" onClick={(e) => handleLinkClick(e, '/add-product', 'Add Product')} className={baseLinkClass}>Add Product</a>
+                    )}
+                    {(user.roles.includes('Content Writer') || user.roles.includes('admin') || user.roles.includes('super-admin')) && (
+                         <a href="#" onClick={(e) => handleLinkClick(e, '/blog/new', 'Add Blog Post')} className={baseLinkClass}>Add Blog Post</a>
                     )}
                      {(user.roles.includes('admin') || user.roles.includes('super-admin')) && (
                          <a href="#" onClick={(e) => handleLinkClick(e, '/admin-dashboard', 'Admin Panel')} className={baseLinkClass}>Admin Panel</a>

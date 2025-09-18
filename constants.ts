@@ -4,6 +4,7 @@ import { Product, Testimonial, Feature, FAQItem } from './types';
 export const NAV_LINKS = [
   { name: 'Home', href: '/' },
   { name: 'Products', href: '/products' },
+  { name: 'Blog', href: '/blog' },
   {
     name: 'Support',
     sublinks: [

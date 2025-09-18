@@ -12,6 +12,17 @@ export interface Product {
   ownerId?: string;
 }
 
+export interface BlogPost {
+  id: string;
+  title: string;
+  author: string;
+  date: string; // ISO 8601 format string
+  imageUrl: string;
+  excerpt: string;
+  content: string;
+  ownerId?: string;
+}
+
 export interface Testimonial {
   quote: string;
   author: string;

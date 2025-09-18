@@ -1,6 +1,4 @@
 
-
-
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -1351,4 +1349,387 @@ const AdminDashboardPage: React.FC<{ navigateTo: (page: string) => void }> = ({ 
                         })}
                     </div>
                      <div className="p-4 flex justify-end gap-3 bg-dark/50 rounded-b-lg">
-                        <button onClick={() => setEditingUser(null)} className="text-sm text-gray-300 hover:text-white
+                        <button onClick={() => setEditingUser(null)} className="text-sm text-gray-300 hover:text-white">Cancel</button>
+                        <button onClick={handleSaveRoles} disabled={isSaving} className="text-sm bg-brand-purple text-white font-semibold py-1 px-4 rounded-full hover:bg-brand-purple/80 disabled:opacity-50">
+                            {isSaving ? 'Saving...' : 'Save'}
+                        </button>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+// --- START OF BLOG COMPONENTS ---
+
+const BlogCard: React.FC<{ post: BlogPost; navigateTo: (page: string, params?: any) => void }> = ({ post, navigateTo }) => {
+    return (
+        <div className="bg-dark-accent rounded-2xl border border-white/10 overflow-hidden flex flex-col group">
+            <div className="aspect-video overflow-hidden">
+                <img src={post.imageUrl} alt={post.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+            </div>
+            <div className="p-6 flex flex-col flex-grow">
+                <h3 className="text-xl font-bold text-white mb-2">{post.title}</h3>
+                <p className="text-sm text-gray-500 mb-4">{post.author} &bull; {new Date(post.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                <p className="text-gray-400 text-sm flex-grow mb-4">{post.excerpt}</p>
+                <div className="mt-auto pt-4">
+                    <button onClick={() => navigateTo('blog-post', { id: post.id })} className="font-semibold text-brand-purple hover:text-brand-purple/80 transition-colors">
+                        Read More &rarr;
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const BlogPage: React.FC<{ blogPosts: BlogPost[]; navigateTo: (page: string, params?: any) => void }> = ({ blogPosts, navigateTo }) => {
+    const { user } = useAuth();
+    const canWrite = user && (user.roles.includes('Content Writer') || user.roles.includes('admin') || user.roles.includes('super-admin'));
+
+    return (
+        <div className="bg-dark pt-24 animate-fade-in min-h-screen">
+            <div className="container mx-auto px-4 py-12 md:py-20">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-16">
+                    <div className="text-left max-w-3xl">
+                        <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-white mb-4">From the NYX Journal</h1>
+                        <p className="text-gray-300 text-lg md:text-xl">
+                            Insights, tutorials, and stories from the team building the future of smart living.
+                        </p>
+                    </div>
+                    {canWrite && (
+                        <button
+                            onClick={() => navigateTo('add-blog-post')}
+                            className="mt-6 md:mt-0 flex-shrink-0 bg-brand-purple text-white font-semibold py-3 px-6 rounded-full hover:bg-brand-purple/80 transition-all duration-300 transform hover:scale-105"
+                        >
+                            + Add New Post
+                        </button>
+                    )}
+                </div>
+                {blogPosts.length === 0 ? (
+                    <div className="text-center text-gray-500 py-16">
+                        <h2 className="text-2xl font-semibold mb-2">No Posts Yet</h2>
+                        <p>Check back soon for updates from our team.</p>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {blogPosts.map((post) => (
+                            <BlogCard key={post.id} post={post} navigateTo={navigateTo} />
+                        ))}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
+
+const BlogPostPage: React.FC<{ postId: string; blogPosts: BlogPost[]; navigateTo: (page: string) => void }> = ({ postId, blogPosts, navigateTo }) => {
+    const post = blogPosts.find(p => p.id === postId);
+
+    if (!post) {
+        return (
+            <div className="bg-dark pt-24 min-h-screen flex items-center justify-center text-center">
+                <div>
+                    <h1 className="text-2xl font-bold text-red-500 mb-4">Post Not Found</h1>
+                    <button onClick={() => navigateTo('blog')} className="mt-8 flex items-center mx-auto gap-2 text-gray-400 hover:text-white transition-colors group">
+                        <ArrowLeftIcon className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
+                        Back to Blog
+                    </button>
+                </div>
+            </div>
+        );
+    }
+    
+    // Simple way to format paragraphs from newline-separated text
+    const paragraphs = post.content.trim().split('\n').map(p => p.trim()).filter(p => p.length > 0);
+
+    return (
+        <div className="bg-dark pt-24 animate-fade-in">
+            <div className="container mx-auto px-4 py-12 md:py-20">
+                <div className="max-w-4xl mx-auto">
+                    <button onClick={() => navigateTo('blog')} className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-8 group">
+                        <ArrowLeftIcon className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
+                        Back to Blog
+                    </button>
+                    <article>
+                        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-white mb-4 leading-tight">{post.title}</h1>
+                        <div className="flex items-center gap-4 text-gray-400 mb-8">
+                            <span>By {post.author}</span>
+                            <span>&bull;</span>
+                            <span>{new Date(post.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                        </div>
+                        <img src={post.imageUrl} alt={post.title} className="w-full aspect-video object-cover rounded-2xl mb-12 border border-white/10" />
+                        <div className="prose prose-lg prose-invert mx-auto text-gray-300 leading-relaxed space-y-6">
+                            {paragraphs.map((paragraph, index) => (
+                                <p key={index}>{paragraph}</p>
+                            ))}
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const AddBlogPostPage: React.FC<{
+    navigateTo: (page: string) => void;
+    addBlogPost: (postData: Omit<BlogPost, 'id' | 'ownerId'>) => Promise<void>;
+}> = ({ navigateTo, addBlogPost }) => {
+    const { user } = useAuth();
+    const [formData, setFormData] = useState({
+        title: '',
+        imageUrl: '',
+        excerpt: '',
+        content: '',
+    });
+    const [isSaving, setIsSaving] = useState(false);
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!formData.title || !formData.excerpt || !formData.content || !user) {
+            alert('Please fill in all fields.');
+            return;
+        }
+        setIsSaving(true);
+        try {
+            await addBlogPost({
+                ...formData,
+                author: user.nickname,
+                date: new Date().toISOString(),
+            });
+            alert('Blog post added successfully!');
+            navigateTo('blog');
+        } catch (error: any) {
+            alert(`Error adding post: ${error.message}`);
+        } finally {
+            setIsSaving(false);
+        }
+    };
+    
+    return (
+         <div className="bg-dark pt-24 animate-fade-in">
+            <div className="container mx-auto px-4 py-12 md:py-20">
+                <div className="max-w-4xl mx-auto bg-dark-accent p-8 rounded-2xl border border-white/10">
+                     <button onClick={() => navigateTo('blog')} className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-8 group">
+                        <ArrowLeftIcon className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
+                        Back to Blog
+                    </button>
+                    <h1 className="text-3xl font-bold text-white mb-8">Add New Blog Post</h1>
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        <div>
+                            <label htmlFor="title" className="block text-sm font-medium mb-2">Post Title <span className="text-red-500">*</span></label>
+                            <input type="text" name="title" value={formData.title} onChange={handleChange} className="w-full bg-dark border border-gray-600 rounded-lg py-3 px-4" required />
+                        </div>
+                         <div>
+                            <label htmlFor="imageUrl" className="block text-sm font-medium mb-2">Image URL</label>
+                            <input type="url" name="imageUrl" value={formData.imageUrl} onChange={handleChange} placeholder="https://images.unsplash.com/..." className="w-full bg-dark border border-gray-600 rounded-lg py-3 px-4" />
+                        </div>
+                         <div>
+                            <label htmlFor="excerpt" className="block text-sm font-medium mb-2">Excerpt / Subtitle <span className="text-red-500">*</span></label>
+                            <textarea name="excerpt" value={formData.excerpt} onChange={handleChange} rows={2} className="w-full bg-dark border border-gray-600 rounded-lg py-3 px-4" required></textarea>
+                        </div>
+                        <div>
+                            <label htmlFor="content" className="block text-sm font-medium mb-2">Full Content <span className="text-red-500">*</span></label>
+                            <textarea name="content" value={formData.content} onChange={handleChange} rows={10} className="w-full bg-dark border border-gray-600 rounded-lg py-3 px-4" required></textarea>
+                             <p className="text-xs text-gray-500 mt-2">You can separate paragraphs by leaving a blank line between them.</p>
+                        </div>
+                        <div className="pt-6 border-t border-white/10 flex justify-end gap-4">
+                            <button type="button" onClick={() => navigateTo('blog')} className="border border-gray-600 text-white font-semibold py-2 px-6 rounded-full hover:bg-gray-700 transition-colors">
+                                Cancel
+                            </button>
+                            <button type="submit" disabled={isSaving} className="bg-brand-purple text-white font-bold py-2 px-6 rounded-full hover:bg-brand-purple/80 transition-all disabled:opacity-50 disabled:cursor-wait">
+                                {isSaving ? 'Publishing...' : 'Publish Post'}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// --- END OF BLOG COMPONENTS ---
+
+
+const AppContent: React.FC = () => {
+    const { user, login, signup } = useAuth();
+    const [currentPage, setCurrentPage] = useState('home');
+    const [pageParams, setPageParams] = useState<any>(null);
+    const [isAskNyxOpen, setIsAskNyxOpen] = useState(false);
+    const [products, setProducts] = useState<Product[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [showCookieConsent, setShowCookieConsent] = useState(false);
+    const [blogPosts, setBlogPosts] = useState<BlogPost[]>(BLOG_POSTS_DATA);
+
+
+    useEffect(() => {
+        const consent = localStorage.getItem('cookie_consent');
+        if (consent === null) {
+            setShowCookieConsent(true);
+        }
+    }, []);
+
+    const handleAcceptCookies = () => {
+        localStorage.setItem('cookie_consent', 'true');
+        setShowCookieConsent(false);
+    };
+
+    const handleDeclineCookies = () => {
+        localStorage.setItem('cookie_consent', 'false');
+        setShowCookieConsent(false);
+    };
+
+    const fetchProducts = useCallback(async () => {
+        setLoading(true);
+        setError(null);
+        const { data, error } = await supabase.from('products').select('*');
+        if (error) {
+            console.error('Error fetching products:', error);
+            setError('Could not fetch products. Please try again later.');
+        } else {
+            setProducts(data || []);
+        }
+        setLoading(false);
+    }, []);
+
+    useEffect(() => {
+        fetchProducts();
+    }, [fetchProducts]);
+
+    const addProduct = async (productData: Omit<Product, 'id' | 'ownerId'>): Promise<void> => {
+        if (!user) {
+            throw new Error('You must be logged in to add a product.');
+        }
+        const { data, error } = await supabase
+            .from('products')
+            .insert([{ ...productData, ownerId: user.id }])
+            .select()
+            .single();
+
+        if (error) throw error;
+        if (data) setProducts(prev => [data, ...prev]);
+    };
+
+    const updateProduct = async (productId: string, updates: Partial<Product>): Promise<void> => {
+        const { data, error } = await supabase
+            .from('products')
+            .update(updates)
+            .eq('id', productId)
+            .select()
+            .single();
+
+        if (error) throw error;
+        if (data) {
+            setProducts(prev => prev.map(p => (p.id === productId ? data : p)));
+        }
+    };
+    
+    const deleteProduct = async (productId: string): Promise<void> => {
+        const { error } = await supabase.from('products').delete().eq('id', productId);
+        if (error) throw error;
+        setProducts(prev => prev.filter(p => p.id !== productId));
+    };
+    
+    const addBlogPost = async (postData: Omit<BlogPost, 'id' | 'ownerId'>): Promise<void> => {
+        if (!user) {
+            throw new Error('You must be logged in to add a blog post.');
+        }
+        const newPost: BlogPost = {
+            ...postData,
+            id: `post-${Date.now()}-${Math.random()}`,
+            ownerId: user.id,
+        };
+        // In a real app with a backend, this would be a Supabase insert call
+        // For now, we update local state
+        setBlogPosts(prevPosts => [newPost, ...prevPosts]);
+    };
+
+
+    const navigateTo = (page: string, params: any = null) => {
+        setCurrentPage(page);
+        setPageParams(params);
+        window.scrollTo(0, 0);
+    };
+
+    // This is a workaround for the Why Us? button, which is outside the main app context
+    useEffect(() => {
+        (window as any).navigateToProducts = () => navigateTo('products');
+        return () => {
+            delete (window as any).navigateToProducts;
+        }
+    }, []);
+
+    const handleAskNyxOpen = () => {
+        setIsAskNyxOpen(true);
+    }
+    
+    const handleAskNyxClose = () => {
+        setIsAskNyxOpen(false);
+    }
+
+    let content;
+    if (currentPage === 'home') {
+        content = <HomePage navigateTo={navigateTo} products={products} />;
+    } else if (currentPage === 'products') {
+        content = <ProductsPage navigateTo={navigateTo} products={products} loading={loading} error={error} />;
+    } else if (currentPage === 'how-it-works') {
+        content = <HowItWorksPage />;
+    } else if (currentPage === 'setup-videos') {
+        content = <SetupVideosPage />;
+    } else if (currentPage === 'faq') {
+        content = <FAQPage />;
+    } else if (currentPage === 'contact') {
+        content = <ContactPage />;
+    } else if (currentPage === 'our-story') {
+        content = <OurStoryPage />;
+    } else if (currentPage === 'why-us') {
+        content = <WhyUsPage />;
+    } else if (currentPage === 'terms-conditions') {
+        content = <TermsAndConditionsPage navigateTo={navigateTo} />;
+    } else if (currentPage === 'add-product') {
+        content = <AddProductPage navigateTo={navigateTo} addProduct={addProduct} />;
+    } else if (currentPage === 'edit-product' && pageParams?.id) {
+        content = <EditProductPage navigateTo={navigateTo} productId={pageParams.id} products={products} updateProduct={updateProduct} deleteProduct={deleteProduct} />;
+    } else if (currentPage === 'admin-dashboard') {
+        content = <AdminDashboardPage navigateTo={navigateTo} />;
+    } else if (currentPage === 'blog') {
+        content = <BlogPage blogPosts={blogPosts} navigateTo={navigateTo} />;
+    } else if (currentPage === 'blog-post' && pageParams?.id) {
+        content = <BlogPostPage postId={pageParams.id} blogPosts={blogPosts} navigateTo={navigateTo} />;
+    } else if (currentPage === 'add-blog-post') {
+        const canWrite = user && (user.roles.includes('Content Writer') || user.roles.includes('admin') || user.roles.includes('super-admin'));
+        content = canWrite ? <AddBlogPostPage navigateTo={navigateTo} addBlogPost={addBlogPost} /> : <HomePage navigateTo={navigateTo} products={products} />;
+    }
+     else {
+        content = <HomePage navigateTo={navigateTo} products={products} />;
+    }
+
+    return (
+        <>
+            <Header onAskNyxOpen={handleAskNyxOpen} navigateTo={navigateTo} />
+            <main>
+                {content}
+                {currentPage === 'home' && <EmailCapture />}
+            </main>
+            <Footer navigateTo={navigateTo} />
+            <CartSidebar navigateTo={navigateTo} />
+            <AskNyx isOpen={isAskNyxOpen} onClose={handleAskNyxClose} />
+            {showCookieConsent && <CookieConsentBanner onAccept={handleAcceptCookies} onDecline={handleDeclineCookies} />}
+        </>
+    );
+};
+
+
+const App: React.FC = () => (
+    <AuthProvider>
+        <CartProvider>
+            <AppContent />
+        </CartProvider>
+    </AuthProvider>
+);
+
+export default App;
