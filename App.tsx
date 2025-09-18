@@ -1,5 +1,6 @@
 
 
+
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -1554,24 +1555,131 @@ const AddBlogPostPage: React.FC<{
 
 // --- END OF BLOG COMPONENTS ---
 
-// A new placeholder component for Login/Signup
-const AuthPage: React.FC<{ navigateTo: (page: string) => void }> = ({ navigateTo }) => {
+const AuthForm: React.FC<{ navigateTo: (page: string) => void }> = ({ navigateTo }) => {
+    const [mode, setMode] = useState<'login' | 'signup'>('login');
+    const [formData, setFormData] = useState({
+        firstName: '',
+        lastName: '',
+        nickname: '',
+        email: '',
+        password: '',
+    });
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
+    const { login, signup, signInWithProvider } = useAuth();
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setError('');
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleProviderSignIn = async (provider: 'google' | 'facebook') => {
+        try {
+            await signInWithProvider(provider);
+            // OAuth redirect will handle the rest.
+        } catch (err: any) {
+            setError(err.message || `Failed to sign in with ${provider}.`);
+        }
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+        setError('');
+
+        try {
+            if (mode === 'login') {
+                await login(formData.email, formData.password);
+            } else {
+                await signup(formData.firstName, formData.lastName, formData.nickname, formData.email, formData.password);
+            }
+            navigateTo('home');
+        } catch (err: any) {
+            setError(err.message || 'An unexpected error occurred.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div className="bg-dark pt-24 animate-fade-in min-h-screen flex items-center justify-center">
-            <div className="text-center p-8 bg-dark-accent rounded-2xl border border-white/10 max-w-md w-full mx-4">
-                <h1 className="text-3xl font-bold text-white mb-4">Authentication</h1>
-                <p className="text-gray-400 mb-8">The login and sign-up functionality is currently under construction. Please check back later.</p>
+            <div className="p-8 bg-dark-accent rounded-2xl border border-white/10 max-w-md w-full mx-4">
                 <button
                     onClick={() => navigateTo('home')}
-                    className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors group mx-auto border border-gray-600 px-4 py-2 rounded-full"
+                    className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-6 group"
                 >
                     <ArrowLeftIcon className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
                     Back to Home
                 </button>
+                <h1 className="text-3xl font-bold text-white mb-2">{mode === 'login' ? 'Welcome Back' : 'Create Account'}</h1>
+                <p className="text-gray-400 mb-6">{mode === 'login' ? 'Sign in to continue.' : 'Get started with NYX.'}</p>
+                
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    {mode === 'signup' && (
+                        <div className="flex gap-4">
+                            <div>
+                                <label htmlFor="firstName" className="sr-only">First Name</label>
+                                <input type="text" name="firstName" placeholder="First Name" value={formData.firstName} onChange={handleChange} required className="w-full bg-dark border border-gray-600 rounded-lg py-3 px-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
+                            </div>
+                            <div>
+                                <label htmlFor="lastName" className="sr-only">Last Name</label>
+                                <input type="text" name="lastName" placeholder="Last Name" value={formData.lastName} onChange={handleChange} required className="w-full bg-dark border border-gray-600 rounded-lg py-3 px-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
+                            </div>
+                        </div>
+                    )}
+                    {mode === 'signup' && (
+                         <div>
+                            <label htmlFor="nickname" className="sr-only">Nickname</label>
+                            <input type="text" name="nickname" placeholder="Nickname" value={formData.nickname} onChange={handleChange} required className="w-full bg-dark border border-gray-600 rounded-lg py-3 px-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
+                        </div>
+                    )}
+                    <div>
+                        <label htmlFor="email" className="sr-only">{mode === 'login' ? 'Email or Nickname' : 'Email'}</label>
+                        <input type="text" name="email" placeholder={mode === 'login' ? 'Email or Nickname' : 'Email'} value={formData.email} onChange={handleChange} required className="w-full bg-dark border border-gray-600 rounded-lg py-3 px-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
+                    </div>
+                    <div>
+                        <label htmlFor="password" className="sr-only">Password</label>
+                        <input type="password" name="password" placeholder="Password" value={formData.password} onChange={handleChange} required className="w-full bg-dark border border-gray-600 rounded-lg py-3 px-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
+                    </div>
+
+                    {error && <p className="text-sm text-red-500 bg-red-500/10 p-3 rounded-lg">{error}</p>}
+                    
+                    <button type="submit" disabled={loading} className="w-full bg-brand-purple text-white font-bold py-3 px-8 rounded-full hover:bg-brand-purple/80 transition-all disabled:opacity-50 disabled:cursor-wait">
+                        {loading ? 'Processing...' : (mode === 'login' ? 'Login' : 'Sign Up')}
+                    </button>
+                </form>
+
+                <div className="relative my-6">
+                    <div className="absolute inset-0 flex items-center">
+                        <div className="w-full border-t border-gray-600" />
+                    </div>
+                    <div className="relative flex justify-center text-sm">
+                        <span className="bg-dark-accent px-2 text-gray-500">OR</span>
+                    </div>
+                </div>
+
+                <div className="space-y-3">
+                     <button onClick={() => handleProviderSignIn('google')} className="w-full flex justify-center items-center gap-3 bg-dark border border-gray-600 text-white font-semibold py-3 px-5 rounded-full hover:bg-gray-700 transition-colors">
+                        <GoogleIcon className="w-5 h-5" />
+                        Continue with Google
+                    </button>
+                     <button onClick={() => handleProviderSignIn('facebook')} className="w-full flex justify-center items-center gap-3 bg-[#1877F2] text-white font-semibold py-3 px-5 rounded-full hover:bg-[#1877F2]/90 transition-colors">
+                        <FacebookAuthIcon className="w-5 h-5" />
+                        Continue with Facebook
+                    </button>
+                </div>
+                
+                <p className="mt-6 text-center text-sm text-gray-400">
+                    {mode === 'login' ? "Don't have an account?" : "Already have an account?"}{' '}
+                    <button onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setError(''); }} className="font-semibold text-brand-purple hover:underline">
+                        {mode === 'login' ? 'Sign up' : 'Log in'}
+                    </button>
+                </p>
             </div>
         </div>
     );
 };
+
 
 // A new placeholder component for the User Profile
 const ProfilePage: React.FC<{ navigateTo: (page: string) => void }> = ({ navigateTo }) => {
@@ -1748,7 +1856,7 @@ const AppContent: React.FC = () => {
         const canWrite = user && (user.roles.includes('Content Writer') || user.roles.includes('admin') || user.roles.includes('super-admin'));
         content = canWrite ? <AddBlogPostPage navigateTo={navigateTo} addBlogPost={addBlogPost} /> : <HomePage navigateTo={navigateTo} products={products} />;
     } else if (currentPage === 'login') {
-        content = <AuthPage navigateTo={navigateTo} />;
+        content = <AuthForm navigateTo={navigateTo} />;
     } else if (currentPage === 'profile') {
         content = <ProfilePage navigateTo={navigateTo} />;
     }
