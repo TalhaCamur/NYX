@@ -1,23 +1,21 @@
-
-
-import React, { useState } from 'react';
+import React from 'react';
 import { useCart } from '../contexts/CartContext';
 import { Product } from '../types';
 import ArrowRightIcon from './icons/ArrowRightIcon';
 import { useAuth } from '../contexts/AuthContext';
+import TrashIcon from './icons/TrashIcon';
 
 // Sub-component for individual product cards
-const ProductCard: React.FC<{ product: Product; navigateTo: (page: string, params?: any) => void }> = ({ product, navigateTo }) => {
+export const ProductCard: React.FC<{ product: Product; navigateTo: (page: string, params?: any) => void }> = ({ product, navigateTo }) => {
     const { user } = useAuth();
-    const { addToCart, openCart } = useCart();
-    const [isAdded, setIsAdded] = useState(false);
+    const { cartItems, addToCart, updateItemQuantity, removeFromCart } = useCart();
     const isAuthorized = user && (user.roles.includes('seller') || user.roles.includes('admin') || user.roles.includes('super-admin'));
+
+    const cartItem = cartItems.find(item => item.id === product.id);
+    const quantityInCart = cartItem ? cartItem.quantity : 0;
 
     const handleAddToCart = () => {
         addToCart(product, 1);
-        setIsAdded(true);
-        setTimeout(() => setIsAdded(false), 2000);
-        setTimeout(() => openCart(), 300);
     };
 
     return (
@@ -44,17 +42,35 @@ const ProductCard: React.FC<{ product: Product; navigateTo: (page: string, param
                             <span className="text-sm text-gray-500 line-through ml-2">€{product.originalPrice.toFixed(2)}</span>
                         )}
                     </div>
-                    <button
-                        onClick={handleAddToCart}
-                        disabled={isAdded}
-                        className={`w-full font-semibold py-3 px-5 rounded-full transition-all duration-300 transform group-hover:scale-105 text-sm ${
-                            isAdded 
-                                ? 'bg-green-500 text-white cursor-default' 
-                                : 'bg-brand-purple text-white hover:bg-brand-purple/80'
-                        }`}
-                    >
-                        {isAdded ? 'Added' : 'Add to Cart'}
-                    </button>
+                    
+                    {quantityInCart === 0 ? (
+                        <button
+                            onClick={handleAddToCart}
+                            className="w-full font-semibold py-3 px-5 rounded-full transition-all duration-300 transform group-hover:scale-105 text-sm bg-brand-purple text-white hover:bg-brand-purple/80"
+                        >
+                            Add to Cart
+                        </button>
+                    ) : (
+                        <div className="flex items-center justify-between bg-dark border border-gray-700 rounded-full h-[46px]">
+                            <button 
+                                onClick={() => quantityInCart === 1 ? removeFromCart(product.id) : updateItemQuantity(product.id, quantityInCart - 1)} 
+                                className="p-3 text-gray-400 hover:text-white transition-colors rounded-full"
+                                aria-label={quantityInCart === 1 ? "Remove item" : "Decrease quantity"}
+                            >
+                                {quantityInCart === 1 ? <TrashIcon className="w-5 h-5 text-red-500" /> : <span className="w-5 h-5 flex items-center justify-center text-2xl leading-none font-light">-</span>}
+                            </button>
+                            <span className="font-bold text-white text-lg select-none">{quantityInCart}</span>
+                            <button 
+                                onClick={() => updateItemQuantity(product.id, quantityInCart + 1)} 
+                                disabled={quantityInCart >= 5}
+                                className="p-3 text-gray-400 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed rounded-full"
+                                aria-label="Increase quantity"
+                            >
+                                <span className="w-5 h-5 flex items-center justify-center text-2xl leading-none font-light">+</span>
+                            </button>
+                        </div>
+                    )}
+
                     {isAuthorized && (
                         <button
                             onClick={() => navigateTo('edit-product', { id: product.id })}

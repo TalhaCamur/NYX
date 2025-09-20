@@ -9,8 +9,8 @@ interface CartContextType {
   cartItems: CartItem[];
   isCartOpen: boolean;
   addToCart: (product: Product, quantity: number) => void;
-  removeFromCart: (productName: string) => void;
-  updateItemQuantity: (productName: string, quantity: number) => void;
+  removeFromCart: (productId: string) => void;
+  updateItemQuantity: (productId: string, quantity: number) => void;
   getCartTotalQuantity: () => number;
   getCartTotalPrice: () => number;
   openCart: () => void;
@@ -28,10 +28,10 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const addToCart = (product: Product, quantity: number) => {
     setCartItems(prevItems => {
-      const existingItem = prevItems.find(item => item.name === product.name);
+      const existingItem = prevItems.find(item => item.id === product.id);
       if (existingItem) {
         return prevItems.map(item =>
-          item.name === product.name
+          item.id === product.id
             ? { ...item, quantity: Math.min(item.quantity + quantity, 5) } // Cap quantity at 5
             : item
         );
@@ -40,14 +40,14 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     });
   };
 
-  const removeFromCart = (productName: string) => {
-    setCartItems(prevItems => prevItems.filter(item => item.name !== productName));
+  const removeFromCart = (productId: string) => {
+    setCartItems(prevItems => prevItems.filter(item => item.id !== productId));
   };
   
-  const updateItemQuantity = (productName: string, quantity: number) => {
+  const updateItemQuantity = (productId: string, quantity: number) => {
       setCartItems(prevItems =>
           prevItems.map(item =>
-              item.name === productName
+              item.id === productId
                   ? { ...item, quantity: Math.max(0, Math.min(quantity, 5)) } // Clamp between 0 and 5
                   : item
           ).filter(item => item.quantity > 0) // Remove if quantity is 0

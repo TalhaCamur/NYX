@@ -15,21 +15,30 @@ const mapProfileToUser = (profile: any, authUser: SupabaseUser | null): User => 
     lastName: profile.last_name,
     nickname: profile.nickname,
     email: authUser?.email || profile.email,
-    roles: profile.roles,
+    roles: Array.isArray(profile.roles)
+        ? profile.roles
+        : (typeof profile.roles === 'string'
+            ? profile.roles.replace(/[{}]/g, '').split(',').filter(role => role.trim() !== '') as UserRole[]
+            : []),
     profilePicture: profile.profile_picture,
+    newsletterSubscribed: profile.newsletter_subscribed,
 });
 
 interface AuthContextType {
     user: User | null;
+    isPasswordRecoveryFlow: boolean;
     login: (identifier: string, password: string) => Promise<void>;
-    signup: (firstName: string, lastName: string, nickname: string, email: string, password: string) => Promise<void>;
+    signup: (firstName: string, lastName: string, nickname: string, email: string, password: string, newsletterSubscribed: boolean) => Promise<void>;
     logout: () => Promise<void>;
     updateUser: (userId: string, updates: Partial<Pick<User, 'firstName' | 'lastName' | 'nickname' | 'profilePicture'>>) => Promise<User>;
     changePassword: (userId: string, currentPassword: string, newPassword: string) => Promise<void>;
     signInWithProvider: (provider: 'google' | 'facebook') => Promise<void>;
+    sendPasswordResetEmail: (email: string) => Promise<void>;
+    updatePassword: (newPassword: string) => Promise<void>;
     fetchAllUsers: () => Promise<User[]>;
     updateUserRoles: (userId: string, roles: UserRole[]) => Promise<void>;
     deleteUserAsAdmin: (userId: string) => Promise<void>;
+    deleteUserAccount: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -37,6 +46,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
+    const [isPasswordRecoveryFlow, setIsPasswordRecoveryFlow] = useState(false);
 
     useEffect(() => {
         const getSession = async () => {
@@ -58,14 +68,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         };
         getSession();
 
-        const { data: authListener } = supabase.auth.onAuthStateChange(async (_event, session) => {
-            if (session?.user) {
+        const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
+            if (event === 'PASSWORD_RECOVERY') {
+                setIsPasswordRecoveryFlow(true);
+            } else if (session?.user) {
                 const { data: profile } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
                 if (profile) {
                     setUser(mapProfileToUser(profile, session.user));
                 }
+                setIsPasswordRecoveryFlow(false);
             } else {
                 setUser(null);
+                setIsPasswordRecoveryFlow(false);
             }
         });
 
@@ -126,7 +140,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         // No need to manually set the user here.
     };
 
-    const signup = async (firstName: string, lastName: string, nickname: string, email: string, password: string): Promise<void> => {
+    const signup = async (firstName: string, lastName: string, nickname: string, email: string, password: string, newsletterSubscribed: boolean): Promise<void> => {
         const trimmedFirstName = firstName.trim();
         const trimmedLastName = lastName.trim();
         const trimmedNickname = nickname.trim();
@@ -163,14 +177,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
         // 3. Create the user profile
         const userRoles: UserRole[] = trimmedEmail.toLowerCase() === 'bedrettinsahin2002@gmail.com' ? ['super-admin'] : ['user'];
+        const rolesPgArray = `{${userRoles.join(',')}}`;
         const { error: profileError } = await supabase.from('profiles').insert([{
             id: authData.user.id,
             first_name: trimmedFirstName,
             last_name: trimmedLastName,
             nickname: normalizedNickname, // Store the normalized nickname
             email: trimmedEmail,
-            roles: userRoles,
+            roles: rolesPgArray,
             profile_picture: `https://ui-avatars.com/api/?name=${trimmedFirstName}+${trimmedLastName}&background=random`,
+            newsletter_subscribed: newsletterSubscribed,
         }]);
 
         if (profileError) {
@@ -191,6 +207,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         const { error } = await supabase.auth.signOut();
         if (error) throw error;
         setUser(null);
+        setIsPasswordRecoveryFlow(false);
     };
 
     const updateUser = async (userId: string, updates: Partial<Pick<User, 'firstName' | 'lastName' | 'nickname' | 'profilePicture'>>): Promise<User> => {
@@ -257,6 +274,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         const { error: updateError } = await supabase.auth.updateUser({ password: newPassword });
         if (updateError) throw updateError;
     };
+    
+    const sendPasswordResetEmail = async (email: string): Promise<void> => {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+            redirectTo: window.location.origin,
+        });
+        if (error) {
+            console.error("Password reset request error:", error.message);
+        }
+    };
+
+    const updatePassword = async (newPassword: string): Promise<void> => {
+        const { error } = await supabase.auth.updateUser({ password: newPassword });
+        if (error) throw error;
+        await logout();
+    };
 
     const fetchAllUsers = async (): Promise<User[]> => {
         const { data, error } = await supabase.from('profiles').select('*');
@@ -274,7 +306,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     };
 
     const updateUserRoles = async (userId: string, roles: UserRole[]): Promise<void> => {
-        const { error } = await supabase.from('profiles').update({ roles }).eq('id', userId);
+        const rolesPgArray = `{${roles.join(',')}}`;
+        const { error } = await supabase.from('profiles').update({ roles: rolesPgArray }).eq('id', userId);
         if (error) throw error;
     };
     
@@ -286,7 +319,31 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         if (error) throw error;
     };
 
-    const value = { user, login, signup, logout, updateUser, changePassword, signInWithProvider, fetchAllUsers, updateUserRoles, deleteUserAsAdmin };
+    const deleteUserAccount = async (): Promise<void> => {
+        const { data: { user: authUser } } = await supabase.auth.getUser();
+        if (!authUser) {
+            throw new Error("You must be logged in to delete your account.");
+        }
+        
+        // The only action possible from the client is deleting the public profile.
+        // RLS policies must be configured on Supabase to allow a user to delete their own profile.
+        // e.g., (auth.uid() = id) for DELETE on 'profiles' table.
+        const { error: profileError } = await supabase
+            .from('profiles')
+            .delete()
+            .eq('id', authUser.id);
+            
+        if (profileError) {
+            throw new Error(`Failed to delete profile data: ${profileError.message}`);
+        }
+
+        // After successfully deleting the profile, sign the user out completely.
+        // This will remove them from the application. The auth user remains but is orphaned.
+        await logout();
+    };
+
+
+    const value = { user, isPasswordRecoveryFlow, login, signup, logout, updateUser, changePassword, signInWithProvider, sendPasswordResetEmail, updatePassword, fetchAllUsers, updateUserRoles, deleteUserAsAdmin, deleteUserAccount };
 
     return (
         <AuthContext.Provider value={value}>

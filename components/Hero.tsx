@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const Hero: React.FC = () => {
+const Hero: React.FC<{ navigateTo: (page: string) => void }> = ({ navigateTo }) => {
     const [isArrowVisible, setIsArrowVisible] = useState(true);
 
     useEffect(() => {
@@ -44,10 +44,10 @@ const Hero: React.FC = () => {
                         Discover the NYX ecosystem of beautifully designed, intelligent devices that work together to simplify your life.
                     </p>
                     <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4">
-                        <a href="#products" className="bg-white text-dark font-semibold py-3 px-8 rounded-full hover:bg-gray-200 transition-all duration-300 transform hover:scale-105 w-full sm:w-auto">
+                        <a href="/products" onClick={(e) => { e.preventDefault(); navigateTo('products'); }} className="bg-white text-dark font-semibold py-3 px-8 rounded-full hover:bg-gray-200 transition-all duration-300 transform hover:scale-105 w-full sm:w-auto">
                             Explore Products
                         </a>
-                        <a href="#about" className="border border-gray-600 text-white font-semibold py-3 px-8 rounded-full hover:bg-white hover:text-dark transition-colors duration-300 w-full sm:w-auto">
+                        <a href="#about" onClick={(e) => { e.preventDefault(); document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' }); }} className="border border-gray-600 text-white font-semibold py-3 px-8 rounded-full hover:bg-white hover:text-dark transition-colors duration-300 w-full sm:w-auto">
                             Why NYX?
                         </a>
                     </div>

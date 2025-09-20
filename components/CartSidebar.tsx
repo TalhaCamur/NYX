@@ -3,7 +3,7 @@ import { useCart } from '../contexts/CartContext';
 import CloseIcon from './icons/CloseIcon';
 import TrashIcon from './icons/TrashIcon';
 
-const CartSidebar: React.FC<{ navigateTo: (page: string) => void }> = ({ navigateTo }) => {
+const CartSidebar: React.FC<{ navigateTo: (page: string, params?: any) => void }> = ({ navigateTo }) => {
     const { isCartOpen, closeCart, cartItems, removeFromCart, updateItemQuantity, getCartTotalPrice } = useCart();
     const [agreedToTerms, setAgreedToTerms] = useState(false);
 
@@ -32,22 +32,45 @@ const CartSidebar: React.FC<{ navigateTo: (page: string) => void }> = ({ navigat
                     ) : (
                         <ul className="space-y-4">
                             {cartItems.map(item => (
-                                <li key={item.name} className="flex gap-4 items-center">
+                                <li key={item.id} className="flex gap-4 items-center">
                                     <img src={item.images[0]} alt={item.name} className="w-20 h-20 object-cover rounded-md bg-nyx-gray" />
                                     <div className="flex-grow">
                                         <h3 className="font-semibold">{item.name}</h3>
                                         <p className="text-sm text-gray-400">€{item.price.toFixed(2)}</p>
                                         <div className="flex items-center mt-2">
                                             <div className="flex items-center border border-gray-700 rounded-full text-sm">
-                                                <button onClick={() => updateItemQuantity(item.name, item.quantity - 1)} className="px-2 py-1 hover:bg-nyx-gray/50 rounded-l-full">-</button>
+                                                {item.quantity === 1 ? (
+                                                    <button 
+                                                        onClick={() => removeFromCart(item.id)} 
+                                                        className="w-8 py-1 hover:bg-nyx-gray/50 rounded-l-full flex items-center justify-center"
+                                                        aria-label="Remove item"
+                                                    >
+                                                        <TrashIcon className="w-4 h-4 text-red-500" />
+                                                    </button>
+                                                ) : (
+                                                    <button 
+                                                        onClick={() => updateItemQuantity(item.id, item.quantity - 1)} 
+                                                        className="w-8 py-1 hover:bg-nyx-gray/50 rounded-l-full"
+                                                        aria-label="Decrease quantity"
+                                                    >
+                                                        -
+                                                    </button>
+                                                )}
                                                 <span className="px-3 select-none">{item.quantity}</span>
-                                                <button onClick={() => updateItemQuantity(item.name, item.quantity + 1)} className="px-2 py-1 hover:bg-nyx-gray/50 rounded-r-full">+</button>
+                                                <button 
+                                                    onClick={() => updateItemQuantity(item.id, item.quantity + 1)} 
+                                                    disabled={item.quantity >= 5}
+                                                    className="w-8 py-1 hover:bg-nyx-gray/50 rounded-r-full disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    aria-label="Increase quantity"
+                                                >
+                                                    +
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
                                     <div className="text-right">
                                         <p className="font-semibold">€{(item.price * item.quantity).toFixed(2)}</p>
-                                        <button onClick={() => removeFromCart(item.name)} className="text-gray-500 hover:text-red-500 transition-colors mt-2">
+                                        <button onClick={() => removeFromCart(item.id)} className="text-gray-500 hover:text-red-500 transition-colors mt-2">
                                             <TrashIcon className="w-5 h-5"/>
                                         </button>
                                     </div>
@@ -73,10 +96,10 @@ const CartSidebar: React.FC<{ navigateTo: (page: string) => void }> = ({ navigat
                             />
                             <label htmlFor="cart-terms" className="text-xs text-gray-400">
                                 I agree to the{' '}
-                                <button type="button" onClick={() => { closeCart(); navigateTo('terms-conditions'); }} className="font-semibold text-nyx-blue hover:underline focus:outline-none">
-                                    Terms and Conditions
+                                <button type="button" onClick={() => { closeCart(); navigateTo('legal', { slug: 'terms-and-conditions', title: 'Terms & Conditions' }); }} className="font-semibold text-nyx-blue hover:underline focus:outline-none">
+                                    Terms & Conditions
                                 </button> and{' '}
-                                <button type="button" onClick={() => alert('Privacy Policy page coming soon!')} className="font-semibold text-nyx-blue hover:underline focus:outline-none">
+                                <button type="button" onClick={() => { closeCart(); navigateTo('legal', { slug: 'privacy-policy', title: 'Privacy Policy' }); }} className="font-semibold text-nyx-blue hover:underline focus:outline-none">
                                     Privacy Policy
                                 </button>.
                             </label>

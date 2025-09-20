@@ -51,4 +51,5 @@ export interface User {
     email: string;
     roles: UserRole[];
     profilePicture?: string;
+    newsletterSubscribed?: boolean;
 }

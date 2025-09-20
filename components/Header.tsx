@@ -8,7 +8,7 @@ import { useAuth } from '../contexts/AuthContext';
 
 interface HeaderProps {
     onAskNyxOpen: () => void;
-    navigateTo: (page: string) => void;
+    navigateTo: (page: string, params?: any) => void;
 }
 
 const Header: React.FC<HeaderProps> = ({ onAskNyxOpen, navigateTo }) => {
@@ -279,7 +279,10 @@ const Header: React.FC<HeaderProps> = ({ onAskNyxOpen, navigateTo }) => {
                         <div className="hidden md:flex">
                              {renderAuthSection()}
                         </div>
-                        <button onClick={openCart} className="relative text-gray-300 hover:text-white transition-colors">
+                        <button 
+                            onClick={openCart} 
+                            className="relative text-gray-300 hover:text-white transition-colors"
+                        >
                             <ShoppingCartIcon className="w-6 h-6" />
                             {totalQuantity > 0 && (
                                 <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-brand-pink text-xs font-bold text-white">
@@ -292,7 +295,7 @@ const Header: React.FC<HeaderProps> = ({ onAskNyxOpen, navigateTo }) => {
                             className="md:hidden text-gray-300"
                             aria-label="Open menu"
                         >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
                             </svg>
                         </button>

@@ -3,7 +3,7 @@ import FacebookIcon from './icons/FacebookIcon';
 import InstagramIcon from './icons/InstagramIcon';
 import TwitterIcon from './icons/TwitterIcon';
 
-const Footer: React.FC<{ navigateTo: (page: string) => void }> = ({ navigateTo }) => {
+const Footer: React.FC<{ navigateTo: (page: string, params?: any) => void }> = ({ navigateTo }) => {
     return (
         <footer className="bg-dark py-12 border-t border-white/10">
             <div className="container mx-auto px-4 text-center text-gray-400">
@@ -21,11 +21,11 @@ const Footer: React.FC<{ navigateTo: (page: string) => void }> = ({ navigateTo }
                     <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors"><TwitterIcon className="w-6 h-6" /></a>
                 </div>
                  <div className="flex flex-wrap justify-center items-center gap-x-6 gap-y-2 mb-8 text-sm">
-                    <a href="#" onClick={(e) => { e.preventDefault(); alert('Privacy Policy page coming soon!'); }} className="hover:text-white transition-colors">Privacy Policy</a>
+                    <button onClick={() => navigateTo('legal', { slug: 'privacy-policy', title: 'Privacy Policy' })} className="hover:text-white transition-colors">Privacy Policy</button>
                     <span className="text-gray-600 hidden sm:inline">|</span>
-                    <a href="#" onClick={(e) => { e.preventDefault(); navigateTo('terms-conditions'); }} className="hover:text-white transition-colors">Terms & Conditions</a>
+                    <button onClick={() => navigateTo('legal', { slug: 'terms-and-conditions', title: 'Terms & Conditions' })} className="hover:text-white transition-colors">Terms & Conditions</button>
                     <span className="text-gray-600 hidden sm:inline">|</span>
-                    <a href="#" onClick={(e) => { e.preventDefault(); alert('Cookie Policy page coming soon!'); }} className="hover:text-white transition-colors">Cookie Policy</a>
+                    <button onClick={() => navigateTo('legal', { slug: 'cookie-policy', title: 'Cookie Policy' })} className="hover:text-white transition-colors">Cookie Policy</button>
                 </div>
                 <p className="text-xs">Copyright © 2025 NYX Smart Home All rights reserved.</p>
             </div>

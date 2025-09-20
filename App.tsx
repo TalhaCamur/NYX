@@ -3,6 +3,7 @@
 
 
 
+
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -13,11 +14,9 @@ import AskNyx from './pages/AskNyxPage';
 import { FAQ_DATA, FEATURES_DATA } from './constants';
 import { useCart } from './contexts/CartContext';
 import { Product, User, UserRole, BlogPost } from './types';
-import EmailCapture from './components/EmailCapture';
 import { AuthProvider, useAuth, supabase } from './contexts/AuthContext';
-import TermsAndConditionsPage from './pages/TermsAndConditionsPage';
 import CookieConsentBanner from './components/CookieConsentBanner';
-import { BLOG_POSTS_DATA } from './blogConstants';
+import { ProductCard } from './components/ProductShowcase';
 
 
 // Define shared icons here to avoid creating new files
@@ -87,6 +86,13 @@ const ImageUploadIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
     </svg>
 );
 
+const CloseIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+    </svg>
+);
+
 const Switch: React.FC<{ checked: boolean; onChange: (checked: boolean) => void; }> = ({ checked, onChange }) => (
     <button
         type="button"
@@ -108,68 +114,6 @@ const Switch: React.FC<{ checked: boolean; onChange: (checked: boolean) => void;
 
 
 // Define the Products Page components here to avoid creating new files
-const ProductCard: React.FC<{ product: Product; navigateTo: (page: string, params?: any) => void }> = ({ product, navigateTo }) => {
-    const { user } = useAuth();
-    const { addToCart, openCart } = useCart();
-    const [isAdded, setIsAdded] = useState(false);
-    const isAuthorized = user && (user.roles.includes('seller') || user.roles.includes('admin') || user.roles.includes('super-admin'));
-
-    const handleAddToCart = () => {
-        addToCart(product, 1);
-        setIsAdded(true);
-        setTimeout(() => setIsAdded(false), 2000);
-        setTimeout(() => openCart(), 300);
-    };
-
-    return (
-        <div className="bg-dark-accent rounded-2xl border border-white/10 overflow-hidden flex flex-col group relative">
-            {!product.isVisible && isAuthorized && (
-                <div className="absolute top-3 right-3 bg-yellow-500 text-black text-xs font-bold px-2 py-1 rounded-full z-10">
-                    Hidden
-                </div>
-            )}
-            <div className="aspect-square overflow-hidden">
-                <img 
-                    src={product.images[0]} 
-                    alt={product.name}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-            </div>
-            <div className="p-6 flex flex-col flex-grow">
-                <h3 className="text-xl font-bold text-white mb-2">{product.name}</h3>
-                <p className="text-gray-400 text-sm flex-grow mb-4">{product.tagline}</p>
-                 <div className="mt-auto pt-4 space-y-2">
-                    <div className="flex items-baseline">
-                        <span className="text-2xl font-bold text-white">€{product.price.toFixed(2)}</span>
-                        {product.originalPrice && (
-                            <span className="text-sm text-gray-500 line-through ml-2">€{product.originalPrice.toFixed(2)}</span>
-                        )}
-                    </div>
-                    <button
-                        onClick={handleAddToCart}
-                        disabled={isAdded}
-                        className={`w-full font-semibold py-3 px-5 rounded-full transition-all duration-300 transform group-hover:scale-105 text-sm ${
-                            isAdded 
-                                ? 'bg-green-500 text-white cursor-default' 
-                                : 'bg-brand-purple text-white hover:bg-brand-purple/80'
-                        }`}
-                    >
-                        {isAdded ? 'Added' : 'Add to Cart'}
-                    </button>
-                    {isAuthorized && (
-                        <button
-                            onClick={() => navigateTo('edit-product', { id: product.id })}
-                            className="w-full text-center font-semibold py-3 px-5 rounded-full transition-all duration-300 text-sm bg-gray-700 text-white hover:bg-gray-600"
-                        >
-                            Edit Product
-                        </button>
-                    )}
-                </div>
-            </div>
-        </div>
-    );
-};
-
 const ProductsPage: React.FC<{ navigateTo: (page: string, params?: any) => void, products: Product[], loading: boolean, error: string | null }> = ({ navigateTo, products, loading, error }) => {
     const { user } = useAuth();
     const isAuthorized = user && (user.roles.includes('seller') || user.roles.includes('admin') || user.roles.includes('super-admin'));
@@ -437,7 +381,7 @@ const ContactPage: React.FC = () => {
                             </div>
                             <div>
                                 <h3 className="text-xl font-semibold text-white">Our Headquarters</h3>
-                                <p className="text-gray-400">123 Innovation Drive, Tech City, 90210, CA</p>
+                                <p className="text-gray-400">Netherlands</p>
                             </div>
                         </div>
                          <div className="flex items-start gap-6">
@@ -447,7 +391,7 @@ const ContactPage: React.FC = () => {
                             <div>
                                 <h3 className="text-xl font-semibold text-white">Email Us</h3>
                                 <p className="text-gray-400">
-                                    <a href="mailto:support@nyxhome.io" className="hover:text-brand-purple transition-colors">support@nyxhome.io</a>
+                                    <a href="mailto:nyxsmarthome@gmail.com" className="hover:text-brand-purple transition-colors">nyxsmarthome@gmail.com</a>
                                 </p>
                             </div>
                         </div>
@@ -458,7 +402,7 @@ const ContactPage: React.FC = () => {
                             <div>
                                 <h3 className="text-xl font-semibold text-white">Call Us</h3>
                                 <p className="text-gray-400">
-                                    <a href="tel:+18005550199" className="hover:text-brand-purple transition-colors">+1 (800) 555-0199</a>
+                                    <a href="tel:+1-800-555-0199" className="hover:text-brand-purple transition-colors">+1-800-555-0199</a>
                                 </p>
                             </div>
                         </div>
@@ -1491,6 +1435,22 @@ const AddBlogPostPage: React.FC<{
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            if (!file.type.startsWith('image/')) {
+                alert("Only image files can be uploaded.");
+                e.target.value = '';
+                return;
+            }
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setFormData(prev => ({ ...prev, imageUrl: reader.result as string }));
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!formData.title || !formData.excerpt || !formData.content || !user) {
@@ -1527,10 +1487,52 @@ const AddBlogPostPage: React.FC<{
                             <label htmlFor="title" className="block text-sm font-medium mb-2">Post Title <span className="text-red-500">*</span></label>
                             <input type="text" name="title" value={formData.title} onChange={handleChange} className="w-full bg-dark border border-gray-600 rounded-lg py-3 px-4" required />
                         </div>
-                         <div>
+                         
+                        {/* Image Section */}
+                        <div>
                             <label htmlFor="imageUrl" className="block text-sm font-medium mb-2">Image URL</label>
-                            <input type="url" name="imageUrl" value={formData.imageUrl} onChange={handleChange} placeholder="https://images.unsplash.com/..." className="w-full bg-dark border border-gray-600 rounded-lg py-3 px-4" />
+                            <input 
+                                type="url" 
+                                name="imageUrl" 
+                                value={formData.imageUrl} 
+                                onChange={handleChange} 
+                                placeholder="https://images.unsplash.com/..." 
+                                className="w-full bg-dark border border-gray-600 rounded-lg py-3 px-4" 
+                            />
+                             <div className="relative my-4 flex items-center">
+                                <div className="flex-grow border-t border-gray-600"></div>
+                                <span className="flex-shrink mx-4 text-gray-500 text-xs uppercase">Or</span>
+                                <div className="flex-grow border-t border-gray-600"></div>
+                            </div>
+                             <label
+                                htmlFor="file-upload"
+                                className="relative cursor-pointer rounded-lg border-2 border-dashed border-gray-600 px-6 py-10 flex flex-col justify-center items-center hover:border-brand-purple/50 transition-colors"
+                            >
+                                <ImageUploadIcon className="mx-auto h-12 w-12 text-gray-500" />
+                                <span className="mt-2 block text-sm font-semibold text-brand-purple">
+                                    Upload an image
+                                </span>
+                                <input id="file-upload" name="file-upload" type="file" className="sr-only" accept="image/*" onChange={handleImageUpload} />
+                            </label>
+
+                            {formData.imageUrl && (
+                                <div className="mt-4">
+                                    <p className="text-sm font-medium mb-2">Image Preview:</p>
+                                    <div className="relative group">
+                                        <img src={formData.imageUrl} alt="Preview" className="w-full h-auto max-h-64 object-contain rounded-lg bg-dark" />
+                                        <button
+                                            type="button"
+                                            onClick={() => setFormData(prev => ({ ...prev, imageUrl: '' }))}
+                                            className="absolute top-2 right-2 p-1.5 rounded-full bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                                            aria-label="Remove image"
+                                        >
+                                            <CloseIcon className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
                         </div>
+
                          <div>
                             <label htmlFor="excerpt" className="block text-sm font-medium mb-2">Excerpt / Subtitle <span className="text-red-500">*</span></label>
                             <textarea name="excerpt" value={formData.excerpt} onChange={handleChange} rows={2} className="w-full bg-dark border border-gray-600 rounded-lg py-3 px-4" required></textarea>
@@ -1557,8 +1559,8 @@ const AddBlogPostPage: React.FC<{
 
 // --- END OF BLOG COMPONENTS ---
 
-const AuthForm: React.FC<{ navigateTo: (page: string) => void }> = ({ navigateTo }) => {
-    const [mode, setMode] = useState<'login' | 'signup'>('login');
+const AuthForm: React.FC<{ navigateTo: (page: string, params?: any) => void }> = ({ navigateTo }) => {
+    const [mode, setMode] = useState<'login' | 'signup' | 'forgotPassword'>('login');
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
@@ -1566,13 +1568,35 @@ const AuthForm: React.FC<{ navigateTo: (page: string) => void }> = ({ navigateTo
         email: '',
         password: '',
     });
+    const [agreements, setAgreements] = useState({
+        news: false,
+        terms: false,
+    });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const { login, signup, signInWithProvider } = useAuth();
+    const [message, setMessage] = useState('');
+    const [countdown, setCountdown] = useState(0);
+    const { login, signup, signInWithProvider, sendPasswordResetEmail } = useAuth();
+
+    useEffect(() => {
+        let timer: ReturnType<typeof setInterval>;
+        if (countdown > 0) {
+            timer = setInterval(() => {
+                setCountdown((prev) => prev - 1);
+            }, 1000);
+        }
+        return () => clearInterval(timer);
+    }, [countdown]);
+
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setError('');
+        setMessage('');
         setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleAgreementChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setAgreements({ ...agreements, [e.target.name]: e.target.checked });
     };
 
     const handleProviderSignIn = async (provider: 'google' | 'facebook') => {
@@ -1588,20 +1612,72 @@ const AuthForm: React.FC<{ navigateTo: (page: string) => void }> = ({ navigateTo
         e.preventDefault();
         setLoading(true);
         setError('');
+        setMessage('');
 
         try {
             if (mode === 'login') {
                 await login(formData.email, formData.password);
-            } else {
-                await signup(formData.firstName, formData.lastName, formData.nickname, formData.email, formData.password);
+                navigateTo('home');
+            } else if (mode === 'signup') {
+                if (!agreements.terms) {
+                    setError("You must agree to the Terms and Privacy Policy to sign up.");
+                    setLoading(false);
+                    return;
+                }
+                await signup(formData.firstName, formData.lastName, formData.nickname, formData.email, formData.password, agreements.news);
+                navigateTo('home');
+            } else if (mode === 'forgotPassword') {
+                await sendPasswordResetEmail(formData.email);
+                setMessage('Password reset link has been sent.');
+                setCountdown(60);
             }
-            navigateTo('home');
         } catch (err: any) {
-            setError(err.message || 'An unexpected error occurred.');
+            const errorMessage = err.message || 'An unexpected error occurred.';
+            if (mode === 'forgotPassword' && errorMessage.includes('For security purposes, you can only request this after')) {
+                const secondsMatch = errorMessage.match(/after (\d+)/);
+                const secondsLeft = secondsMatch ? parseInt(secondsMatch[1], 10) : 60;
+                setCountdown(secondsLeft);
+                setError(`Too many requests. Please wait before trying again.`);
+            } else {
+                setError(errorMessage);
+            }
         } finally {
             setLoading(false);
         }
     };
+    
+    if (mode === 'forgotPassword') {
+        return (
+            <div className="bg-dark pt-24 animate-fade-in min-h-screen flex items-center justify-center">
+                <div className="p-8 bg-dark-accent rounded-2xl border border-white/10 max-w-md w-full mx-4">
+                    <h1 className="text-3xl font-bold text-white mb-2">Reset Password</h1>
+                    <p className="text-gray-400 mb-6">Enter your email address to receive a password reset link.</p>
+                     <form onSubmit={handleSubmit} className="space-y-4">
+                        <div>
+                            <label htmlFor="email" className="sr-only">Email</label>
+                            <input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} required className="w-full bg-dark border border-gray-600 rounded-lg py-3 px-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
+                        </div>
+                        {error && <p className="text-sm text-red-500 bg-red-500/10 p-3 rounded-lg">{error}</p>}
+                        {message && !error && <p className="text-sm text-green-400 bg-green-500/10 p-3 rounded-lg">{message}</p>}
+                        <button type="submit" disabled={loading || countdown > 0} className="w-full bg-brand-purple text-white font-bold py-3 px-8 rounded-full hover:bg-brand-purple/80 transition-all disabled:opacity-50 disabled:cursor-wait">
+                            {loading ? 'Sending...' : 'Send Reset Link'}
+                        </button>
+                        {countdown > 0 && (
+                            <p className="text-sm text-center text-gray-400 mt-2">
+                                For security, you can request another link in {countdown} seconds.
+                            </p>
+                        )}
+                    </form>
+                    <p className="mt-6 text-center text-sm text-gray-400">
+                        Remember your password?{' '}
+                        <button onClick={() => { setMode('login'); setError(''); setMessage(''); setCountdown(0); }} className="font-semibold text-brand-purple hover:underline">
+                            Back to Login
+                        </button>
+                    </p>
+                </div>
+            </div>
+        )
+    }
 
     return (
         <div className="bg-dark pt-24 animate-fade-in min-h-screen flex items-center justify-center">
@@ -1642,11 +1718,58 @@ const AuthForm: React.FC<{ navigateTo: (page: string) => void }> = ({ navigateTo
                     <div>
                         <label htmlFor="password" className="sr-only">Password</label>
                         <input type="password" name="password" placeholder="Password" value={formData.password} onChange={handleChange} required className="w-full bg-dark border border-gray-600 rounded-lg py-3 px-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
+                        {mode === 'login' && (
+                            <div className="text-right mt-2">
+                                <button
+                                    type="button"
+                                    onClick={() => { setMode('forgotPassword'); setError(''); }}
+                                    className="text-xs font-semibold text-brand-purple hover:underline"
+                                >
+                                    Forgot password?
+                                </button>
+                            </div>
+                        )}
                     </div>
+
+                    {mode === 'signup' && (
+                        <div className="space-y-3 pt-2">
+                            <label className="flex items-start gap-3 cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    name="news"
+                                    checked={agreements.news}
+                                    onChange={handleAgreementChange}
+                                    className="mt-1 h-4 w-4 shrink-0 rounded border-gray-600 bg-dark text-brand-purple focus:ring-brand-purple focus:ring-offset-dark-accent"
+                                />
+                                <span className="text-sm text-gray-400">
+                                    I agree to receive news from NYX
+                                </span>
+                            </label>
+                            <label className="flex items-start gap-3 cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    name="terms"
+                                    checked={agreements.terms}
+                                    onChange={handleAgreementChange}
+                                    className="mt-1 h-4 w-4 shrink-0 rounded border-gray-600 bg-dark text-brand-purple focus:ring-brand-purple focus:ring-offset-dark-accent"
+                                    required
+                                />
+                                <span className="text-sm text-gray-400">
+                                    I agree to NYX's{' '}
+                                    <button type="button" onClick={() => navigateTo('legal', { slug: 'terms-and-conditions', title: 'Terms & Conditions' })} className="font-semibold text-brand-purple hover:underline focus:outline-none">
+                                        Terms
+                                    </button> and{' '}
+                                    <button type="button" onClick={() => navigateTo('legal', { slug: 'privacy-policy', title: 'Privacy Policy' })} className="font-semibold text-brand-purple hover:underline focus:outline-none">
+                                        Privacy Policy
+                                    </button>
+                                </span>
+                            </label>
+                        </div>
+                    )}
 
                     {error && <p className="text-sm text-red-500 bg-red-500/10 p-3 rounded-lg">{error}</p>}
                     
-                    <button type="submit" disabled={loading} className="w-full bg-brand-purple text-white font-bold py-3 px-8 rounded-full hover:bg-brand-purple/80 transition-all disabled:opacity-50 disabled:cursor-wait">
+                    <button type="submit" disabled={loading || (mode === 'signup' && !agreements.terms)} className="w-full bg-brand-purple text-white font-bold py-3 px-8 rounded-full hover:bg-brand-purple/80 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
                         {loading ? 'Processing...' : (mode === 'login' ? 'Login' : 'Sign Up')}
                     </button>
                 </form>
@@ -1683,30 +1806,512 @@ const AuthForm: React.FC<{ navigateTo: (page: string) => void }> = ({ navigateTo
 };
 
 
-// A new placeholder component for the User Profile
 const ProfilePage: React.FC<{ navigateTo: (page: string) => void }> = ({ navigateTo }) => {
-    const { user } = useAuth();
+    const { user, updateUser, changePassword, logout, deleteUserAccount } = useAuth();
+    
+    // State for profile info form
+    const [profileData, setProfileData] = useState({
+        firstName: user?.firstName || '',
+        lastName: user?.lastName || '',
+        nickname: user?.nickname || '',
+    });
+    const [profilePictureFile, setProfilePictureFile] = useState<string | null>(null);
+    const [profileLoading, setProfileLoading] = useState(false);
+    const [profileMessage, setProfileMessage] = useState({ type: '', text: '' });
+
+    // State for password change form
+    const [passwordData, setPasswordData] = useState({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+    });
+    const [passwordLoading, setPasswordLoading] = useState(false);
+    const [passwordMessage, setPasswordMessage] = useState({ type: '', text: '' });
+
+    // State for account deletion
+    const [deleteLoading, setDeleteLoading] = useState(false);
+
+    if (!user) {
+        return (
+            <div className="bg-dark pt-24 animate-fade-in min-h-screen flex items-center justify-center">
+                <div className="text-center p-8">
+                    <p className="text-gray-400 mb-8">Please log in to view your profile.</p>
+                    <button onClick={() => navigateTo('login')} className="bg-brand-purple text-white font-semibold py-3 px-8 rounded-full">
+                        Login
+                    </button>
+                </div>
+            </div>
+        );
+    }
+    
+    const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setProfileMessage({ type: '', text: '' });
+        setProfileData({ ...profileData, [e.target.name]: e.target.value });
+    };
+
+    const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setPasswordMessage({ type: '', text: '' });
+        setPasswordData({ ...passwordData, [e.target.name]: e.target.value });
+    };
+
+    const handleProfilePictureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setProfilePictureFile(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleProfileSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setProfileLoading(true);
+        setProfileMessage({ type: '', text: '' });
+        
+        try {
+            const updates: Partial<User> = { ...profileData };
+            if (profilePictureFile) {
+                updates.profilePicture = profilePictureFile;
+            }
+            await updateUser(user.id, updates);
+            setProfileMessage({ type: 'success', text: 'Profile updated successfully!' });
+        } catch (err: any) {
+            setProfileMessage({ type: 'error', text: err.message || 'Failed to update profile.' });
+        } finally {
+            setProfileLoading(false);
+        }
+    };
+    
+    const handlePasswordSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (passwordData.newPassword !== passwordData.confirmPassword) {
+            setPasswordMessage({ type: 'error', text: 'New passwords do not match.' });
+            return;
+        }
+         if (passwordData.newPassword.length < 6) {
+            setPasswordMessage({ type: 'error', text: "Password must be at least 6 characters long." });
+            return;
+        }
+        setPasswordLoading(true);
+        setPasswordMessage({ type: '', text: '' });
+
+        try {
+            await changePassword(user.id, passwordData.currentPassword, passwordData.newPassword);
+            setPasswordMessage({ type: 'success', text: 'Password changed successfully!' });
+            setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+        } catch (err: any) {
+            setPasswordMessage({ type: 'error', text: err.message || 'Failed to change password.' });
+        } finally {
+            setPasswordLoading(false);
+        }
+    };
+
+    const handleLogout = async () => {
+        await logout();
+        navigateTo('home');
+    }
+
+    const handleDeleteAccount = async () => {
+        if (window.confirm('Are you sure you want to permanently delete your account? This action is irreversible and all your data will be removed.')) {
+            setDeleteLoading(true);
+            setProfileMessage({ type: '', text: '' });
+            setPasswordMessage({ type: '', text: '' });
+            try {
+                await deleteUserAccount();
+                navigateTo('home');
+            } catch (err: any) {
+                setProfileMessage({ type: 'error', text: `Failed to delete account: ${err.message}` });
+            } finally {
+                setDeleteLoading(false);
+            }
+        }
+    };
+
     return (
-        <div className="bg-dark pt-24 animate-fade-in min-h-screen flex items-center justify-center">
-            <div className="text-center p-8 bg-dark-accent rounded-2xl border border-white/10 max-w-md w-full mx-4">
-                <h1 className="text-3xl font-bold text-white mb-4">Profile</h1>
-                 {user ? (
-                    <p className="text-gray-400 mb-8">Welcome, {user.nickname}! The profile management page is currently under construction.</p>
-                ) : (
-                    <p className="text-gray-400 mb-8">You are not logged in. Please log in to view your profile.</p>
-                )}
-                <button
+        <div className="bg-dark pt-24 animate-fade-in">
+            <div className="container mx-auto px-4 py-12 md:py-16">
+                 <button
                     onClick={() => navigateTo('home')}
-                    className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors group mx-auto border border-gray-600 px-4 py-2 rounded-full"
+                    className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-8 group max-w-4xl mx-auto"
                 >
                     <ArrowLeftIcon className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
                     Back to Home
                 </button>
+                <div className="max-w-4xl mx-auto bg-dark-accent p-8 md:p-12 rounded-2xl border border-white/10">
+                    <div className="flex flex-col sm:flex-row items-center gap-6 mb-10">
+                         <div className="relative">
+                            <img 
+                                src={profilePictureFile || user.profilePicture || `https://ui-avatars.com/api/?name=${user.firstName}+${user.lastName}`}
+                                alt="Profile" 
+                                className="w-28 h-28 rounded-full object-cover bg-dark border-2 border-brand-purple"
+                            />
+                             <label htmlFor="profile-picture-upload" className="absolute bottom-0 right-0 bg-dark-accent p-2 rounded-full cursor-pointer hover:bg-dark border border-white/10">
+                                 <ImageUploadIcon className="w-5 h-5 text-gray-300"/>
+                                <input id="profile-picture-upload" type="file" className="sr-only" accept="image/*" onChange={handleProfilePictureChange} />
+                            </label>
+                        </div>
+                        <div>
+                            <h1 className="text-3xl font-bold text-white text-center sm:text-left">{user.nickname}</h1>
+                            <p className="text-gray-400 text-center sm:text-left">{user.email}</p>
+                            <div className="flex flex-wrap gap-2 mt-2 justify-center sm:justify-start">
+                                {user.roles.map(role => (
+                                    <span key={role} className="px-2 py-0.5 text-xs font-semibold rounded-full bg-gray-700 text-gray-300">
+                                        {role}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Profile Information Form */}
+                    <form onSubmit={handleProfileSubmit} className="space-y-6">
+                        <h2 className="text-2xl font-semibold text-white border-b border-white/10 pb-3">Profile Information</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label htmlFor="firstName" className="block text-sm font-medium mb-2">First Name</label>
+                                <input type="text" name="firstName" value={profileData.firstName} onChange={handleProfileChange} className="w-full bg-dark border border-gray-600 rounded-lg py-3 px-4" />
+                            </div>
+                            <div>
+                                <label htmlFor="lastName" className="block text-sm font-medium mb-2">Last Name</label>
+                                <input type="text" name="lastName" value={profileData.lastName} onChange={handleProfileChange} className="w-full bg-dark border border-gray-600 rounded-lg py-3 px-4" />
+                            </div>
+                        </div>
+                        <div>
+                            <label htmlFor="nickname" className="block text-sm font-medium mb-2">Nickname</label>
+                            <input type="text" name="nickname" value={profileData.nickname} onChange={handleProfileChange} className="w-full bg-dark border border-gray-600 rounded-lg py-3 px-4" />
+                        </div>
+                        {profileMessage.text && (
+                            <p className={`text-sm ${profileMessage.type === 'success' ? 'text-green-400' : 'text-red-500'}`}>
+                                {profileMessage.text}
+                            </p>
+                        )}
+                        <div className="text-right">
+                            <button type="submit" disabled={profileLoading} className="bg-brand-purple text-white font-bold py-2 px-6 rounded-full hover:bg-brand-purple/80 transition-all disabled:opacity-50">
+                                {profileLoading ? 'Saving...' : 'Save Profile Changes'}
+                            </button>
+                        </div>
+                    </form>
+
+                     {/* Password Change Form */}
+                    <form onSubmit={handlePasswordSubmit} className="space-y-6 mt-12">
+                        <h2 className="text-2xl font-semibold text-white border-b border-white/10 pb-3">Change Password</h2>
+                         <div>
+                            <label htmlFor="currentPassword" arie-label="Current Password" className="block text-sm font-medium mb-2">Current Password</label>
+                            <input type="password" name="currentPassword" value={passwordData.currentPassword} onChange={handlePasswordChange} className="w-full bg-dark border border-gray-600 rounded-lg py-3 px-4" required />
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label htmlFor="newPassword" aria-label="New Password" className="block text-sm font-medium mb-2">New Password</label>
+                                <input type="password" name="newPassword" value={passwordData.newPassword} onChange={handlePasswordChange} className="w-full bg-dark border border-gray-600 rounded-lg py-3 px-4" required />
+                            </div>
+                            <div>
+                                <label htmlFor="confirmPassword" aria-label="Confirm New Password" className="block text-sm font-medium mb-2">Confirm New Password</label>
+                                <input type="password" name="confirmPassword" value={passwordData.confirmPassword} onChange={handlePasswordChange} className="w-full bg-dark border border-gray-600 rounded-lg py-3 px-4" required />
+                            </div>
+                        </div>
+                        {passwordMessage.text && (
+                            <p className={`text-sm ${passwordMessage.type === 'success' ? 'text-green-400' : 'text-red-500'}`}>
+                                {passwordMessage.text}
+                            </p>
+                        )}
+                         <div className="text-right">
+                            <button type="submit" disabled={passwordLoading} className="bg-brand-purple text-white font-bold py-2 px-6 rounded-full hover:bg-brand-purple/80 transition-all disabled:opacity-50">
+                                {passwordLoading ? 'Updating...' : 'Update Password'}
+                            </button>
+                        </div>
+                    </form>
+
+                    <div className="mt-12 border-t border-white/10 pt-6 flex justify-center items-center gap-x-8">
+                         <button onClick={handleLogout} className="text-gray-400 hover:text-white transition-colors">
+                            Logout
+                         </button>
+                         <button 
+                            onClick={handleDeleteAccount} 
+                            disabled={deleteLoading}
+                            className="text-red-500 hover:text-red-400 font-semibold transition-colors disabled:opacity-50 disabled:cursor-wait"
+                        >
+                            {deleteLoading ? 'Deleting...' : 'Delete Account'}
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     );
 };
 
+const UpdatePasswordPage: React.FC<{ navigateTo: (page: string) => void }> = ({ navigateTo }) => {
+    const { updatePassword, logout } = useAuth();
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [success, setSuccess] = useState(false);
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError('');
+        if (newPassword !== confirmPassword) {
+            setError("Passwords do not match.");
+            return;
+        }
+        if (newPassword.length < 6) {
+            setError("Password must be at least 6 characters long.");
+            return;
+        }
+        setLoading(true);
+        try {
+            await updatePassword(newPassword);
+            setSuccess(true);
+            setTimeout(() => {
+                navigateTo('login');
+            }, 3000);
+        } catch (err: any) {
+            setError(err.message || 'Failed to update password.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (success) {
+        return (
+            <div className="bg-dark pt-24 animate-fade-in min-h-screen flex items-center justify-center">
+                <div className="p-8 bg-dark-accent rounded-2xl border border-white/10 max-w-md w-full mx-4 text-center">
+                    <h1 className="text-3xl font-bold text-white mb-4">Password Updated!</h1>
+                    <p className="text-gray-300">Your password has been changed successfully. You will be redirected to the login page shortly.</p>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="bg-dark pt-24 animate-fade-in min-h-screen flex items-center justify-center">
+            <div className="p-8 bg-dark-accent rounded-2xl border border-white/10 max-w-md w-full mx-4">
+                <h1 className="text-3xl font-bold text-white mb-2">Set a New Password</h1>
+                <p className="text-gray-400 mb-6">Please enter and confirm your new password.</p>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div>
+                        <label htmlFor="newPassword" className="sr-only">New Password</label>
+                        <input type="password" name="newPassword" placeholder="New Password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required className="w-full bg-dark border border-gray-600 rounded-lg py-3 px-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
+                    </div>
+                    <div>
+                        <label htmlFor="confirmPassword" className="sr-only">Confirm New Password</label>
+                        <input type="password" name="confirmPassword" placeholder="Confirm New Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required className="w-full bg-dark border border-gray-600 rounded-lg py-3 px-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
+                    </div>
+                    {error && <p className="text-sm text-red-500 bg-red-500/10 p-3 rounded-lg">{error}</p>}
+                    <button type="submit" disabled={loading} className="w-full bg-brand-purple text-white font-bold py-3 px-8 rounded-full hover:bg-brand-purple/80 transition-all disabled:opacity-50 disabled:cursor-wait">
+                        {loading ? 'Updating...' : 'Update Password'}
+                    </button>
+                </form>
+                <div className="mt-4 text-center">
+                     <button onClick={logout} className="text-sm text-gray-500 hover:underline">
+                        Cancel and Log Out
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// --- START: NEW DYNAMIC LEGAL DOCUMENT PAGE ---
+// This component replaces the old hardcoded Terms, Privacy, and Cookie pages.
+const getDefaultLegalContent = (slug: string, title: string): string => {
+    switch(slug) {
+        case 'terms-and-conditions':
+            return `## Welcome to NYX\n\nThese terms and conditions outline the rules and regulations for the use of NYX's Website.\n\nBy accessing this website we assume you accept these terms and conditions. Do not continue to use NYX if you do not agree to take all of the terms and conditions stated on this page.`;
+        case 'privacy-policy':
+            return `## Privacy Policy for NYX\n\nAt NYX, one of our main priorities is the privacy of our visitors. This Privacy Policy document contains types of information that is collected and recorded by NYX and how we use it.\n\nIf you have additional questions or require more information about our Privacy Policy, do not hesitate to contact us.`;
+        case 'cookie-policy':
+            return `## Cookie Policy for NYX\n\nThis is the Cookie Policy for NYX.\n\n**What Are Cookies**\n\nAs is common practice with almost all professional websites this site uses cookies, which are tiny files that are downloaded to your computer, to improve your experience.`;
+        default:
+            return `Welcome to the ${title} page.`;
+    }
+};
+
+const LegalDocumentPage: React.FC<{ 
+    docSlug: 'terms-and-conditions' | 'privacy-policy' | 'cookie-policy';
+    docTitle: string;
+    navigateTo: (page: string) => void; 
+}> = ({ docSlug, docTitle, navigateTo }) => {
+    const { user } = useAuth();
+    const [isLoading, setIsLoading] = useState(true);
+    const [isEditing, setIsEditing] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+    const [error, setError] = useState('');
+    const [content, setContent] = useState('');
+    const [editedContent, setEditedContent] = useState('');
+    const [lastUpdated, setLastUpdated] = useState<string | null>(null);
+    const [isPlaceholder, setIsPlaceholder] = useState(false);
+
+    const isAuthorized = user && (user.roles.includes('admin') || user.roles.includes('super-admin'));
+    
+    const fetchDocument = useCallback(async () => {
+        setIsLoading(true);
+        setError('');
+        const { data, error: fetchError } = await supabase
+            .from('legal_documents')
+            .select('content, last_updated')
+            .eq('slug', docSlug)
+            .single();
+
+        const placeholderContent = getDefaultLegalContent(docSlug, docTitle);
+
+        if (fetchError || !data) {
+            // Document doesn't exist in DB
+            if (isAuthorized) {
+                // If admin, create it with placeholder content
+                const { data: insertData, error: insertError } = await supabase
+                    .from('legal_documents')
+                    .insert({ slug: docSlug, title: docTitle, content: placeholderContent })
+                    .select('content, last_updated')
+                    .single();
+                
+                if (insertError) {
+                    setError(`Failed to create document: ${insertError.message}`);
+                    setContent(placeholderContent);
+                    setEditedContent(placeholderContent);
+                    setLastUpdated(null);
+                    setIsPlaceholder(true);
+                } else if (insertData) {
+                    setContent(insertData.content);
+                    setEditedContent(insertData.content);
+                    setLastUpdated(insertData.last_updated);
+                    setIsPlaceholder(insertData.content === placeholderContent);
+                }
+            } else {
+                // If non-admin, just show the placeholder content without saving
+                setContent(placeholderContent);
+                setEditedContent(placeholderContent);
+                setLastUpdated(null);
+                setIsPlaceholder(true);
+            }
+        } else {
+            // Document exists, load it
+            setContent(data.content);
+            setEditedContent(data.content);
+            setLastUpdated(data.last_updated);
+            setIsPlaceholder(data.content === placeholderContent);
+        }
+        setIsLoading(false);
+    }, [docSlug, docTitle, isAuthorized]);
+
+    useEffect(() => {
+        fetchDocument();
+    }, [fetchDocument]);
+
+    const handleSave = async () => {
+        setIsSaving(true);
+        setError('');
+        const { error: updateError } = await supabase
+            .from('legal_documents')
+            .update({ content: editedContent, last_updated: new Date().toISOString() })
+            .eq('slug', docSlug);
+
+        if (updateError) {
+            setError(`Failed to save: ${updateError.message}`);
+        } else {
+            setContent(editedContent);
+            setIsEditing(false);
+            fetchDocument(); // Re-fetch to get the new last_updated timestamp and check for placeholder
+        }
+        setIsSaving(false);
+    };
+
+    const handleCancel = () => {
+        setEditedContent(content);
+        setIsEditing(false);
+    };
+
+    const renderContent = () => {
+        if (isLoading) return <p className="text-gray-400">Loading document...</p>;
+        
+        const adminError = error && isAuthorized ? <p className="text-red-500 bg-red-500/10 p-4 rounded-lg mb-4">{error}</p> : null;
+
+        const renderableContent = content.split('\n').map((paragraph, index) => {
+            const trimmed = paragraph.trim();
+            if (trimmed.startsWith('## ')) {
+                return <h2 key={index} className="text-2xl text-white font-semibold mt-6 mb-3 border-b border-white/10 pb-2">{trimmed.substring(3)}</h2>;
+            }
+            if (trimmed.startsWith('# ')) {
+                 return <h1 key={index} className="text-3xl text-white font-bold mt-8 mb-4">{trimmed.substring(2)}</h1>;
+            }
+            if (trimmed.startsWith('**') && trimmed.endsWith('**')) {
+                return <p key={index}><strong>{trimmed.substring(2, trimmed.length - 2)}</strong></p>;
+            }
+            if (trimmed === '') return null; // Skip empty lines
+            return <p key={index}>{trimmed}</p>;
+        });
+
+        if (isEditing) {
+            return (
+                <div>
+                    {adminError}
+                    <textarea
+                        value={editedContent}
+                        onChange={(e) => setEditedContent(e.target.value)}
+                        className="w-full h-96 bg-dark border border-gray-600 rounded-lg py-3 px-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-purple"
+                    />
+                    <div className="flex justify-end gap-4 mt-4">
+                        <button onClick={handleCancel} className="border border-gray-600 text-white font-semibold py-2 px-6 rounded-full hover:bg-gray-700 transition-colors">
+                            Cancel
+                        </button>
+                        <button onClick={handleSave} disabled={isSaving} className="bg-brand-purple text-white font-bold py-2 px-6 rounded-full hover:bg-brand-purple/80 transition-all disabled:opacity-50">
+                            {isSaving ? 'Saving...' : 'Save Changes'}
+                        </button>
+                    </div>
+                </div>
+            );
+        }
+
+        return (
+            <>
+                {adminError}
+                {renderableContent}
+            </>
+        );
+    };
+
+    return (
+        <div className="bg-dark pt-24 animate-fade-in">
+            <div className="container mx-auto px-4 py-12 md:py-20">
+                <div className="max-w-4xl mx-auto">
+                    <button onClick={() => navigateTo('home')} className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-8 group">
+                        <ArrowLeftIcon className="w-5 h-5 transition-transform group-hover:-translate-x-1" /> Back to Home
+                    </button>
+                    <div className="flex justify-between items-center mb-8">
+                        <div>
+                            <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-white">{docTitle}</h1>
+                            {lastUpdated && !isEditing && (
+                                <p className="text-sm text-gray-500 mt-2">
+                                    Last Updated: {new Date(lastUpdated).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                                </p>
+                            )}
+                        </div>
+                        {isAuthorized && !isEditing && !isLoading && (
+                            <button onClick={() => setIsEditing(true)} className="bg-brand-purple/20 text-brand-purple font-semibold py-2 px-5 rounded-full hover:bg-brand-purple/30 transition-colors">
+                                Edit Content
+                            </button>
+                        )}
+                    </div>
+                    <div className="text-gray-300 space-y-4 text-lg leading-relaxed">
+                        {renderContent()}
+                        {isAuthorized && !isEditing && isPlaceholder && (
+                             <div className="mt-8 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+                                <p className="text-sm text-yellow-300">
+                                    <span className="font-bold">Admin Note:</span> This document is currently a placeholder. Click the "Edit Content" button above to create the official version. This note is only visible to administrators.
+                                </p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+// --- END: NEW DYNAMIC LEGAL DOCUMENT PAGE ---
+
+// --- Data Mapping Helpers ---
 const productToCamel = (product: any): Product => ({
     id: product.id,
     name: product.name,
@@ -1734,80 +2339,118 @@ const productToSnake = (product: Partial<Product>): any => {
     return snakeProduct;
 };
 
+const blogPostToCamel = (post: any): BlogPost => ({
+    id: post.id,
+    title: post.title,
+    author: post.author,
+    date: post.date,
+    imageUrl: post.image_url,
+    excerpt: post.excerpt,
+    content: post.content,
+    ownerId: post.owner_id,
+});
+
+const blogPostToSnake = (post: Partial<BlogPost>): any => {
+    const snakePost: any = {};
+    if (post.title !== undefined) snakePost.title = post.title;
+    if (post.author !== undefined) snakePost.author = post.author;
+    if (post.date !== undefined) snakePost.date = post.date;
+    if (post.imageUrl !== undefined) snakePost.image_url = post.imageUrl;
+    if (post.excerpt !== undefined) snakePost.excerpt = post.excerpt;
+    if (post.content !== undefined) snakePost.content = post.content;
+    if (post.ownerId !== undefined) snakePost.owner_id = post.ownerId;
+    return snakePost;
+};
 
 const AppContent: React.FC = () => {
-    const { user, login, signup } = useAuth();
+    const { user, isPasswordRecoveryFlow } = useAuth();
     const [currentPage, setCurrentPage] = useState('home');
-    const [pageParams, setPageParams] = useState<any>(null);
+    const [pageParams, setPageParams] = useState<any>({});
     const [isAskNyxOpen, setIsAskNyxOpen] = useState(false);
-    const [products, setProducts] = useState<Product[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const [showCookieConsent, setShowCookieConsent] = useState(false);
-    const [blogPosts, setBlogPosts] = useState<BlogPost[]>(BLOG_POSTS_DATA);
 
+    const [products, setProducts] = useState<Product[]>([]);
+    const [productsLoading, setProductsLoading] = useState(true);
+    const [productsError, setProductsError] = useState<string | null>(null);
+
+    const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+    const [postsLoading, setPostsLoading] = useState(true);
+    const [postsError, setPostsError] = useState<string | null>(null);
+
+    const [cookieConsent, setCookieConsent] = useState<'accepted' | 'declined' | null>(null);
 
     useEffect(() => {
-        const consent = localStorage.getItem('cookie_consent');
-        if (consent === null) {
-            setShowCookieConsent(true);
+        const consent = localStorage.getItem('cookieConsent');
+        if (consent === 'accepted' || consent === 'declined') {
+            setCookieConsent(consent);
         }
     }, []);
 
-    const handleAcceptCookies = () => {
-        localStorage.setItem('cookie_consent', 'true');
-        setShowCookieConsent(false);
+    const handleCookieConsent = (decision: 'accepted' | 'declined') => {
+        localStorage.setItem('cookieConsent', decision);
+        setCookieConsent(decision);
     };
 
-    const handleDeclineCookies = () => {
-        localStorage.setItem('cookie_consent', 'false');
-        setShowCookieConsent(false);
+    const navigateTo = (page: string, params: any = {}) => {
+        window.scrollTo(0, 0);
+        setPageParams(params);
+        setCurrentPage(page);
     };
 
+    // Make navigateTo globally accessible for features like 'Why Us?' button
+    useEffect(() => {
+        (window as any).navigateToProducts = () => navigateTo('products');
+    }, []);
+    
+    useEffect(() => {
+        if(isPasswordRecoveryFlow) {
+            navigateTo('update-password');
+        }
+    }, [isPasswordRecoveryFlow]);
+
+    // Fetch Products
     const fetchProducts = useCallback(async () => {
-        setLoading(true);
-        setError(null);
+        setProductsLoading(true);
         const { data, error } = await supabase.from('products').select('*');
         if (error) {
-            console.error('Error fetching products:', error);
-            setError('Could not fetch products. Please try again later.');
+            setProductsError(`Failed to fetch products: ${error.message}`);
         } else {
-            setProducts((data || []).map(productToCamel));
+            setProducts(data ? data.map(productToCamel) : []);
+            setProductsError(null);
         }
-        setLoading(false);
+        setProductsLoading(false);
+    }, []);
+
+    // Fetch Blog Posts
+    const fetchBlogPosts = useCallback(async () => {
+        setPostsLoading(true);
+        const { data, error } = await supabase.from('blog_posts').select('*').order('date', { ascending: false });
+        if (error) {
+            setPostsError(`Failed to fetch blog posts: ${error.message}`);
+        } else {
+            setBlogPosts(data ? data.map(blogPostToCamel) : []);
+            setPostsError(null);
+        }
+        setPostsLoading(false);
     }, []);
 
     useEffect(() => {
         fetchProducts();
-    }, [fetchProducts]);
-
+        fetchBlogPosts();
+    }, [fetchProducts, fetchBlogPosts]);
+    
+    // Product CUD operations
     const addProduct = async (productData: Omit<Product, 'id' | 'ownerId'>): Promise<void> => {
-        if (!user) {
-            throw new Error('You must be logged in to add a product.');
-        }
-        const fullProductData = { ...productData, ownerId: user.id };
-        const { data, error } = await supabase
-            .from('products')
-            .insert([productToSnake(fullProductData)])
-            .select()
-            .single();
-
+        if (!user) throw new Error("You must be logged in to add products.");
+        const snakeData = productToSnake({ ...productData, ownerId: user.id });
+        const { data, error } = await supabase.from('products').insert(snakeData).select().single();
         if (error) throw error;
-        if (data) setProducts(prev => [productToCamel(data), ...prev]);
+        setProducts(prev => [productToCamel(data), ...prev]);
     };
 
     const updateProduct = async (productId: string, updates: Partial<Product>): Promise<void> => {
-        const { data, error } = await supabase
-            .from('products')
-            .update(productToSnake(updates))
-            .eq('id', productId)
-            .select()
-            .single();
-
+        const { data, error } = await supabase.from('products').update(productToSnake(updates)).eq('id', productId).select().single();
         if (error) throw error;
-        if (data) {
-            setProducts(prev => prev.map(p => (p.id === productId ? productToCamel(data) : p)));
-        }
+        setProducts(prev => prev.map(p => p.id === productId ? productToCamel(data) : p));
     };
     
     const deleteProduct = async (productId: string): Promise<void> => {
@@ -1815,107 +2458,87 @@ const AppContent: React.FC = () => {
         if (error) throw error;
         setProducts(prev => prev.filter(p => p.id !== productId));
     };
-    
+
+    // Blog Post CUD operations
     const addBlogPost = async (postData: Omit<BlogPost, 'id' | 'ownerId'>): Promise<void> => {
-        if (!user) {
-            throw new Error('You must be logged in to add a blog post.');
-        }
-        const newPost: BlogPost = {
-            ...postData,
-            id: `post-${Date.now()}-${Math.random()}`,
-            ownerId: user.id,
-        };
-        // In a real app with a backend, this would be a Supabase insert call
-        // For now, we update local state
-        setBlogPosts(prevPosts => [newPost, ...prevPosts]);
+        if (!user) throw new Error("You must be logged in to add blog posts.");
+        const snakeData = blogPostToSnake({ ...postData, ownerId: user.id });
+        const { data, error } = await supabase.from('blog_posts').insert(snakeData).select().single();
+        if (error) throw error;
+        setBlogPosts(prev => [blogPostToCamel(data), ...prev]);
     };
-
-
-    const navigateTo = (page: string, params: any = null) => {
-        setCurrentPage(page);
-        setPageParams(params);
-        window.scrollTo(0, 0);
-    };
-
-    // This is a workaround for the Why Us? button, which is outside the main app context
-    useEffect(() => {
-        (window as any).navigateToProducts = () => navigateTo('products');
-        return () => {
-            delete (window as any).navigateToProducts;
-        }
-    }, []);
-
-    const handleAskNyxOpen = () => {
-        setIsAskNyxOpen(true);
-    }
     
-    const handleAskNyxClose = () => {
-        setIsAskNyxOpen(false);
-    }
-
-    let content;
-    if (currentPage === 'home') {
-        content = <HomePage navigateTo={navigateTo} products={products} />;
-    } else if (currentPage === 'products') {
-        content = <ProductsPage navigateTo={navigateTo} products={products} loading={loading} error={error} />;
-    } else if (currentPage === 'how-it-works') {
-        content = <HowItWorksPage />;
-    } else if (currentPage === 'setup-videos') {
-        content = <SetupVideosPage />;
-    } else if (currentPage === 'faq') {
-        content = <FAQPage />;
-    } else if (currentPage === 'contact') {
-        content = <ContactPage />;
-    } else if (currentPage === 'our-story') {
-        content = <OurStoryPage />;
-    } else if (currentPage === 'why-us') {
-        content = <WhyUsPage />;
-    } else if (currentPage === 'terms-conditions') {
-        content = <TermsAndConditionsPage navigateTo={navigateTo} />;
-    } else if (currentPage === 'add-product') {
-        content = <AddProductPage navigateTo={navigateTo} addProduct={addProduct} />;
-    } else if (currentPage === 'edit-product' && pageParams?.id) {
-        content = <EditProductPage navigateTo={navigateTo} productId={pageParams.id} products={products} updateProduct={updateProduct} deleteProduct={deleteProduct} />;
-    } else if (currentPage === 'admin-dashboard') {
-        content = <AdminDashboardPage navigateTo={navigateTo} />;
-    } else if (currentPage === 'blog') {
-        content = <BlogPage blogPosts={blogPosts} navigateTo={navigateTo} />;
-    } else if (currentPage === 'blog-post' && pageParams?.id) {
-        content = <BlogPostPage postId={pageParams.id} blogPosts={blogPosts} navigateTo={navigateTo} />;
-    } else if (currentPage === 'add-blog-post') {
-        const canWrite = user && (user.roles.includes('Content Writer') || user.roles.includes('admin') || user.roles.includes('super-admin'));
-        content = canWrite ? <AddBlogPostPage navigateTo={navigateTo} addBlogPost={addBlogPost} /> : <HomePage navigateTo={navigateTo} products={products} />;
-    } else if (currentPage === 'login') {
-        content = <AuthForm navigateTo={navigateTo} />;
-    } else if (currentPage === 'profile') {
-        content = <ProfilePage navigateTo={navigateTo} />;
-    }
-     else {
-        content = <HomePage navigateTo={navigateTo} products={products} />;
-    }
+    const renderPage = () => {
+        switch (currentPage) {
+            case 'home':
+                return <HomePage navigateTo={navigateTo} products={products} />;
+            case 'products':
+                return <ProductsPage navigateTo={navigateTo} products={products} loading={productsLoading} error={productsError} />;
+            case 'how-it-works':
+                return <HowItWorksPage />;
+            case 'setup-videos':
+                return <SetupVideosPage />;
+            case 'faq':
+                return <FAQPage />;
+            case 'contact':
+                return <ContactPage />;
+            case 'our-story':
+                return <OurStoryPage />;
+            case 'why-us':
+                return <WhyUsPage />;
+            case 'add-product':
+                return <AddProductPage navigateTo={navigateTo} addProduct={addProduct} />;
+            case 'edit-product':
+                return <EditProductPage navigateTo={navigateTo} productId={pageParams.id} products={products} updateProduct={updateProduct} deleteProduct={deleteProduct} />;
+            case 'admin-dashboard':
+                return <AdminDashboardPage navigateTo={navigateTo} />;
+            case 'blog':
+                return <BlogPage blogPosts={blogPosts} navigateTo={navigateTo} />;
+            case 'blog-post':
+                return <BlogPostPage postId={pageParams.id} blogPosts={blogPosts} navigateTo={navigateTo} />;
+            case 'add-blog-post':
+                return <AddBlogPostPage navigateTo={navigateTo} addBlogPost={addBlogPost} />;
+            case 'login':
+                return <AuthForm navigateTo={navigateTo} />;
+            case 'profile':
+                return <ProfilePage navigateTo={navigateTo} />;
+            case 'update-password':
+                return <UpdatePasswordPage navigateTo={navigateTo} />;
+            case 'legal':
+                if (!pageParams.slug || !pageParams.title) return <HomePage navigateTo={navigateTo} products={products} />;
+                return <LegalDocumentPage docSlug={pageParams.slug} docTitle={pageParams.title} navigateTo={navigateTo} />;
+            default:
+                return <HomePage navigateTo={navigateTo} products={products} />;
+        }
+    };
 
     return (
-        <>
-            <Header onAskNyxOpen={handleAskNyxOpen} navigateTo={navigateTo} />
-            <main>
-                {content}
-                {currentPage === 'home' && <EmailCapture />}
-            </main>
-            <Footer navigateTo={navigateTo} />
+        <CartProvider>
+            <div className="flex flex-col min-h-screen">
+                <Header onAskNyxOpen={() => setIsAskNyxOpen(true)} navigateTo={navigateTo} />
+                <main className="flex-grow">
+                    {renderPage()}
+                </main>
+                <Footer navigateTo={navigateTo} />
+            </div>
             <CartSidebar navigateTo={navigateTo} />
-            <AskNyx isOpen={isAskNyxOpen} onClose={handleAskNyxClose} />
-            {showCookieConsent && <CookieConsentBanner onAccept={handleAcceptCookies} onDecline={handleDeclineCookies} />}
-        </>
+            <AskNyx isOpen={isAskNyxOpen} onClose={() => setIsAskNyxOpen(false)} />
+            {!cookieConsent && (
+                <CookieConsentBanner
+                    onAccept={() => handleCookieConsent('accepted')}
+                    onDecline={() => handleCookieConsent('declined')}
+                />
+            )}
+        </CartProvider>
     );
 };
 
-
-const App: React.FC = () => (
-    <AuthProvider>
-        <CartProvider>
+const App: React.FC = () => {
+    return (
+        <AuthProvider>
             <AppContent />
-        </CartProvider>
-    </AuthProvider>
-);
+        </AuthProvider>
+    );
+};
 
 export default App;
