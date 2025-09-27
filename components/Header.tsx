@@ -11,7 +11,7 @@ interface HeaderProps {
     navigateTo: (page: string, params?: any) => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ onAskNyxOpen, navigateTo }) => {
+export const Header = ({ onAskNyxOpen, navigateTo }: HeaderProps) => {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -106,7 +106,7 @@ const Header: React.FC<HeaderProps> = ({ onAskNyxOpen, navigateTo }) => {
                                 className="w-full flex justify-center items-center gap-2 text-3xl font-semibold text-gray-300 hover:text-white transition-colors"
                             >
                                 {link.name}
-                                <ChevronDownIcon className={`w-6 h-6 transition-transform ${openMobileSubmenu === link.name ? 'rotate-180' : ''}`} />
+                                <ChevronDownIcon className="w-6 h-6" />
                             </button>
                             {openMobileSubmenu === link.name && (
                                 <div className="mt-4 space-y-4">
@@ -134,7 +134,7 @@ const Header: React.FC<HeaderProps> = ({ onAskNyxOpen, navigateTo }) => {
                     >
                         <button className="flex items-center gap-1 text-gray-300 hover:text-white transition-colors duration-300 cursor-pointer">
                             {link.name}
-                            <ChevronDownIcon className={`w-4 h-4 transition-transform ${openDropdown === link.name ? 'rotate-180' : ''}`} />
+                            <ChevronDownIcon className="w-4 h-4" />
                         </button>
                         {openDropdown === link.name && (
                             <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2 z-10">
@@ -201,7 +201,7 @@ const Header: React.FC<HeaderProps> = ({ onAskNyxOpen, navigateTo }) => {
                             className="w-8 h-8 rounded-full object-cover bg-dark-accent"
                         />
                         <span className="font-semibold">{user.nickname}</span>
-                        <ChevronDownIcon className={`w-4 h-4 transition-transform ${openDropdown === 'user-menu' ? 'rotate-180' : ''}`} />
+                        <ChevronDownIcon className="w-4 h-4" />
                     </button>
                      {openDropdown === 'user-menu' && (
                         <div className="absolute top-full right-0 pt-2 z-10">
@@ -211,7 +211,7 @@ const Header: React.FC<HeaderProps> = ({ onAskNyxOpen, navigateTo }) => {
                                 {(user.roles.includes('seller') || user.roles.includes('admin') || user.roles.includes('super-admin')) && (
                                      <button onClick={(e) => handleLinkClick(e, '/add-product', 'Add Product')} className={baseLinkClass}>Add Product</button>
                                 )}
-                                {(user.roles.includes('Content Writer') || user.roles.includes('admin') || user.roles.includes('super-admin')) && (
+                                {(user.roles.includes('content_writer') || user.roles.includes('admin') || user.roles.includes('super-admin')) && (
                                      <button onClick={(e) => handleLinkClick(e, '/blog/new', 'Add Blog Post')} className={baseLinkClass}>Add Blog Post</button>
                                 )}
                                 {(user.roles.includes('admin') || user.roles.includes('super-admin')) && (
@@ -244,7 +244,7 @@ const Header: React.FC<HeaderProps> = ({ onAskNyxOpen, navigateTo }) => {
                     {(user.roles.includes('seller') || user.roles.includes('admin') || user.roles.includes('super-admin')) && (
                          <a href="#" onClick={(e) => handleLinkClick(e, '/add-product', 'Add Product')} className={baseLinkClass}>Add Product</a>
                     )}
-                    {(user.roles.includes('Content Writer') || user.roles.includes('admin') || user.roles.includes('super-admin')) && (
+                    {(user.roles.includes('content_writer') || user.roles.includes('admin') || user.roles.includes('super-admin')) && (
                          <a href="#" onClick={(e) => handleLinkClick(e, '/blog/new', 'Add Blog Post')} className={baseLinkClass}>Add Blog Post</a>
                     )}
                      {(user.roles.includes('admin') || user.roles.includes('super-admin')) && (
@@ -337,5 +337,3 @@ const Header: React.FC<HeaderProps> = ({ onAskNyxOpen, navigateTo }) => {
         </>
     );
 };
-
-export default Header;

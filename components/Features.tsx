@@ -1,7 +1,7 @@
 import React from 'react';
 import { FEATURES_DATA } from '../constants';
 
-const Features: React.FC = () => {
+const Features = () => {
     return (
         <section id="about" className="py-20 md:py-32 bg-dark-accent">
             <div className="container mx-auto px-4">

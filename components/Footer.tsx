@@ -1,11 +1,12 @@
+
 import React from 'react';
 import FacebookIcon from './icons/FacebookIcon';
 import InstagramIcon from './icons/InstagramIcon';
 import TwitterIcon from './icons/TwitterIcon';
 
-const Footer: React.FC<{ navigateTo: (page: string, params?: any) => void }> = ({ navigateTo }) => {
+const Footer = ({ navigateTo }: { navigateTo: (page: string, params?: any) => void }) => {
     return (
-        <footer className="bg-dark py-12 border-t border-white/10">
+        <footer className="bg-dark py-12 md:py-16 border-t border-white/10">
             <div className="container mx-auto px-4 text-center text-gray-400">
                 <div className="flex justify-center items-center mb-4">
                      <span className="text-2xl font-bold tracking-widest bg-gradient-to-r from-brand-purple to-brand-pink text-transparent bg-clip-text">
@@ -23,7 +24,7 @@ const Footer: React.FC<{ navigateTo: (page: string, params?: any) => void }> = (
                  <div className="flex flex-wrap justify-center items-center gap-x-6 gap-y-2 mb-8 text-sm">
                     <button onClick={() => navigateTo('legal', { slug: 'privacy-policy', title: 'Privacy Policy' })} className="hover:text-white transition-colors">Privacy Policy</button>
                     <span className="text-gray-600 hidden sm:inline">|</span>
-                    <button onClick={() => navigateTo('legal', { slug: 'terms-and-conditions', title: 'Terms & Conditions' })} className="hover:text-white transition-colors">Terms & Conditions</button>
+                    <button onClick={() => navigateTo('legal', { slug: 'terms-conditions', title: 'Terms & Conditions' })} className="hover:text-white transition-colors">Terms & Conditions</button>
                     <span className="text-gray-600 hidden sm:inline">|</span>
                     <button onClick={() => navigateTo('legal', { slug: 'cookie-policy', title: 'Cookie Policy' })} className="hover:text-white transition-colors">Cookie Policy</button>
                 </div>

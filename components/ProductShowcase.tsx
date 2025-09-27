@@ -6,7 +6,7 @@ import { useAuth } from '../contexts/AuthContext';
 import TrashIcon from './icons/TrashIcon';
 
 // Sub-component for individual product cards
-export const ProductCard: React.FC<{ product: Product; navigateTo: (page: string, params?: any) => void }> = ({ product, navigateTo }) => {
+export const ProductCard = ({ product, navigateTo }: { product: Product; navigateTo: (page: string, params?: any) => void }) => {
     const { user } = useAuth();
     const { cartItems, addToCart, updateItemQuantity, removeFromCart } = useCart();
     const isAuthorized = user && (user.roles.includes('seller') || user.roles.includes('admin') || user.roles.includes('super-admin'));
@@ -90,7 +90,7 @@ interface ProductShowcaseProps {
   products: Product[];
 }
 
-const ProductShowcase: React.FC<ProductShowcaseProps> = ({ navigateTo, products }) => {
+const ProductShowcase = ({ navigateTo, products }: ProductShowcaseProps) => {
     const { user } = useAuth();
     const isAuthorized = user && (user.roles.includes('seller') || user.roles.includes('admin') || user.roles.includes('super-admin'));
 

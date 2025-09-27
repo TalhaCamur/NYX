@@ -3,7 +3,7 @@ import { useCart } from '../contexts/CartContext';
 import CloseIcon from './icons/CloseIcon';
 import TrashIcon from './icons/TrashIcon';
 
-const CartSidebar: React.FC<{ navigateTo: (page: string, params?: any) => void }> = ({ navigateTo }) => {
+const CartSidebar = ({ navigateTo }: { navigateTo: (page: string, params?: any) => void }) => {
     const { isCartOpen, closeCart, cartItems, removeFromCart, updateItemQuantity, getCartTotalPrice } = useCart();
     const [agreedToTerms, setAgreedToTerms] = useState(false);
 
@@ -96,7 +96,7 @@ const CartSidebar: React.FC<{ navigateTo: (page: string, params?: any) => void }
                             />
                             <label htmlFor="cart-terms" className="text-xs text-gray-400">
                                 I agree to the{' '}
-                                <button type="button" onClick={() => { closeCart(); navigateTo('legal', { slug: 'terms-and-conditions', title: 'Terms & Conditions' }); }} className="font-semibold text-nyx-blue hover:underline focus:outline-none">
+                                <button type="button" onClick={() => { closeCart(); navigateTo('legal', { slug: 'terms-conditions', title: 'Terms & Conditions' }); }} className="font-semibold text-nyx-blue hover:underline focus:outline-none">
                                     Terms & Conditions
                                 </button> and{' '}
                                 <button type="button" onClick={() => { closeCart(); navigateTo('legal', { slug: 'privacy-policy', title: 'Privacy Policy' }); }} className="font-semibold text-nyx-blue hover:underline focus:outline-none">

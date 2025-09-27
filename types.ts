@@ -1,5 +1,7 @@
 
 
+import React from 'react';
+
 export interface Product {
   id: string;
   name: string;
@@ -24,16 +26,17 @@ export interface BlogPost {
   ownerId?: string;
 }
 
+export interface Feature {
+  icon: (props: React.SVGProps<SVGSVGElement>) => React.ReactElement;
+  title: string;
+  description: string;
+}
+
+// FIX: Add Testimonial interface for use in Testimonials component.
 export interface Testimonial {
   quote: string;
   author: string;
   publication: string;
-}
-
-export interface Feature {
-  icon: React.FC<React.SVGProps<SVGSVGElement>>;
-  title: string;
-  description: string;
 }
 
 export interface FAQItem {
@@ -41,7 +44,7 @@ export interface FAQItem {
   answer: string;
 }
 
-export type UserRole = 'user' | 'seller' | 'admin' | 'super-admin' | 'Web Developer' | 'UI/UX Designer' | 'Content Writer';
+export type UserRole = 'user' | 'seller' | 'admin' | 'super-admin' | 'Web Developer' | 'UI/UX Designer' | 'content_writer';
 
 export interface User {
     id: string;

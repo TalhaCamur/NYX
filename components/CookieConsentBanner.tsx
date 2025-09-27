@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 
 interface CookieConsentBannerProps {
@@ -6,7 +7,7 @@ interface CookieConsentBannerProps {
   onDecline: () => void;
 }
 
-const CookieConsentBanner: React.FC<CookieConsentBannerProps> = ({ onAccept, onDecline }) => {
+const CookieConsentBanner = ({ onAccept, onDecline }: CookieConsentBannerProps) => {
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-dark-accent/90 backdrop-blur-sm border-t border-white/10 p-4 z-[100] animate-fade-in">
       <div className="container mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">

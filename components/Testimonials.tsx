@@ -1,7 +1,7 @@
 import React from 'react';
 import { TESTIMONIALS_DATA } from '../constants';
 
-const Testimonials: React.FC = () => {
+const Testimonials = () => {
     return (
         <section id="reviews" className="py-20 md:py-32 bg-dark">
             <div className="container mx-auto px-4">

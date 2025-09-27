@@ -7,13 +7,13 @@ interface AskNyxProps {
     onClose: () => void;
 }
 
-const SendIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+const SendIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="currentColor" {...props}>
         <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
     </svg>
 );
 
-const ClearIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+const ClearIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
         <path d="M3 6h18" />
         <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
@@ -28,7 +28,7 @@ interface Message {
     content: string;
 }
 
-const TypingIndicator: React.FC = () => (
+const TypingIndicator = () => (
     <div className="flex items-center space-x-2">
         <div className="w-2 h-2 bg-gray-500 rounded-full animate-pulse [animation-delay:-0.3s]"></div>
         <div className="w-2 h-2 bg-gray-500 rounded-full animate-pulse [animation-delay:-0.15s]"></div>
@@ -36,7 +36,7 @@ const TypingIndicator: React.FC = () => (
     </div>
 );
 
-const AskNyx: React.FC<AskNyxProps> = ({ isOpen, onClose }) => {
+const AskNyx = ({ isOpen, onClose }: AskNyxProps) => {
     const [prompt, setPrompt] = useState('');
     const [conversation, setConversation] = useState<Message[]>([]);
     const [isLoading, setIsLoading] = useState(false);
