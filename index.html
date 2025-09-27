@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NYX | Smart Home</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+        @keyframes gradient-flow {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+        .animate-gradient-flow {
+            background-image: linear-gradient(to right, #9333ea, #f472b6, #db2777, #f472b6, #9333ea);
+            background-size: 300% auto;
+            animation: gradient-flow 3s linear infinite;
+        }
+        
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'dark': '#111111',
+                        'dark-accent': '#1D1D1D',
+                        'brand-purple': '#9333ea',
+                        'brand-pink': '#db2777',
+                        // NYX branding colors
+                        'nyx-black': '#111111',
+                        'nyx-gray': '#1D1D1D',
+                        'nyx-blue': '#9333ea',
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'sans-serif'],
+                    },
+                    keyframes: {
+                        scanner: {
+                            '0%': { transform: 'translateX(-100%)' },
+                            '100%': { transform: 'translateX(200%)' },
+                        },
+                        'fade-in': {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                    },
+                    animation: {
+                        scanner: 'scanner 2s linear infinite',
+                        'fade-in': 'fade-in 0.5s ease-in-out',
+                    }
+                }
+            }
+        }
+    </script>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@19.1.1",
+    "react-dom/client": "https://aistudiocdn.com/react-dom@19.1.1/client",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.1.1/",
+    "react/": "https://aistudiocdn.com/react@^19.1.1/",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.20.0",
+    "@supabase/supabase-js": "https://aistudiocdn.com/@supabase/supabase-js@^2.57.4"
+  }
+}
+</script>
+
+<link rel="stylesheet" href="/index.css">
+</head>
+<body class="bg-dark text-gray-200 font-sans">
+    <div id="root"></div>
+    <script type="module" src="index.tsx"></script>
+<script type="module" src="/index.tsx"></script>
+</body>
+</html>

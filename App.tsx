@@ -1,0 +1,1331 @@
+
+
+
+
+
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Header } from './components/Header';
+import Footer from './components/Footer';
+import HomePage from './pages/HomePage';
+import { CartProvider } from './contexts/CartContext';
+import CartSidebar from './components/CartSidebar';
+import AskNyx from './pages/AskNyxPage';
+import { FAQ_DATA, FEATURES_DATA } from './constants';
+import { useCart } from './contexts/CartContext';
+import { Product, User, UserRole, BlogPost } from './types';
+import { AuthProvider, useAuth, supabase } from './contexts/AuthContext';
+import CookieConsentBanner from './components/CookieConsentBanner';
+import { ProductCard } from './components/ProductShowcase';
+import { ProductManagement } from './components/ProductManagement';
+import { BlogManagement } from './components/BlogManagement';
+import { OrderManagement } from './components/OrderManagement';
+import { CouponManagement } from './components/CouponManagement';
+
+
+// Define shared icons here to avoid creating new files
+const ArrowLeftIcon = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+    </svg>
+);
+
+const PlayIcon = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="currentColor" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" {...props}>
+        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+    </svg>
+);
+
+const PlusMinusIcon = ({ isOpen, className }: { isOpen: boolean; className?: string }) => (
+    <svg className={className} width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="12" y1="5" x2="12" y2="19"></line>
+        <line x1="5" y1="12" x2="19" y2="12" className={`transition-transform duration-300 ${isOpen ? 'rotate-90' : ''}`}></line>
+    </svg>
+);
+
+// Icons for Contact Page
+const MapPinIcon = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+        <circle cx="12" cy="10" r="3"></circle>
+    </svg>
+);
+
+const MailIcon = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+        <rect width="20" height="16" x="2" y="4" rx="2"></rect>
+        <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+    </svg>
+);
+
+const PhoneIcon = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+    </svg>
+);
+
+const EditIcon = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+    </svg>
+  );
+
+const UsersIcon = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </svg>
+);
+
+const TrashIcon = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+        <polyline points="3 6 5 6 21 6"></polyline>
+        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+        <line x1="10" y1="11" x2="10" y2="17"></line>
+        <line x1="14" y1="11" x2="14" y2="17"></line>
+    </svg>
+);
+
+
+// Google Icon for AuthForm
+const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" {...props}>
+        <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C12.955 4 4 12.955 4 24s8.955 20 20 20s20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"/>
+        <path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C16.318 4 9.656 8.337 6.306 14.691z"/>
+        <path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.223 0-9.657-3.356-11.303-7.918l-6.573 5.013C9.657 39.646 16.318 44 24 44z"/>
+        <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.087 5.571l6.19 5.238C41.332 36.636 44 31.023 44 24c0-1.341-.138-2.65-.389-3.917z"/>
+    </svg>
+);
+
+const AuthForm = ({ navigateTo }: { navigateTo: (page: string) => void }) => {
+    const [isLogin, setIsLogin] = useState(true);
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [nickname, setNickname] = useState('');
+    const [newsletterSubscribed, setNewsletterSubscribed] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [message, setMessage] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
+    const { login, signup, signInWithProvider, sendPasswordResetEmail } = useAuth();
+    
+    // Forgot Password State
+    const [isForgotPassword, setIsForgotPassword] = useState(false);
+    const [forgotPasswordEmail, setForgotPasswordEmail] = useState('');
+
+
+    const handleAuthAction = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError(null);
+        setMessage(null);
+        setLoading(true);
+
+        if (isLogin) {
+            try {
+                await login(email, password);
+                navigateTo('home');
+            } catch (err: any) {
+                setError(err.message);
+            }
+        } else {
+            if (password !== confirmPassword) {
+                setError("Passwords do not match.");
+                setLoading(false);
+                return;
+            }
+            try {
+                await signup(firstName, lastName, nickname, email, password, newsletterSubscribed);
+                setMessage("Success! Please check your email to confirm your account.");
+                // Reset form fields after successful signup
+                setFirstName(''); setLastName(''); setNickname(''); setEmail(''); setPassword(''); setConfirmPassword(''); setNewsletterSubscribed(false);
+            } catch (err: any) {
+                setError(err.message);
+            }
+        }
+        setLoading(false);
+    };
+    
+    const handleProviderSignIn = async (provider: 'google') => {
+        try {
+            await signInWithProvider(provider);
+            // On success, the onAuthStateChange listener will handle navigation
+        } catch (err: any) {
+            setError(err.message);
+        }
+    }
+    
+    const handleForgotPasswordSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError(null);
+        setMessage(null);
+        setLoading(true);
+        try {
+            await sendPasswordResetEmail(forgotPasswordEmail);
+            setMessage(`If an account with ${forgotPasswordEmail} exists, a password reset link has been sent.`);
+            setForgotPasswordEmail('');
+        } catch (err: any) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
+    const renderInput = (id: string, type: string, value: string, onChange: (e: React.ChangeEvent<HTMLInputElement>) => void, placeholder: string, required: boolean = true) => (
+        <div className="relative">
+            <input
+                id={id}
+                name={id}
+                type={type}
+                value={value}
+                onChange={onChange}
+                placeholder={placeholder}
+                className="w-full bg-nyx-gray border border-gray-700 rounded-lg py-3 px-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-nyx-blue transition-all"
+                required={required}
+            />
+        </div>
+    );
+    
+    if (isForgotPassword) {
+        return (
+             <div className="w-full max-w-md p-8 md:p-12 bg-nyx-black rounded-2xl border border-nyx-gray/50">
+                <div className="text-center mb-8">
+                    <h2 className="text-3xl font-bold text-white">Reset Password</h2>
+                    <p className="text-gray-400 mt-2">Enter your email to receive a password reset link.</p>
+                </div>
+
+                <form onSubmit={handleForgotPasswordSubmit} className="space-y-6">
+                    {renderInput('forgot-email', 'email', forgotPasswordEmail, (e) => setForgotPasswordEmail(e.target.value), 'Your Email')}
+                    
+                    {error && <p className="text-red-500 text-sm">{error}</p>}
+                    {message && <p className="text-green-500 text-sm">{message}</p>}
+                    
+                    <button type="submit" disabled={loading} className="w-full bg-nyx-blue text-nyx-black font-bold py-3 px-8 rounded-full hover:bg-white transition-all duration-300 transform hover:scale-105 disabled:opacity-50">
+                        {loading ? 'Sending...' : 'Send Reset Link'}
+                    </button>
+                </form>
+
+                <div className="text-center mt-6">
+                    <button onClick={() => setIsForgotPassword(false)} className="text-sm text-nyx-blue hover:underline">
+                        Back to Login
+                    </button>
+                </div>
+            </div>
+        )
+    }
+
+    return (
+        <div className="w-full max-w-md p-8 md:p-12 bg-nyx-black rounded-2xl border border-nyx-gray/50">
+            <div className="text-center mb-8">
+                <h2 className="text-3xl font-bold text-white">{isLogin ? "Welcome Back" : "Create Account"}</h2>
+                <p className="text-gray-400 mt-2">{isLogin ? "Sign in to continue" : "Join the future of smart living"}</p>
+            </div>
+            
+            <form onSubmit={handleAuthAction} className="space-y-4">
+                {!isLogin && (
+                    <>
+                        <div className="flex gap-4">
+                            {renderInput('firstName', 'text', firstName, (e) => setFirstName(e.target.value), 'First Name')}
+                            {renderInput('lastName', 'text', lastName, (e) => setLastName(e.target.value), 'Last Name')}
+                        </div>
+                        {renderInput('nickname', 'text', nickname, (e) => setNickname(e.target.value), 'Nickname')}
+                    </>
+                )}
+                {renderInput('email', isLogin ? 'text' : 'email', email, (e) => setEmail(e.target.value), isLogin ? 'Email or Nickname' : 'Email')}
+                {renderInput('password', 'password', password, (e) => setPassword(e.target.value), 'Password')}
+                {!isLogin && renderInput('confirmPassword', 'password', confirmPassword, (e) => setConfirmPassword(e.target.value), 'Confirm Password')}
+                
+                {isLogin && (
+                    <div className="text-right">
+                        <button type="button" onClick={() => setIsForgotPassword(true)} className="text-sm text-nyx-blue hover:underline">
+                            Forgot Password?
+                        </button>
+                    </div>
+                )}
+                
+                {!isLogin && (
+                    <div className="flex items-center">
+                        <input
+                            id="newsletter"
+                            name="newsletter"
+                            type="checkbox"
+                            checked={newsletterSubscribed}
+                            onChange={(e) => setNewsletterSubscribed(e.target.checked)}
+                            className="h-4 w-4 rounded border-gray-600 bg-nyx-black text-nyx-blue focus:ring-nyx-blue"
+                        />
+                        <label htmlFor="newsletter" className="ml-2 block text-sm text-gray-400">
+                            Subscribe to our newsletter for updates.
+                        </label>
+                    </div>
+                )}
+                
+                 {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+                 {message && <p className="text-green-500 text-sm text-center">{message}</p>}
+
+                <button type="submit" disabled={loading} className="w-full bg-nyx-blue text-nyx-black font-bold py-3 px-8 rounded-full hover:bg-white transition-all duration-300 transform hover:scale-105 disabled:opacity-50">
+                    {loading ? 'Processing...' : (isLogin ? 'Login' : 'Sign Up')}
+                </button>
+            </form>
+            
+            <div className="relative my-6">
+                <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-gray-700"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                    <span className="bg-nyx-black px-2 text-gray-500">Or continue with</span>
+                </div>
+            </div>
+
+            <div>
+                <button
+                    onClick={() => handleProviderSignIn('google')}
+                    className="w-full flex justify-center items-center gap-3 bg-nyx-gray border border-gray-700 rounded-lg py-3 px-4 text-white hover:bg-nyx-gray/50 transition-colors"
+                >
+                    <GoogleIcon className="w-6 h-6" />
+                    <span>Sign in with Google</span>
+                </button>
+            </div>
+            
+            <p className="mt-8 text-center text-sm text-gray-400">
+                {isLogin ? "Don't have an account? " : "Already have an account? "}
+                <button onClick={() => { setIsLogin(!isLogin); setError(null); setMessage(null); }} className="font-semibold text-nyx-blue hover:underline">
+                    {isLogin ? 'Sign up' : 'Login'}
+                </button>
+            </p>
+        </div>
+    );
+};
+
+const LoginPage = ({ navigateTo }: { navigateTo: (page: string) => void }) => {
+    return (
+        <main className="min-h-screen flex items-center justify-center bg-dark py-12 px-4">
+             <div className="w-full max-w-md">
+                 <AuthForm navigateTo={navigateTo} />
+            </div>
+        </main>
+    );
+};
+
+
+// Dummy pages
+const HowItWorksPage = () => {
+    const videoRef = useRef<HTMLVideoElement>(null);
+    const [isPlaying, setIsPlaying] = useState(false);
+
+    const togglePlay = () => {
+        if (videoRef.current) {
+            if (videoRef.current.paused) {
+                videoRef.current.play();
+                setIsPlaying(true);
+            } else {
+                videoRef.current.pause();
+                setIsPlaying(false);
+            }
+        }
+    };
+    
+     useEffect(() => {
+        const video = videoRef.current;
+        if (!video) return;
+
+        const onPlay = () => setIsPlaying(true);
+        const onPause = () => setIsPlaying(false);
+        const onEnded = () => setIsPlaying(false);
+
+        video.addEventListener('play', onPlay);
+        video.addEventListener('pause', onPause);
+        video.addEventListener('ended', onEnded);
+
+        return () => {
+            video.removeEventListener('play', onPlay);
+            video.removeEventListener('pause', onPause);
+            video.removeEventListener('ended', onEnded);
+        };
+    }, []);
+
+    return (
+        <div className="py-24 md:py-32 bg-dark text-white">
+            <div className="container mx-auto px-4">
+                <div className="max-w-3xl mx-auto text-center mb-16">
+                    <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-4">How NYX Works</h1>
+                    <p className="text-gray-300 text-lg md:text-xl">
+                        Experience the simplicity and power of the NYX ecosystem. From unboxing to everyday use, smart living has never been this effortless.
+                    </p>
+                </div>
+                
+                <div className="max-w-4xl mx-auto">
+                    <div className="relative aspect-video rounded-2xl overflow-hidden border border-brand-purple/50 shadow-2xl shadow-brand-purple/20">
+                        <video ref={videoRef} className="w-full h-full object-cover" poster="https://images.unsplash.com/photo-1543286386-71314c48926b?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" src="https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" playsInline onClick={togglePlay}></video>
+                         {!isPlaying && (
+                             <div className="absolute inset-0 flex items-center justify-center bg-black/50 cursor-pointer" onClick={togglePlay}>
+                                <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm hover:bg-white/30 transition-all">
+                                     <PlayIcon className="w-10 h-10 text-white ml-1" />
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-6xl mx-auto mt-24 text-center">
+                    <div className="flex flex-col items-center">
+                        <div className="text-4xl font-bold bg-gradient-to-r from-brand-purple to-brand-pink text-transparent bg-clip-text mb-4">1</div>
+                        <h3 className="text-xl font-bold mb-2">Unbox & Power On</h3>
+                        <p className="text-gray-400">Simply unbox your NYX device and connect it to power. The status light will guide you.</p>
+                    </div>
+                    <div className="flex flex-col items-center">
+                        <div className="text-4xl font-bold bg-gradient-to-r from-brand-purple to-brand-pink text-transparent bg-clip-text mb-4">2</div>
+                        <h3 className="text-xl font-bold mb-2">Connect to Wi-Fi</h3>
+                        <p className="text-gray-400">Open the NYX app, and it will automatically detect your new device and guide you through a quick Wi-Fi setup.</p>
+                    </div>
+                    <div className="flex flex-col items-center">
+                        <div className="text-4xl font-bold bg-gradient-to-r from-brand-purple to-brand-pink text-transparent bg-clip-text mb-4">3</div>
+                        <h3 className="text-xl font-bold mb-2">Enjoy Smart Living</h3>
+                        <p className="text-gray-400">That's it! Your device is now part of your smart home, ready to be controlled and automated.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+const SetupVideosPage = () => {
+    const videos = [
+        { id: 1, title: "Setting Up Your NYX-1 Sensor", duration: "3:45", thumbnail: "https://images.unsplash.com/photo-1614036855179-73b185c7c229?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" },
+        { id: 2, title: "Connecting the NYX-Bulb", duration: "2:15", thumbnail: "https://images.unsplash.com/photo-1608999383953-d61f5d928ace?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" },
+        { id: 3, title: "Automations with NYX-Cam", duration: "5:30", thumbnail: "https://images.unsplash.com/photo-1599351549026-e57573708f52?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" },
+        { id: 4, title: "Advanced Features in the NYX App", duration: "8:12", thumbnail: "https://images.unsplash.com/photo-1558233043-4559e7a826a7?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" },
+    ];
+    return (
+        <div className="py-24 md:py-32 bg-dark text-white">
+            <div className="container mx-auto px-4">
+                 <div className="max-w-3xl mx-auto text-center mb-16">
+                    <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-4">Setup Videos</h1>
+                    <p className="text-gray-300 text-lg md:text-xl">
+                        Visual guides to help you get started with your NYX products in minutes.
+                    </p>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {videos.map(video => (
+                        <div key={video.id} className="group cursor-pointer">
+                            <div className="relative aspect-video rounded-2xl overflow-hidden mb-4">
+                                <img src={video.thumbnail} alt={video.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                                    <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm group-hover:bg-white/30 transition-all">
+                                        <PlayIcon className="w-8 h-8 text-white ml-1" />
+                                    </div>
+                                </div>
+                                <span className="absolute bottom-3 right-3 bg-black/70 text-white text-xs font-semibold px-2 py-1 rounded-md">{video.duration}</span>
+                            </div>
+                            <h3 className="text-lg font-semibold group-hover:text-brand-purple transition-colors">{video.title}</h3>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+};
+const FAQPage = () => {
+    const [openIndex, setOpenIndex] = useState<number | null>(null);
+
+    const toggleFAQ = (index: number) => {
+        setOpenIndex(openIndex === index ? null : index);
+    };
+
+    return (
+        <div className="py-24 md:py-32 bg-dark text-white">
+            <div className="container mx-auto px-4">
+                 <div className="max-w-3xl mx-auto text-center mb-16">
+                    <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-4">Frequently Asked Questions</h1>
+                    <p className="text-gray-300 text-lg md:text-xl">
+                        Find answers to common questions about NYX products and services.
+                    </p>
+                </div>
+                <div className="max-w-3xl mx-auto space-y-4">
+                    {FAQ_DATA.map((faq, index) => (
+                        <div key={index} className="bg-dark-accent rounded-lg border border-white/10">
+                            <button
+                                onClick={() => toggleFAQ(index)}
+                                className="w-full flex justify-between items-center text-left p-6"
+                            >
+                                <span className="text-lg font-semibold">{faq.question}</span>
+                                <PlusMinusIcon isOpen={openIndex === index} className="w-6 h-6 text-brand-purple flex-shrink-0"/>
+                            </button>
+                            <div className={`overflow-hidden transition-all duration-300 ease-in-out ${openIndex === index ? 'max-h-96' : 'max-h-0'}`}>
+                                <div className="p-6 pt-0 text-gray-400">
+                                    <p>{faq.answer}</p>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+};
+const ContactPage = () => {
+    const [formState, setFormState] = useState({
+        name: '',
+        email: '',
+        message: '',
+    });
+    const [status, setStatus] = useState('');
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        setFormState({ ...formState, [e.target.name]: e.target.value });
+    };
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        setStatus('Sending...');
+        // Mock sending form
+        setTimeout(() => {
+            setStatus('Your message has been sent!');
+            setFormState({ name: '', email: '', message: '' });
+        }, 1000);
+    };
+
+    return (
+        <div className="min-h-screen bg-dark text-white">
+            {/* Hero Section */}
+            <section className="relative py-24 md:py-32 overflow-hidden">
+                {/* Background Effects */}
+                <div className="absolute inset-0 bg-gradient-to-br from-nyx-black via-nyx-blue/10 to-nyx-black"></div>
+                <div className="absolute top-1/4 right-1/4 w-80 h-80 bg-gradient-to-r from-nyx-blue/20 to-brand-purple/20 rounded-full blur-3xl animate-pulse"></div>
+                <div className="absolute bottom-1/4 left-1/4 w-72 h-72 bg-gradient-to-r from-brand-pink/20 to-nyx-blue/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+                
+                <div className="container mx-auto px-4 relative z-10">
+                    <div className="max-w-4xl mx-auto text-center">
+                        <div className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-nyx-blue/20 to-brand-purple/20 border border-nyx-blue/30 mb-6">
+                            <span className="w-2 h-2 bg-brand-pink rounded-full mr-2 animate-pulse"></span>
+                            <span className="text-sm font-medium text-gray-300">We're Here to Help</span>
+                        </div>
+                        <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6">
+                            Get in
+                            <span className="block bg-gradient-to-r from-nyx-blue via-brand-purple to-brand-pink text-transparent bg-clip-text">
+                                Touch
+                            </span>
+                        </h1>
+                        <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
+                            We're here to help. Whether you have a question about our products or need 
+                            <span className="text-nyx-blue font-semibold"> support</span>, please feel free to 
+                            <span className="text-brand-purple font-semibold"> reach out</span>.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            {/* Contact Form */}
+            <section className="relative py-16 md:py-24 overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-nyx-black via-nyx-gray/10 to-nyx-black"></div>
+                <div className="container mx-auto px-4 relative z-10">
+                    <div className="max-w-3xl mx-auto">
+
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 max-w-6xl mx-auto">
+                            <div className="lg:col-span-1 space-y-8">
+                                <div className="bg-nyx-gray/30 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-brand-purple/30 transition-all duration-300">
+                                    <div className="flex gap-4">
+                                        <div className="w-12 h-12 bg-gradient-to-br from-brand-purple to-brand-pink rounded-xl flex items-center justify-center">
+                                            <MapPinIcon className="w-6 h-6 text-white" />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-xl font-semibold text-white">Our Office</h3>
+                                            <p className="text-gray-400">123 Innovation Drive, Tech City, 90210</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="bg-nyx-gray/30 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-nyx-blue/30 transition-all duration-300">
+                                    <div className="flex gap-4">
+                                        <div className="w-12 h-12 bg-gradient-to-br from-nyx-blue to-cyan-400 rounded-xl flex items-center justify-center">
+                                            <MailIcon className="w-6 h-6 text-white" />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-xl font-semibold text-white">Email Us</h3>
+                                            <a href="mailto:support@nyx.com" className="text-gray-400 hover:text-nyx-blue transition">support@nyx.com</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="bg-nyx-gray/30 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-brand-pink/30 transition-all duration-300">
+                                    <div className="flex gap-4">
+                                        <div className="w-12 h-12 bg-gradient-to-br from-brand-pink to-brand-purple rounded-xl flex items-center justify-center">
+                                            <PhoneIcon className="w-6 h-6 text-white" />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-xl font-semibold text-white">Call Us</h3>
+                                            <a href="tel:+1-800-555-0199" className="text-gray-400 hover:text-brand-pink transition">+1 (800) 555-0199</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="lg:col-span-2 bg-nyx-gray/30 backdrop-blur-sm p-8 rounded-3xl border border-white/10 hover:border-brand-purple/30 transition-all duration-300">
+                                <h3 className="text-3xl font-bold mb-6 text-white">Send Us a Message</h3>
+                                <form onSubmit={handleSubmit} className="space-y-6">
+                                    <div>
+                                        <label htmlFor="name" className="sr-only">Name</label>
+                                        <input type="text" name="name" id="name" value={formState.name} onChange={handleChange} placeholder="Your Name" required className="w-full bg-dark/50 border border-white/20 rounded-xl py-4 px-6 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-purple focus:border-transparent transition-all" />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="email" className="sr-only">Email</label>
+                                        <input type="email" name="email" id="email" value={formState.email} onChange={handleChange} placeholder="Your Email" required className="w-full bg-dark/50 border border-white/20 rounded-xl py-4 px-6 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-purple focus:border-transparent transition-all" />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="message" className="sr-only">Message</label>
+                                        <textarea name="message" id="message" value={formState.message} onChange={handleChange} rows={5} placeholder="Your Message" required className="w-full bg-dark/50 border border-white/20 rounded-xl py-4 px-6 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-purple focus:border-transparent transition-all resize-none"></textarea>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-sm text-green-400">{status}</span>
+                                        <button type="submit" className="group relative bg-gradient-to-r from-brand-purple to-brand-pink text-white font-semibold py-4 px-10 rounded-full hover:from-brand-pink hover:to-brand-purple transition-all duration-500 transform hover:scale-105 hover:shadow-2xl hover:shadow-brand-purple/25">
+                                            <span className="relative z-10">Send Message</span>
+                                            <div className="absolute inset-0 bg-gradient-to-r from-brand-purple to-brand-pink rounded-full blur opacity-0 group-hover:opacity-75 transition-opacity duration-500"></div>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    );
+};
+const OurStoryPage = () => (
+    <div className="py-24 md:py-32 bg-dark text-white">
+        <div className="container mx-auto px-4">
+             <div className="max-w-3xl mx-auto">
+                <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-8 text-center">Our Story</h1>
+                <div className="prose prose-invert prose-lg max-w-none text-gray-300 space-y-6">
+                    <p>Founded in 2023 by a group of designers and engineers, NYX was born from a simple yet powerful idea: smart home technology should be beautiful, intuitive, and accessible to everyone. We were tired of the clunky, complicated devices that flooded the market, devices that promised a future of convenience but delivered a present of frustration.</p>
+                    <p>We envisioned a different future. A future where your home anticipates your needs, where technology fades into the background, and where design and function exist in perfect harmony. This vision drove us to create our first product, the NYX-1 Smart Sensor.</p>
+                     <figure className="my-12">
+                        <img src="https://images.unsplash.com/photo-1580234811497-9df7fd2f337e?q=80&w=1973&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="NYX Team working" className="w-full rounded-2xl shadow-lg"/>
+                        <figcaption className="text-center text-sm text-gray-500 mt-4">The founding team in our first workshop.</figcaption>
+                    </figure>
+                    <p>Crafted from a single piece of aluminum and powered by our proprietary Adaptive AI, the NYX-1 was more than just a motion sensor; it was a statement. It was proof that technology could be both powerful and elegant. The success of the NYX-1 paved the way for a full ecosystem of products, each designed with the same core principles.</p>
+                    <p>Today, NYX is a leader in the smart home industry, but our mission remains the same: to simplify life through thoughtful design and intelligent technology. We're still a small, passionate team, dedicated to pushing the boundaries of what a smart home can be. And we're just getting started.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+);
+const WhyUsPage = () => (
+    <div className="py-24 md:py-32 bg-dark text-white">
+        <div className="container mx-auto px-4">
+            <div className="max-w-3xl mx-auto text-center mb-16">
+                <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-4">Why Choose NYX?</h1>
+                <p className="text-gray-300 text-lg md:text-xl">
+                    We believe in a different approach to smart technology. Here's what sets us apart.
+                </p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                <div className="bg-dark-accent p-8 rounded-2xl border border-white/10">
+                    <h3 className="text-2xl font-bold mb-4">Design First</h3>
+                    <p className="text-gray-400">We are designers at heart. Every product is meticulously crafted to not only perform its function flawlessly but to also enhance your living space. We use premium materials and a minimalist aesthetic to create devices you'll be proud to display.</p>
+                </div>
+                <div className="bg-dark-accent p-8 rounded-2xl border border-white/10">
+                    <h3 className="text-2xl font-bold mb-4">Intelligent Simplicity</h3>
+                    <p className="text-gray-400">Technology should make life easier, not more complicated. From a setup process that takes seconds to an AI that learns your habits, our focus is on creating a user experience that is powerful yet effortlessly simple.</p>
+                </div>
+                <div className="bg-dark-accent p-8 rounded-2xl border border-white/10">
+                    <h3 className="text-2xl font-bold mb-4">Customer-Centric</h3>
+                    <p className="text-gray-400">You are at the center of everything we do. We offer lifetime support for all our products and actively listen to our community to continuously improve our software and develop new products that solve real-world problems.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+);
+const ProductsPage = ({ navigateTo, allProducts }: { navigateTo: (page: string, params?: any) => void, allProducts: Product[] }) => {
+     const { user } = useAuth();
+     const isAuthorized = user && (user.roles.includes('seller') || user.roles.includes('admin') || user.roles.includes('super-admin'));
+     const displayedProducts = isAuthorized ? allProducts : allProducts.filter(p => p.isVisible);
+
+    return (
+        <div className="min-h-screen bg-dark text-white">
+            {/* Hero Section */}
+            <section className="relative py-24 md:py-32 overflow-hidden">
+                {/* Background Effects */}
+                <div className="absolute inset-0 bg-gradient-to-br from-nyx-black via-purple-900/20 to-nyx-black"></div>
+                <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-gradient-to-r from-brand-purple/20 to-brand-pink/20 rounded-full blur-3xl animate-pulse"></div>
+                <div className="absolute top-3/4 right-1/4 w-96 h-96 bg-gradient-to-r from-nyx-blue/20 to-brand-purple/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+                
+                <div className="container mx-auto px-4 relative z-10">
+                    <div className="max-w-4xl mx-auto text-center">
+                        <div className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-brand-purple/20 to-brand-pink/20 border border-brand-purple/30 mb-6">
+                            <span className="w-2 h-2 bg-nyx-blue rounded-full mr-2 animate-pulse"></span>
+                            <span className="text-sm font-medium text-gray-300">Complete Collection</span>
+                        </div>
+                        <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6">
+                            Our
+                            <span className="block bg-gradient-to-r from-brand-purple via-brand-pink to-nyx-blue text-transparent bg-clip-text">
+                                Collection
+                            </span>
+                        </h1>
+                        <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
+                            Explore the full range of NYX smart home devices, designed to work together to create a 
+                            <span className="text-nyx-blue font-semibold"> seamless</span> and 
+                            <span className="text-brand-purple font-semibold"> intelligent</span> living experience.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            {/* Products Grid */}
+            <section className="relative py-16 md:py-24 overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-nyx-black via-nyx-gray/10 to-nyx-black"></div>
+                <div className="container mx-auto px-4 relative z-10">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                        {displayedProducts.map(product => (
+                            <ProductCard key={product.id} product={product} navigateTo={navigateTo} />
+                        ))}
+                    </div>
+                </div>
+            </section>
+        </div>
+    );
+};
+const BlogPage = ({ navigateTo }: { navigateTo: (page: string, params?: any) => void }) => {
+    // Dummy blog post data. In a real app, this would come from a database.
+    const blogPosts: BlogPost[] = [
+        { id: '1', title: 'The Future of Ambient Computing', author: 'Jane Doe', date: '2025-07-15T10:00:00Z', imageUrl: 'https://images.unsplash.com/photo-1558655146-364adaf1fcc9?q=80&w=1964&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', excerpt: 'How smart devices are fading into the background of our lives.', content: 'Full content here...' },
+        { id: '2', title: 'Designing for Simplicity: The NYX Philosophy', author: 'John Smith', date: '2025-07-10T14:30:00Z', imageUrl: 'https://images.unsplash.com/photo-1522199755839-a2bacb67c546?q=80&w=2072&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', excerpt: 'A deep dive into the principles that guide our product design.', content: 'Full content here...' },
+        { id: '3', title: '5 Ways to Automate Your Home with NYX', author: 'Emily White', date: '2025-07-05T09:00:00Z', imageUrl: 'https://images.unsplash.com/photo-1565538813994-714046a55198?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', excerpt: 'Practical tips and tricks to get the most out of your devices.', content: 'Full content here...' },
+    ];
+    
+    return (
+        <div className="min-h-screen bg-dark text-white">
+            {/* Hero Section */}
+            <section className="relative py-24 md:py-32 overflow-hidden">
+                {/* Background Effects */}
+                <div className="absolute inset-0 bg-gradient-to-br from-nyx-black via-brand-purple/10 to-nyx-black"></div>
+                <div className="absolute top-1/4 right-1/4 w-80 h-80 bg-gradient-to-r from-brand-pink/20 to-brand-purple/20 rounded-full blur-3xl animate-pulse"></div>
+                <div className="absolute bottom-1/4 left-1/4 w-72 h-72 bg-gradient-to-r from-nyx-blue/20 to-brand-pink/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+                
+                <div className="container mx-auto px-4 relative z-10">
+                    <div className="max-w-4xl mx-auto text-center">
+                        <div className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-brand-pink/20 to-brand-purple/20 border border-brand-pink/30 mb-6">
+                            <span className="w-2 h-2 bg-nyx-blue rounded-full mr-2 animate-pulse"></span>
+                            <span className="text-sm font-medium text-gray-300">Latest Insights</span>
+                        </div>
+                        <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6">
+                            NYX
+                            <span className="block bg-gradient-to-r from-brand-pink via-brand-purple to-nyx-blue text-transparent bg-clip-text">
+                                Blog
+                            </span>
+                        </h1>
+                        <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
+                            News, insights, and updates from the team building the 
+                            <span className="text-brand-purple font-semibold"> future</span> of 
+                            <span className="text-nyx-blue font-semibold"> smart living</span>.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            {/* Blog Posts */}
+            <section className="relative py-16 md:py-24 overflow-hidden">
+                {/* Background Effects */}
+                <div className="absolute inset-0 bg-gradient-to-br from-nyx-black via-nyx-gray/20 to-nyx-black"></div>
+                <div className="absolute top-0 left-1/4 w-96 h-96 bg-gradient-to-r from-brand-purple/10 to-brand-pink/10 rounded-full blur-3xl"></div>
+                <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-gradient-to-r from-nyx-blue/10 to-brand-purple/10 rounded-full blur-3xl"></div>
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-r from-brand-pink/10 to-nyx-blue/10 rounded-full blur-3xl"></div>
+                
+                <div className="container mx-auto px-4 relative z-10">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                        {blogPosts.map((post, index) => (
+                            <div key={post.id} className="group relative">
+                                {/* Card Glow Effect */}
+                                <div className="absolute -inset-0.5 bg-gradient-to-r from-brand-purple via-brand-pink to-nyx-blue rounded-3xl blur opacity-0 group-hover:opacity-75 transition-opacity duration-500"></div>
+                                
+                                <div className="relative bg-nyx-gray/30 backdrop-blur-sm rounded-3xl overflow-hidden flex flex-col border border-white/20 hover:border-brand-purple/50 transition-all duration-500 hover:transform hover:scale-105 hover:shadow-2xl hover:shadow-brand-purple/20">
+                                    {/* Image with overlay */}
+                                    <div className="aspect-video overflow-hidden relative">
+                                        <img src={post.imageUrl} alt={post.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-nyx-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                        <div className="absolute top-4 left-4">
+                                            <div className="bg-brand-purple/90 backdrop-blur-sm text-white text-xs font-semibold px-3 py-1 rounded-full">
+                                                {new Date(post.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="p-6 flex flex-col flex-grow">
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <div className="w-2 h-2 bg-nyx-blue rounded-full animate-pulse"></div>
+                                            <span className="text-xs text-gray-400 font-medium">BLOG POST</span>
+                                        </div>
+                                        <h3 className="text-xl font-bold text-white mb-3 flex-grow group-hover:text-nyx-blue transition-colors leading-tight">{post.title}</h3>
+                                        <p className="text-gray-400 text-sm mb-4 line-clamp-3">{post.excerpt}</p>
+                                        
+                                        <div className="flex items-center justify-between mt-auto">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-6 h-6 bg-gradient-to-br from-brand-purple to-brand-pink rounded-full flex items-center justify-center">
+                                                    <span className="text-xs font-bold text-white">{post.author.charAt(0)}</span>
+                                                </div>
+                                                <span className="text-xs text-gray-400">By {post.author}</span>
+                                            </div>
+                                            <a 
+                                                href="#" 
+                                                onClick={(e) => { e.preventDefault(); navigateTo('blog-post', { post: post }); }} 
+                                                className="group/link flex items-center gap-2 text-nyx-blue hover:text-cyan-400 font-semibold text-sm transition-colors"
+                                            >
+                                                Read More
+                                                <svg className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                                </svg>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+        </div>
+    );
+};
+const BlogPostPage = ({ navigateTo, post }: { navigateTo: (page: string) => void, post: BlogPost }) => {
+     return (
+        <div className="min-h-screen bg-dark text-white">
+            {/* Hero Section */}
+            <section className="relative py-24 md:py-32 overflow-hidden">
+                {/* Background Effects */}
+                <div className="absolute inset-0 bg-gradient-to-br from-nyx-black via-brand-purple/10 to-nyx-black"></div>
+                <div className="absolute top-1/4 left-1/4 w-80 h-80 bg-gradient-to-r from-brand-purple/20 to-brand-pink/20 rounded-full blur-3xl animate-pulse"></div>
+                <div className="absolute bottom-1/4 right-1/4 w-72 h-72 bg-gradient-to-r from-nyx-blue/20 to-brand-purple/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+                
+                <div className="container mx-auto px-4 relative z-10">
+                    <div className="max-w-4xl mx-auto">
+                        <button onClick={() => navigateTo('blog')} className="flex items-center gap-2 text-brand-purple hover:text-brand-purple/80 mb-8 group">
+                            <ArrowLeftIcon className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+                            Back to Blog
+                        </button>
+                        <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6 leading-tight">
+                            {post.title}
+                        </h1>
+                        <div className="flex items-center gap-4 text-gray-400 mb-8">
+                            <span>By <span className="text-nyx-blue font-semibold">{post.author}</span></span>
+                            <span>&bull;</span>
+                            <span>{new Date(post.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Article Content */}
+            <section className="relative py-16 md:py-24 overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-nyx-black via-nyx-gray/10 to-nyx-black"></div>
+                <div className="container mx-auto px-4 relative z-10">
+                    <div className="max-w-4xl mx-auto">
+                        <div className="bg-nyx-gray/30 backdrop-blur-sm rounded-3xl overflow-hidden border border-white/10 mb-8">
+                            <img src={post.imageUrl} alt={post.title} className="w-full aspect-video object-cover" />
+                        </div>
+                        <div className="prose prose-invert prose-lg max-w-none text-gray-300 leading-relaxed">
+                            {/* In a real app, this would be sanitized HTML */}
+                            <p className="text-xl text-gray-200 mb-6">{post.excerpt} {post.content}</p>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                            <p>Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis et commodo pharetra, est eros bibendum elit, nec luctus magna felis sollicitudin mauris. Integer in mauris eu nibh euismod gravida. Duis ac tellus et risus vulputate vehicula. Donec lobortis risus a elit. Etiam tempor. Ut ullamcorper, ligula eu tempor congue, eros est euismod turpis, id tincidunt sapien risus a quam. Maecenas fermentum consequat mi. Donec fermentum. Pellentesque malesuada nulla a mi. Duis sapien sem, aliquet nec, commodo eget, consequat quis, neque. Aliquam faucibus, elit ut dictum aliquet, felis nisl adipiscing sapien, sed malesuada diam lacus eget erat. Cras mollis scelerisque nunc. Nullam arcu. Aliquam consequat.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+     );
+};
+const LegalPage = ({ navigateTo, slug, title }: { navigateTo: (page: string) => void, slug: string, title: string }) => {
+    const { user } = useAuth();
+    const isAuthorized = user && (user.roles.includes('admin') || user.roles.includes('super-admin'));
+
+    const [documentContent, setDocumentContent] = useState('');
+    const [lastUpdated, setLastUpdated] = useState('');
+    const [editableContent, setEditableContent] = useState('');
+    const [isEditing, setIsEditing] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState('');
+    const [saveStatus, setSaveStatus] = useState('');
+
+    useEffect(() => {
+        const fetchDocument = async () => {
+            setIsLoading(true);
+            setError('');
+            setSaveStatus('');
+            try {
+                const { data, error } = await supabase
+                    .from('legal_documents')
+                    .select('content, last_updated')
+                    .eq('slug', slug)
+                    .single();
+
+                if (error && error.code !== 'PGRST116') throw error;
+                if (data) {
+                    setDocumentContent(data.content || "This document has not been written yet.");
+                    setLastUpdated(data.last_updated);
+                } else {
+                    setDocumentContent("This document has not been written yet.");
+                    setError('Document not found.');
+                }
+            } catch (err: any) {
+                setError(err.message || 'Failed to fetch document.');
+                setDocumentContent('Content could not be loaded.');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchDocument();
+    }, [slug]);
+
+    const handleEdit = () => {
+        setEditableContent(documentContent);
+        setIsEditing(true);
+        setSaveStatus('');
+    };
+
+    const handleCancel = () => {
+        setIsEditing(false);
+        setEditableContent('');
+    };
+
+    const handleSave = async () => {
+        setSaveStatus('Saving...');
+        try {
+            const { data, error } = await supabase
+                .from('legal_documents')
+                .update({ content: editableContent, last_updated: new Date().toISOString() })
+                .eq('slug', slug)
+                .select('last_updated')
+                .single();
+            
+            if (error) throw error;
+
+            setDocumentContent(editableContent);
+            if(data) setLastUpdated(data.last_updated);
+            setSaveStatus('Changes saved successfully!');
+            setIsEditing(false);
+            setTimeout(() => setSaveStatus(''), 3000); // Clear status after 3s
+        } catch (err: any) {
+            setSaveStatus(`Error: ${err.message}`);
+        }
+    };
+
+    if (isLoading) {
+        return (
+            <div className="py-24 md:py-32 bg-dark text-white">
+                <div className="container mx-auto px-4">
+                    <div className="max-w-3xl mx-auto">Loading document...</div>
+                </div>
+            </div>
+        );
+    }
+    
+    return (
+        <div className="py-24 md:py-32 bg-dark text-white">
+            <div className="container mx-auto px-4">
+                <div className="max-w-3xl mx-auto">
+                     <button onClick={() => navigateTo('home')} className="flex items-center gap-2 text-brand-purple hover:text-brand-purple/80 mb-8">
+                        <ArrowLeftIcon className="w-5 h-5" />
+                        Back to Home
+                    </button>
+                    <div className="flex justify-between items-start mb-8 gap-4">
+                        <h1 className="text-4xl md:text-5xl font-bold tracking-tight">{title}</h1>
+                        {isAuthorized && !isEditing && (
+                            <button onClick={handleEdit} className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors bg-dark-accent p-3 rounded-lg border border-white/10 flex-shrink-0">
+                                <EditIcon className="w-5 h-5"/>
+                                <span className="hidden sm:inline">Edit</span>
+                            </button>
+                        )}
+                    </div>
+                    {isEditing ? (
+                        <div className="space-y-4">
+                             <textarea 
+                                value={editableContent}
+                                onChange={(e) => setEditableContent(e.target.value)}
+                                className="w-full min-h-[500px] bg-dark-accent border border-gray-600 rounded-lg py-3 px-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-purple font-mono"
+                            />
+                            <div className="flex flex-col sm:flex-row justify-end items-center gap-4">
+                               {saveStatus && <p className={`text-sm ${saveStatus.startsWith('Error') ? 'text-red-400' : 'text-green-400'}`}>{saveStatus}</p>}
+                                <button onClick={handleCancel} className="border border-gray-600 text-gray-300 font-medium py-2 px-5 rounded-full hover:border-white hover:text-white transition-all w-full sm:w-auto">Cancel</button>
+                                <button onClick={handleSave} disabled={saveStatus === 'Saving...'} className="bg-brand-purple text-white font-semibold py-2 px-5 rounded-full hover:bg-brand-purple/80 transition-all disabled:opacity-50 w-full sm:w-auto">
+                                    {saveStatus === 'Saving...' ? 'Saving...' : 'Save Changes'}
+                                </button>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="prose prose-invert prose-lg max-w-none text-gray-300">
+                            {error && !error.includes('Document not found') ? <p className="text-red-400">{error}</p> : <p style={{whiteSpace: 'pre-wrap'}}>{documentContent}</p>}
+                            {lastUpdated && (!error || error.includes('Document not found')) && (
+                                <p className="text-sm text-gray-500 mt-8">Last Updated: {new Date(lastUpdated).toLocaleString()}</p>
+                            )}
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// Admin & User Profile pages
+const AddProductPage = () => <div className="p-8 text-white min-h-screen pt-24">Add Product Form...</div>;
+const EditProductPage = ({ id }: {id: string}) => <div className="p-8 text-white min-h-screen pt-24">Edit Product Form for {id}...</div>;
+const AddBlogPostPage = () => <div className="p-8 text-white min-h-screen pt-24">Add Blog Post Form...</div>;
+const AdminDashboardPage = () => {
+    const { fetchAllUsers, updateUserRoles, deleteUserAsAdmin, user: currentUser } = useAuth();
+    const [users, setUsers] = useState<User[]>([]);
+    const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [searchTerm, setSearchTerm] = useState('');
+
+    // State for modals
+    const [editingUser, setEditingUser] = useState<User | null>(null);
+    const [deletingUser, setDeletingUser] = useState<User | null>(null);
+    const [selectedRoles, setSelectedRoles] = useState<UserRole[]>([]);
+    const [modalActionLoading, setModalActionLoading] = useState(false);
+
+    // State for management components
+    const [showProductManagement, setShowProductManagement] = useState(false);
+    const [showBlogManagement, setShowBlogManagement] = useState(false);
+    const [showOrderManagement, setShowOrderManagement] = useState(false);
+    const [showCouponManagement, setShowCouponManagement] = useState(false);
+
+    const availableRoles: UserRole[] = ['user', 'seller', 'content_writer', 'admin', 'super-admin', 'Web Developer', 'UI/UX Designer'];
+
+    const roleColorMap: Record<UserRole, string> = {
+        'super-admin': 'bg-red-500/20 text-red-400 border-red-500/30',
+        'admin': 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
+        'seller': 'bg-green-500/20 text-green-400 border-green-500/30',
+        'content_writer': 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+        'user': 'bg-gray-500/20 text-gray-400 border-gray-500/30',
+        'Web Developer': 'bg-purple-500/20 text-purple-400 border-purple-500/30',
+        'UI/UX Designer': 'bg-pink-500/20 text-pink-400 border-pink-500/30'
+    };
+    
+    const loadUsers = useCallback(async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const allUsers = await fetchAllUsers();
+            setUsers(allUsers);
+        } catch (err: any) {
+            setError(err.message || 'Failed to fetch users.');
+        } finally {
+            setLoading(false);
+        }
+    }, [fetchAllUsers]);
+
+    useEffect(() => {
+        loadUsers();
+    }, [loadUsers]);
+
+    useEffect(() => {
+        const lowercasedFilter = searchTerm.toLowerCase();
+        const filtered = users.filter(user =>
+            user.firstName.toLowerCase().includes(lowercasedFilter) ||
+            user.lastName.toLowerCase().includes(lowercasedFilter) ||
+            user.nickname.toLowerCase().includes(lowercasedFilter) ||
+            user.email.toLowerCase().includes(lowercasedFilter)
+        );
+        setFilteredUsers(filtered);
+    }, [searchTerm, users]);
+    
+    const handleEditRolesClick = (user: User) => {
+        setEditingUser(user);
+        setSelectedRoles(user.roles);
+    };
+
+    const handleRoleChange = (role: UserRole, isChecked: boolean) => {
+        setSelectedRoles(prev => 
+            isChecked ? [...prev, role] : prev.filter(r => r !== role)
+        );
+    };
+
+    const handleSaveRoles = async () => {
+        if (!editingUser) return;
+        setModalActionLoading(true);
+        try {
+            await updateUserRoles(editingUser.id, selectedRoles);
+            setUsers(users.map(u => u.id === editingUser.id ? { ...u, roles: selectedRoles } : u));
+            setEditingUser(null);
+        } catch (err: any) {
+            alert(`Error updating roles: ${err.message}`);
+        } finally {
+            setModalActionLoading(false);
+        }
+    };
+    
+    const handleDeleteUserClick = (user: User) => {
+        setDeletingUser(user);
+    };
+
+    const confirmDeleteUser = async () => {
+        if (!deletingUser) return;
+        setModalActionLoading(true);
+        try {
+            await deleteUserAsAdmin(deletingUser.id);
+            setUsers(users.filter(u => u.id !== deletingUser.id));
+            setDeletingUser(null);
+        } catch (err: any) {
+             alert(`Error deleting user: ${err.message}`);
+        } finally {
+            setModalActionLoading(false);
+        }
+    };
+
+    const renderModals = () => (
+        <>
+            {/* Edit Roles Modal */}
+            {editingUser && (
+                <div className="fixed inset-0 bg-black/60 z-[101] backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
+                    <div className="bg-dark-accent rounded-2xl border border-white/10 p-6 sm:p-8 w-full max-w-lg">
+                        <h3 className="text-xl sm:text-2xl font-bold mb-4">Edit Roles for {editingUser.nickname}</h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 my-6">
+                            {availableRoles.map(role => (
+                                <label key={role} className="flex items-center gap-3 bg-dark p-3 rounded-lg cursor-pointer hover:bg-nyx-gray/50 transition-colors">
+                                    <input
+                                        type="checkbox"
+                                        checked={selectedRoles.includes(role)}
+                                        onChange={(e) => handleRoleChange(role, e.target.checked)}
+                                        className="h-5 w-5 rounded border-gray-600 bg-nyx-black text-nyx-blue focus:ring-nyx-blue"
+                                    />
+                                    <span className={`px-2 py-1 text-xs font-medium rounded-md border ${roleColorMap[role] || roleColorMap['user']}`}>{role}</span>
+                                </label>
+                            ))}
+                        </div>
+                        <div className="flex justify-end gap-4 mt-8">
+                            <button onClick={() => setEditingUser(null)} className="border border-gray-600 text-gray-300 font-medium py-2 px-5 rounded-full hover:border-white hover:text-white transition-colors">Cancel</button>
+                            <button onClick={handleSaveRoles} disabled={modalActionLoading} className="bg-brand-purple text-white font-semibold py-2 px-5 rounded-full hover:bg-brand-purple/80 transition-colors disabled:opacity-50">
+                                {modalActionLoading ? 'Saving...' : 'Save Changes'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {/* Delete User Modal */}
+            {deletingUser && (
+                 <div className="fixed inset-0 bg-black/60 z-[101] backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
+                    <div className="bg-dark-accent rounded-2xl border border-white/10 p-6 sm:p-8 w-full max-w-md text-center">
+                        <h3 className="text-xl sm:text-2xl font-bold mb-2">Delete User</h3>
+                        <p className="text-gray-400 mb-6">Are you sure you want to delete <span className="font-bold text-white">{deletingUser.nickname}</span>? This action is irreversible.</p>
+                         <div className="flex justify-center gap-4 mt-8">
+                            <button onClick={() => setDeletingUser(null)} className="border border-gray-600 text-gray-300 font-medium py-2 px-5 rounded-full hover:border-white hover:text-white flex-1 transition-colors">Cancel</button>
+                            <button onClick={confirmDeleteUser} disabled={modalActionLoading} className="bg-red-600 text-white font-semibold py-2 px-5 rounded-full hover:bg-red-700 flex-1 transition-colors disabled:opacity-50">
+                                {modalActionLoading ? 'Deleting...' : 'Confirm Delete'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </>
+    );
+
+    if (loading) {
+        return <div className="py-24 md:py-32 bg-dark text-white min-h-screen flex items-center justify-center">Loading users...</div>;
+    }
+
+    if (error) {
+         return <div className="py-24 md:py-32 bg-dark text-red-400 min-h-screen flex items-center justify-center">Error: {error}</div>;
+    }
+
+    return (
+        <>
+            {renderModals()}
+            {showProductManagement && <ProductManagement onClose={() => setShowProductManagement(false)} />}
+            {showBlogManagement && <BlogManagement onClose={() => setShowBlogManagement(false)} />}
+            {showOrderManagement && <OrderManagement onClose={() => setShowOrderManagement(false)} />}
+            {showCouponManagement && <CouponManagement onClose={() => setShowCouponManagement(false)} />}
+            
+            <div className="py-24 md:py-32 bg-dark text-white min-h-screen">
+            <div className="container mx-auto px-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
+                    <div className="flex items-center gap-3">
+                        <UsersIcon className="w-8 h-8 text-brand-purple"/>
+                        <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Admin Dashboard</h1>
+                    </div>
+                     <input
+                        type="text"
+                        placeholder="Search users..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full sm:w-64 bg-dark-accent border border-gray-600 rounded-lg py-2 px-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-purple"
+                    />
+                </div>
+
+                {/* Management Buttons */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                    <button
+                        onClick={() => setShowProductManagement(true)}
+                        className="bg-nyx-blue text-nyx-black p-4 rounded-lg hover:bg-white transition-colors text-center"
+                    >
+                        <h3 className="font-semibold mb-2">Product Management</h3>
+                        <p className="text-sm">Manage products, inventory, and pricing</p>
+                    </button>
+                    <button
+                        onClick={() => setShowBlogManagement(true)}
+                        className="bg-purple-600 text-white p-4 rounded-lg hover:bg-purple-700 transition-colors text-center"
+                    >
+                        <h3 className="font-semibold mb-2">Blog Management</h3>
+                        <p className="text-sm">Create and manage blog posts</p>
+                    </button>
+                    <button
+                        onClick={() => setShowOrderManagement(true)}
+                        className="bg-green-600 text-white p-4 rounded-lg hover:bg-green-700 transition-colors text-center"
+                    >
+                        <h3 className="font-semibold mb-2">Order Management</h3>
+                        <p className="text-sm">View and process orders</p>
+                    </button>
+                    <button
+                        onClick={() => setShowCouponManagement(true)}
+                        className="bg-orange-600 text-white p-4 rounded-lg hover:bg-orange-700 transition-colors text-center"
+                    >
+                        <h3 className="font-semibold mb-2">Coupon Management</h3>
+                        <p className="text-sm">Create and manage discount codes</p>
+                    </button>
+                </div>
+                
+                <div className="bg-dark-accent border border-white/10 rounded-2xl overflow-hidden">
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left">
+                            <thead className="border-b border-white/10">
+                                <tr>
+                                    <th className="p-4 font-semibold">User</th>
+                                    <th className="p-4 font-semibold hidden md:table-cell">Nickname</th>
+                                    <th className="p-4 font-semibold">Roles</th>
+                                    <th className="p-4 font-semibold">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {filteredUsers.map(user => {
+                                    if (!currentUser) return null;
+                                    const isTargetSuperAdmin = user.roles.includes('super-admin');
+                                    const isTargetAdmin = user.roles.includes('admin');
+                                    const isCurrentUserSuperAdmin = currentUser.roles.includes('super-admin');
+                                    const isCurrentUserAdmin = currentUser.roles.includes('admin');
+
+                                    const canEdit = user.id !== currentUser.id && (isCurrentUserSuperAdmin || (isCurrentUserAdmin && !isTargetAdmin && !isTargetSuperAdmin));
+                                    const canDelete = user.id !== currentUser.id && !isTargetSuperAdmin && (isCurrentUserSuperAdmin || (isCurrentUserAdmin && !isTargetAdmin));
+
+                                    return (
+                                        <tr key={user.id} className="border-b border-white/10 last:border-b-0 hover:bg-dark/50 transition-colors">
+                                            <td className="p-4">
+                                                <div className="flex items-center gap-3">
+                                                    <img src={user.profilePicture || `https://ui-avatars.com/api/?name=${user.firstName}+${user.lastName}&background=random`} alt={user.nickname} className="w-10 h-10 rounded-full" />
+                                                    <div>
+                                                        <div className="font-semibold text-white">{user.firstName} {user.lastName}</div>
+                                                        <div className="text-sm text-gray-400">{user.email}</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="p-4 hidden md:table-cell">
+                                                <span className="text-white font-medium">@{user.nickname}</span>
+                                            </td>
+                                            <td className="p-4">
+                                                <div className="flex flex-wrap gap-1">
+                                                    {user.roles.map(role => (
+                                                        <span key={role} className={`px-2 py-1 text-xs font-medium rounded-md border ${roleColorMap[role] || roleColorMap['user']}`}>
+                                                            {role}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            </td>
+                                            <td className="p-4">
+                                                <div className="flex gap-2">
+                                                    {canEdit && (
+                                                        <button
+                                                            onClick={() => handleEditRolesClick(user)}
+                                                            className="text-blue-400 hover:text-blue-300 transition-colors"
+                                                            title="Edit Roles"
+                                                        >
+                                                            <EditIcon className="w-4 h-4" />
+                                                        </button>
+                                                    )}
+                                                    {canDelete && (
+                                                        <button
+                                                            onClick={() => handleDeleteUserClick(user)}
+                                                            className="text-red-400 hover:text-red-300 transition-colors"
+                                                            title="Delete User"
+                                                        >
+                                                            <TrashIcon className="w-4 h-4" />
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </>
+    );
+};
+
+// Placeholder components for missing pages
+
+// Main App Component
+const App = () => {
+    const [currentPage, setCurrentPage] = useState('home');
+    const [pageParams, setPageParams] = useState<any>(null);
+
+    const navigateTo = (page: string, params?: any) => {
+        setCurrentPage(page);
+        setPageParams(params);
+    };
+
+    const renderPage = () => {
+        switch (currentPage) {
+            case 'home':
+                return <HomePage navigateTo={navigateTo} />;
+            case 'login':
+                return <LoginPage navigateTo={navigateTo} />;
+            case 'products':
+                return <ProductsPage navigateTo={navigateTo} allProducts={[]} />;
+            case 'blog':
+                return <BlogPage navigateTo={navigateTo} />;
+            case 'blog-post':
+                return <BlogPostPage navigateTo={navigateTo} post={pageParams?.post} />;
+            case 'how-it-works':
+                return <HowItWorksPage />;
+            case 'setup-videos':
+                return <SetupVideosPage />;
+            case 'faq':
+                return <FAQPage />;
+            case 'contact':
+                return <ContactPage />;
+            case 'our-story':
+                return <OurStoryPage />;
+            case 'why-us':
+                return <WhyUsPage />;
+            case 'ask':
+                return <AskNyxPage navigateTo={navigateTo} />;
+            case 'admin':
+                return <AdminDashboardPage />;
+            case 'legal':
+                return <LegalPage navigateTo={navigateTo} slug={pageParams?.slug} title={pageParams?.title} />;
+            default:
+                return <HomePage navigateTo={navigateTo} />;
+        }
+    };
+
+    return (
+        <AuthProvider>
+            <CartProvider>
+                <div className="min-h-screen bg-dark text-white">
+                    <Header navigateTo={navigateTo} />
+                    <main>
+                        {renderPage()}
+                    </main>
+                    <Footer navigateTo={navigateTo} />
+                    <CartSidebar navigateTo={navigateTo} />
+                    <CookieConsentBanner />
+                </div>
+            </CartProvider>
+        </AuthProvider>
+    );
+};
+
+export default App;
