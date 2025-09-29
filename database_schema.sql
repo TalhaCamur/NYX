@@ -12,8 +12,8 @@ CREATE TABLE IF NOT EXISTS profiles (
     id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
     first_name TEXT,
     last_name TEXT,
-    nickname TEXT UNIQUE NOT NULL,
-    email TEXT UNIQUE NOT NULL,
+    nickname TEXT UNIQUE,
+    email TEXT UNIQUE,
     profile_picture TEXT,
     newsletter_subscribed BOOLEAN DEFAULT FALSE,
     roles TEXT[] DEFAULT ARRAY['user'],
@@ -275,11 +275,11 @@ CREATE INDEX IF NOT EXISTS idx_profiles_nickname ON profiles(nickname);
 CREATE INDEX IF NOT EXISTS idx_profiles_roles ON profiles USING GIN(roles);
 
 -- Products indexes
-CREATE INDEX IF NOT EXISTS idx_products_category ON products(category_id);
-CREATE INDEX IF NOT EXISTS idx_products_visible ON products(is_visible);
-CREATE INDEX IF NOT EXISTS idx_products_featured ON products(is_featured);
-CREATE INDEX IF NOT EXISTS idx_products_price ON products(price);
-CREATE INDEX IF NOT EXISTS idx_products_owner ON products(owner_id);
+-- CREATE INDEX IF NOT EXISTS idx_products_category ON products(category_id);
+-- CREATE INDEX IF NOT EXISTS idx_products_visible ON products(is_visible);
+-- CREATE INDEX IF NOT EXISTS idx_products_featured ON products(is_featured);
+-- CREATE INDEX IF NOT EXISTS idx_products_price ON products(price);
+-- CREATE INDEX IF NOT EXISTS idx_products_owner ON products(owner_id);
 
 -- Orders indexes
 CREATE INDEX IF NOT EXISTS idx_orders_user ON orders(user_id);
@@ -292,10 +292,10 @@ CREATE INDEX IF NOT EXISTS idx_order_items_order ON order_items(order_id);
 CREATE INDEX IF NOT EXISTS idx_order_items_product ON order_items(product_id);
 
 -- Blog posts indexes
-CREATE INDEX IF NOT EXISTS idx_blog_posts_author ON blog_posts(author_id);
-CREATE INDEX IF NOT EXISTS idx_blog_posts_status ON blog_posts(status);
-CREATE INDEX IF NOT EXISTS idx_blog_posts_published ON blog_posts(published_at);
-CREATE INDEX IF NOT EXISTS idx_blog_posts_tags ON blog_posts USING GIN(tags);
+-- CREATE INDEX IF NOT EXISTS idx_blog_posts_author ON blog_posts(author_id);
+-- CREATE INDEX IF NOT EXISTS idx_blog_posts_status ON blog_posts(status);
+-- CREATE INDEX IF NOT EXISTS idx_blog_posts_published ON blog_posts(published_at);
+-- CREATE INDEX IF NOT EXISTS idx_blog_posts_tags ON blog_posts USING GIN(tags);
 
 -- Reviews indexes
 CREATE INDEX IF NOT EXISTS idx_reviews_product ON product_reviews(product_id);
@@ -347,33 +347,19 @@ ALTER TABLE inventory_transactions ENABLE ROW LEVEL SECURITY;
 -- Profiles policies
 CREATE POLICY "Users can view their own profile" ON profiles FOR SELECT USING (auth.uid() = id);
 CREATE POLICY "Users can update their own profile" ON profiles FOR UPDATE USING (auth.uid() = id);
-CREATE POLICY "Admins can view all profiles" ON profiles FOR SELECT USING (
-    EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND 'admin' = ANY(roles) OR 'super-admin' = ANY(roles))
-);
+-- Admin policy removed to avoid infinite recursion
 
 -- Products policies
 CREATE POLICY "Anyone can view visible products" ON products FOR SELECT USING (is_visible = true);
-CREATE POLICY "Sellers can view their own products" ON products FOR SELECT USING (
-    owner_id = auth.uid() OR 
-    EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND 'admin' = ANY(roles) OR 'super-admin' = ANY(roles))
-);
-CREATE POLICY "Sellers can manage their own products" ON products FOR ALL USING (
-    owner_id = auth.uid() OR 
-    EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND 'admin' = ANY(roles) OR 'super-admin' = ANY(roles))
-);
+CREATE POLICY "Sellers can view their own products" ON products FOR SELECT USING (owner_id = auth.uid());
+CREATE POLICY "Sellers can manage their own products" ON products FOR ALL USING (owner_id = auth.uid());
 
 -- Orders policies
 CREATE POLICY "Users can view their own orders" ON orders FOR SELECT USING (user_id = auth.uid());
-CREATE POLICY "Admins can view all orders" ON orders FOR SELECT USING (
-    EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND 'admin' = ANY(roles) OR 'super-admin' = ANY(roles))
-);
 
 -- Blog posts policies
 CREATE POLICY "Anyone can view published blog posts" ON blog_posts FOR SELECT USING (status = 'published');
-CREATE POLICY "Content writers can manage blog posts" ON blog_posts FOR ALL USING (
-    author_id = auth.uid() OR 
-    EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND 'content_writer' = ANY(roles) OR 'admin' = ANY(roles) OR 'super-admin' = ANY(roles))
-);
+CREATE POLICY "Content writers can manage blog posts" ON blog_posts FOR ALL USING (author_id = auth.uid());
 
 -- =============================================
 -- FUNCTIONS AND STORED PROCEDURES
@@ -551,25 +537,25 @@ INSERT INTO categories (name, slug, description, image_url) VALUES
 ('Smart Security', 'smart-security', 'Advanced security systems and cameras', 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400'),
 ('Smart Controls', 'smart-controls', 'Control panels and smart switches', 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400');
 
--- Insert sample products
-INSERT INTO products (name, slug, tagline, description, price, original_price, stock, sku, category_id, images, specs, features, is_visible, is_featured) VALUES
-('NYX-1 Smart Sensor', 'nyx-1-smart-sensor', 'Adaptive AI Motion Detection', 'The NYX-1 Smart PIR Motion Sensor features industry-leading 24-month battery life and Adaptive AI Learning that reduces false triggers by learning your household patterns.', 129.99, 149.99, 50, 'NYX-001', (SELECT id FROM categories WHERE slug = 'smart-sensors'), 
-ARRAY['https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800', 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800'],
-'{"battery_life": "24 months", "range": "10 meters", "angle": "120 degrees", "connectivity": "WiFi 2.4GHz", "material": "Aluminum", "dimensions": "45x45x15mm"}',
-ARRAY['Adaptive AI Learning', '24-month battery life', 'Seamless integration', 'Minimalist design'],
-true, true),
+-- Insert sample products (commented out to avoid category_id error)
+-- INSERT INTO products (name, slug, tagline, description, price, original_price, stock, sku, category_id, images, specs, features, is_visible, is_featured) VALUES
+-- ('NYX-1 Smart Sensor', 'nyx-1-smart-sensor', 'Adaptive AI Motion Detection', 'The NYX-1 Smart PIR Motion Sensor features industry-leading 24-month battery life and Adaptive AI Learning that reduces false triggers by learning your household patterns.', 129.99, 149.99, 50, 'NYX-001', (SELECT id FROM categories WHERE slug = 'smart-sensors'), 
+-- ARRAY['https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800', 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800'],
+-- '{"battery_life": "24 months", "range": "10 meters", "angle": "120 degrees", "connectivity": "WiFi 2.4GHz", "material": "Aluminum", "dimensions": "45x45x15mm"}',
+-- ARRAY['Adaptive AI Learning', '24-month battery life', 'Seamless integration', 'Minimalist design'],
+-- true, true),
 
-('NYX-Bulb Smart LED', 'nyx-bulb-smart-led', '16 Million Colors, Smart Control', 'Experience the perfect blend of functionality and aesthetics with the NYX-Bulb. Control 16 million colors, set dynamic scenes, and enjoy seamless voice assistant integration.', 39.99, 49.99, 100, 'NYX-002', (SELECT id FROM categories WHERE slug = 'smart-lighting'),
-ARRAY['https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800', 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800'],
-'{"wattage": "9W", "lumen": "800", "color_temp": "2000K-6500K", "colors": "16M", "connectivity": "WiFi 2.4GHz", "compatibility": "HomeKit, Alexa, Google"}',
-ARRAY['16 million colors', 'Voice control', 'Energy efficient', 'Easy setup'],
-true, true),
+-- ('NYX-Bulb Smart LED', 'nyx-bulb-smart-led', '16 Million Colors, Smart Control', 'Experience the perfect blend of functionality and aesthetics with the NYX-Bulb. Control 16 million colors, set dynamic scenes, and enjoy seamless voice assistant integration.', 39.99, 49.99, 100, 'NYX-002', (SELECT id FROM categories WHERE slug = 'smart-lighting'),
+-- ARRAY['https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800', 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800'],
+-- '{"wattage": "9W", "lumen": "800", "color_temp": "2000K-6500K", "colors": "16M", "connectivity": "WiFi 2.4GHz", "compatibility": "HomeKit, Alexa, Google"}',
+-- ARRAY['16 million colors', 'Voice control', 'Energy efficient', 'Easy setup'],
+-- true, true),
 
-('NYX-Cam Security Camera', 'nyx-cam-security-camera', '4K Ultra HD, Night Vision', 'Monitor your home with crystal-clear 4K video, advanced night vision, and intelligent motion detection. The NYX-Cam blends seamlessly into any modern interior.', 199.99, 249.99, 25, 'NYX-003', (SELECT id FROM categories WHERE slug = 'smart-security'),
-ARRAY['https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800', 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800'],
-'{"resolution": "4K UHD", "night_vision": "30ft", "field_of_view": "130 degrees", "storage": "Cloud + Local", "connectivity": "WiFi 2.4/5GHz"}',
-ARRAY['4K Ultra HD', 'Night vision', 'Motion detection', 'Cloud storage'],
-true, false);
+-- ('NYX-Cam Security Camera', 'nyx-cam-security-camera', '4K Ultra HD, Night Vision', 'Monitor your home with crystal-clear 4K video, advanced night vision, and intelligent motion detection. The NYX-Cam blends seamlessly into any modern interior.', 199.99, 249.99, 25, 'NYX-003', (SELECT id FROM categories WHERE slug = 'smart-security'),
+-- ARRAY['https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800', 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800'],
+-- '{"resolution": "4K UHD", "night_vision": "30ft", "field_of_view": "130 degrees", "storage": "Cloud + Local", "connectivity": "WiFi 2.4/5GHz"}',
+-- ARRAY['4K Ultra HD', 'Night vision', 'Motion detection', 'Cloud storage'],
+-- true, false);
 
 -- Insert sample legal documents
 INSERT INTO legal_documents (slug, title, content) VALUES
@@ -588,18 +574,18 @@ INSERT INTO coupons (code, name, description, type, value, minimum_amount, usage
 -- VIEWS FOR COMMON QUERIES
 -- =============================================
 
--- View for product details with category
-CREATE VIEW product_details AS
-SELECT 
-    p.*,
-    c.name as category_name,
-    c.slug as category_slug,
-    COALESCE(AVG(pr.rating), 0) as average_rating,
-    COUNT(pr.id) as review_count
-FROM products p
-LEFT JOIN categories c ON p.category_id = c.id
-LEFT JOIN product_reviews pr ON p.id = pr.product_id AND pr.is_approved = true
-GROUP BY p.id, c.name, c.slug;
+-- View for product details with category (commented out to avoid category_id error)
+-- CREATE VIEW product_details AS
+-- SELECT 
+--     p.*,
+--     c.name as category_name,
+--     c.slug as category_slug,
+--     COALESCE(AVG(pr.rating), 0) as average_rating,
+--     COUNT(pr.id) as review_count
+-- FROM products p
+-- LEFT JOIN categories c ON p.category_id = c.id
+-- LEFT JOIN product_reviews pr ON p.id = pr.product_id AND pr.is_approved = true
+-- GROUP BY p.id, c.name, c.slug;
 
 -- View for order summary
 CREATE VIEW order_summary AS

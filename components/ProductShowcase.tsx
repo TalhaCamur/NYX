@@ -1,5 +1,6 @@
 import React from 'react';
 import { Product } from '../types';
+import { useCart } from '../contexts/CartContext';
 
 interface ProductCardProps {
   product: Product;
@@ -7,7 +8,8 @@ interface ProductCardProps {
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product, navigateTo }) => {
-  const { addToCart } = React.useContext(require('../contexts/CartContext').CartContext);
+  const { addToCart } = useCart();
+
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -21,7 +23,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, navigateTo })
     >
       <div className="aspect-square overflow-hidden">
         <img 
-          src={product.images[0]} 
+          src={product.images?.[0] || product.imageUrl || 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=400&fit=crop&crop=center'} 
           alt={product.name}
           className="w-full h-full object-cover"
         />
@@ -30,20 +32,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, navigateTo })
         <h3 className="text-xl font-bold text-white mb-2 hover:text-nyx-blue transition-colors">
           {product.name}
         </h3>
-        <p className="text-gray-400 text-sm mb-4">{product.tagline}</p>
+        <p className="text-gray-400 text-sm mb-4">{product.description?.substring(0, 100)}...</p>
         
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-2">
             <span className="text-2xl font-bold text-white">${product.price}</span>
-            {product.originalPrice && (
-              <span className="text-lg text-gray-500 line-through">${product.originalPrice}</span>
-            )}
           </div>
-          {product.originalPrice && (
-            <span className="bg-red-600 text-white text-xs font-semibold px-2 py-1 rounded">
-              {Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% OFF
-            </span>
-          )}
         </div>
 
         <div className="flex items-center justify-between">

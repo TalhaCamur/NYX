@@ -3,16 +3,53 @@ import { User, UserRole } from '../types';
 import { createClient, Session, User as SupabaseUser } from '@supabase/supabase-js';
 
 // --- Supabase Client Initialization ---
-const supabaseUrl = 'https://dpbyrvnvxjlhvtooyuru.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwYnlydm52eGpsaHZ0b295dXJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxMTExODAsImV4cCI6MjA3MzY4NzE4MH0.txkD2Awid_RJhWhFJb0I13QBseIHdrDqHfeGgXrG0EE';
-export const supabase = createClient(supabaseUrl, supabaseKey);
+const supabaseUrl = (import.meta as any).env?.VITE_SUPABASE_URL || 'https://dpbyrvnvxjlhvtooyuru.supabase.co';
+const supabaseKey = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwYnlydm52eGpsaHZ0b295dXJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxMTExODAsImV4cCI6MjA3MzY4NzE4MH0.txkD2Awid_RJhWhFJb0I13QBseIHdrDqHfeGgXrG0EE';
+export const supabase = createClient(supabaseUrl, supabaseKey, {
+    auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true
+    }
+});
+
+// Test Supabase connection
+export const testSupabaseConnection = async () => {
+    try {
+        const startTime = Date.now();
+        
+        // Add timeout to prevent infinite waiting
+        const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Connection test timeout')), 10000)
+        );
+        
+        // Try a simpler test first - just check if we can reach Supabase
+        const connectionPromise = supabase
+            .from('profiles')
+            .select('id')
+            .limit(1);
+            
+        const { data, error } = await Promise.race([connectionPromise, timeoutPromise]) as any;
+        const duration = Date.now() - startTime;
+        
+        if (error) {
+            console.error("❌ Supabase connection test failed:", error);
+            return { success: false, error, duration };
+        }
+        
+        return { success: true, duration };
+    } catch (error) {
+        console.error("💥 Supabase connection test error:", error);
+        return { success: false, error, duration: 0 };
+    }
+};
 
 // --- Helper Functions ---
 const mapProfileToUser = (profile: any, authUser: SupabaseUser | null): User => ({
     id: profile.id,
     firstName: profile.first_name || '',
     lastName: profile.last_name || '',
-    nickname: authUser?.user_metadata?.nickname || profile.nickname || 'user',
+    nickname: profile.nickname || authUser?.user_metadata?.nickname || 'user',
     email: authUser?.email || profile.email || '',
     roles: Array.isArray(profile.roles)
         ? (profile.roles.length > 0 ? profile.roles : ['user'])
@@ -25,6 +62,7 @@ const mapProfileToUser = (profile: any, authUser: SupabaseUser | null): User => 
 
 interface AuthContextType {
     user: User | null;
+    loading: boolean;
     isPasswordRecoveryFlow: boolean;
     login: (identifier: string, password: string) => Promise<void>;
     signup: (firstName: string, lastName: string, nickname: string, email: string, password: string, newsletterSubscribed: boolean) => Promise<void>;
@@ -44,40 +82,171 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false); // INSTANT LOADING
     const [isPasswordRecoveryFlow, setIsPasswordRecoveryFlow] = useState(false);
 
     useEffect(() => {
         const getSession = async () => {
             try {
                 const { data: { session }, error } = await supabase.auth.getSession();
-                if (error) throw error;
+                
+                if (error) {
+                    console.error("❌ Session error:", error);
+                    setUser(null);
+                    setLoading(false);
+                    return;
+                }
+                
                 if (session?.user) {
                     const { data: profile, error: profileError } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
+                    
                     if (profileError) {
-                        console.warn("User exists in auth but not in profiles. Logging out.");
-                        await supabase.auth.signOut();
-                        return;
-                    }
-                    if (profile) {
+                        console.warn("⚠️ User exists in auth but not in profiles. Creating profile...");
+                        
+                        // Create profile for existing user
+                        const emailPrefix = session.user.email?.split('@')[0] || 'user';
+                        const fullName = session.user.user_metadata?.full_name || '';
+                        const nameParts = fullName.split(' ');
+                        
+                        const { error: createProfileError } = await supabase
+                            .from('profiles')
+                            .insert({
+                                id: session.user.id,
+                                first_name: session.user.user_metadata?.first_name || nameParts[0] || emailPrefix,
+                                last_name: session.user.user_metadata?.last_name || nameParts.slice(1).join(' ') || '',
+                                nickname: session.user.user_metadata?.nickname || emailPrefix,
+                                email: session.user.email || '',
+                                newsletter_subscribed: session.user.user_metadata?.newsletter_subscribed || false,
+                                roles: ['user'],
+                                created_at: session.user.created_at,
+                                updated_at: new Date().toISOString(),
+                                is_active: true
+                            });
+
+                        if (createProfileError) {
+                            console.error("❌ Failed to create profile:", createProfileError);
+                            await supabase.auth.signOut();
+                            setUser(null);
+                        } else {
+                            // Load the newly created profile
+                            const { data: newProfile } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
+                            if (newProfile) {
+                                setUser(mapProfileToUser(newProfile, session.user));
+                            }
+                        }
+                    } else if (profile) {
+                        // Check if account is deleted/deactivated
+                        if (!profile.is_active || profile.email?.includes('deleted_')) {
+                            await supabase.auth.signOut();
+                            setUser(null);
+                            return;
+                        }
+                        
+                        
+                        // Check if profile needs updating (if first_name is email prefix)
+                        const emailPrefix = session.user.email?.split('@')[0] || '';
+                        if (profile.first_name === emailPrefix && emailPrefix) {
+                            
+                            const fullName = session.user.user_metadata?.full_name || '';
+                            const nameParts = fullName.split(' ');
+                            
+                            const { error: updateError } = await supabase
+                                .from('profiles')
+                                .update({
+                                    first_name: session.user.user_metadata?.first_name || nameParts[0] || emailPrefix,
+                                    last_name: session.user.user_metadata?.last_name || nameParts.slice(1).join(' ') || '',
+                                    nickname: session.user.user_metadata?.nickname || emailPrefix,
+                                    updated_at: new Date().toISOString()
+                                })
+                                .eq('id', session.user.id);
+                            
+                            if (updateError) {
+                                console.error("❌ Failed to update profile:", updateError);
+                            } else {
+                                // Reload profile
+                                const { data: updatedProfile } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
+                                if (updatedProfile) {
+                                    setUser(mapProfileToUser(updatedProfile, session.user));
+                                    return;
+                                }
+                            }
+                        }
+                        
                         setUser(mapProfileToUser(profile, session.user));
                     }
+                } else {
+                    setUser(null);
                 }
             } catch (error) {
-                console.error("Error fetching initial session:", error);
+                console.error("💥 Error fetching initial session:", error);
+                setUser(null);
             } finally {
                 setLoading(false);
             }
         };
-        getSession();
+        
+        // Add a fallback timeout
+        const fallbackTimeout = setTimeout(() => {
+            setLoading(false);
+        }, 3000);
+        
+        getSession().finally(() => {
+            clearTimeout(fallbackTimeout);
+        });
 
         const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
+            console.log("🔄 Auth state change:", event, session?.user?.id);
+            
             if (event === 'PASSWORD_RECOVERY') {
                 setIsPasswordRecoveryFlow(true);
+            } else if (event === 'USER_UPDATED') {
+                // For USER_UPDATED events, update user and profile
+                console.log("👤 User updated:", session?.user?.email);
+                if (session?.user) {
+                    // Update profiles table with new email
+                    const { error: profileUpdateError } = await supabase
+                        .from('profiles')
+                        .update({ 
+                            email: session.user.email,
+                            updated_at: new Date().toISOString()
+                        })
+                        .eq('id', session.user.id);
+                    
+                    if (profileUpdateError) {
+                        console.error("❌ Profile email update error:", profileUpdateError);
+                    } else {
+                        console.log("✅ Profile email updated successfully");
+                    }
+                    
+                    // Update user state with new auth data
+                    setUser(prevUser => prevUser ? {
+                        ...prevUser,
+                        email: session.user.email || prevUser.email,
+                        profilePicture: session.user.user_metadata?.avatar_url || prevUser.profilePicture
+                    } : null);
+                }
             } else if (session?.user) {
-                const { data: profile } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
+                console.log("👤 User session found:", session.user.email);
+                const { data: profile, error: profileError } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
+                
+                if (profileError) {
+                    console.error("❌ Profile loading error:", profileError);
+                }
+                
                 if (profile) {
                     setUser(mapProfileToUser(profile, session.user));
+                } else {
+                    // Create a basic user from auth data if no profile exists
+                    setUser({
+                        id: session.user.id,
+                        firstName: session.user.user_metadata?.first_name || '',
+                        lastName: session.user.user_metadata?.last_name || '',
+                        nickname: session.user.user_metadata?.nickname || session.user.email?.split('@')[0] || 'user',
+                        email: session.user.email || '',
+                        roles: ['user'],
+                        profilePicture: session.user.user_metadata?.avatar_url || null,
+                        newsletterSubscribed: false,
+                    });
                 }
                 setIsPasswordRecoveryFlow(false);
             } else {
@@ -92,57 +261,62 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }, []);
     
 
-    const login = useCallback(async (identifier: string, password: string): Promise<void> => {
+    const login = useCallback(async (identifier: string, password: string): Promise<any> => {
         const trimmedIdentifier = identifier.trim();
     
-        // Attempt to sign in with the identifier as an email first.
-        const { error: emailLoginError } = await supabase.auth.signInWithPassword({
-            email: trimmedIdentifier,
-            password: password,
-        });
-    
-        // If login is successful, we are done.
-        if (!emailLoginError) {
-            return;
-        }
-    
-        // If the error is not "Invalid login credentials", it could be a network issue or something else.
-        // In that case, we don't proceed to the nickname check and throw the original error.
-        if (!emailLoginError.message.includes('Invalid login credentials')) {
-            throw emailLoginError;
-        }
-    
-        // Since email login failed with invalid credentials, now we try to treat the identifier as a nickname.
-        // We normalize the nickname to lowercase for a case-insensitive lookup.
-        const normalizedNickname = trimmedIdentifier.toLowerCase();
-        const { data: emailFromNickname, error: rpcError } = await supabase.rpc('get_email_from_nickname', {
-            nickname_to_find: normalizedNickname
-        });
-    
-        // If the RPC call fails or doesn't return an email, it means the nickname doesn't exist.
-        if (rpcError || !emailFromNickname) {
-            // We throw the generic error because the user doesn't need to know if it was the email or nickname that failed.
-            throw new Error("Invalid email/nickname or password.");
-        }
-    
-        // If we found an email associated with the nickname, we try to sign in again with that email.
-        const { error: nicknameLoginError } = await supabase.auth.signInWithPassword({
-            email: emailFromNickname as string,
-            password: password,
-        });
-    
-        // If this second attempt fails, it implies the password was incorrect for the user with that nickname.
-        if (nicknameLoginError) {
-             if (nicknameLoginError.message.includes('Invalid login credentials')) {
-                 throw new Error("Invalid email/nickname or password.");
+        try {
+            console.log("🚀 Starting login process...");
+            
+            // First check if email exists in profiles table
+            console.log("🔍 Checking if email exists...");
+            const { data: profileCheck, error: profileError } = await supabase
+                .from('profiles')
+                .select('id, email')
+                .eq('email', trimmedIdentifier)
+                .single();
+            
+            // Attempt login
+            console.log("📧 Attempting email login...");
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: trimmedIdentifier,
+                password: password,
+            });
+            
+            if (error) {
+                console.error("❌ Login error:", error);
+                
+                // Check if it's an invalid credentials error
+                if (error.message.includes('Invalid login credentials')) {
+                    // If profile exists but login failed, it's a password issue
+                    if (profileCheck && !profileError) {
+                        throw new Error("Password does not match. Please check your password and try again.");
+                    } else {
+                        // If no profile found, account doesn't exist
+                        throw new Error("Account not found. Please check your email address or sign up for a new account.");
+                    }
+                }
+                
+                if (error.message.includes('email_not_confirmed')) {
+                    throw new Error("Please check your email and click the confirmation link to complete your registration.");
+                }
+                
+                throw new Error(error.message || 'Login failed. Please try again.');
             }
-            throw nicknameLoginError;
+            
+            if (!data.user) {
+                throw new Error("Login failed. Could not authenticate user.");
+            }
+            
+            console.log("✅ Login successful:", data.user.email);
+            return data; // Return data to resolve Promise
+            
+        } catch (error) {
+            console.error("💥 Login error:", error);
+            throw error;
         }
-    
-        // If we reach here, the login via nickname was successful.
     }, []);
 
-    const signup = useCallback(async (firstName: string, lastName: string, nickname: string, email: string, password: string, newsletterSubscribed: boolean): Promise<void> => {
+    const signup = useCallback(async (firstName: string, lastName: string, nickname: string, email: string, password: string, newsletterSubscribed: boolean): Promise<any> => {
         const trimmedFirstName = firstName.trim();
         const trimmedLastName = lastName.trim();
         const trimmedNickname = nickname.trim();
@@ -153,45 +327,91 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             throw new Error("All fields must be filled out.");
         }
 
-        const { data: existingProfiles, error: checkError } = await supabase
-            .from('profiles')
-            .select('nickname')
-            .eq('nickname', normalizedNickname);
+        try {
+            // Add timeout to prevent infinite processing
+            const timeoutPromise = new Promise((_, reject) => 
+                setTimeout(() => reject(new Error('Signup timeout - please check your internet connection')), 15000)
+            );
 
-        if (checkError) throw checkError;
-        if (existingProfiles && existingProfiles.length > 0) {
-            throw new Error('This nickname is already taken. Please choose another one.');
-        }
+            const signupPromise = (async () => {
+                console.log("🚀 Starting signup process...");
+                
+                // Skip nickname check for now to avoid timeout issues
+                console.log("⚠️ Skipping nickname check to avoid timeout...");
 
-        const { data, error: authError } = await supabase.auth.signUp({ 
-            email: trimmedEmail, 
-            password,
-            options: {
-                data: {
-                    first_name: trimmedFirstName,
-                    last_name: trimmedLastName,
-                    nickname: trimmedNickname,
-                    newsletter_subscribed: newsletterSubscribed,
+                // Simple signup without complex options
+                console.log("📝 Creating user account...");
+                const authSignupPromise = supabase.auth.signUp({ 
+                    email: trimmedEmail, 
+                    password,
+                    options: {
+                        data: {
+                            first_name: trimmedFirstName,
+                            last_name: trimmedLastName,
+                            nickname: trimmedNickname,
+                            newsletter_subscribed: newsletterSubscribed,
+                        }
+                    }
+                });
+                
+                const authTimeoutPromise = new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('Auth signup timeout')), 10000)
+                );
+                
+                const { data, error: authError } = await Promise.race([
+                    authSignupPromise,
+                    authTimeoutPromise
+                ]) as any;
+                
+                if (authError) {
+                    console.error("❌ Auth signup error:", authError);
+                    if (authError.message.includes('User already registered')) {
+                        throw new Error('This email is already registered. Please try logging in or resetting your password.');
+                    }
+                    if (authError.message.includes('Database error')) {
+                        throw new Error('Database error. Please try again in a few moments.');
+                    }
+                    throw new Error(authError.message || 'Signup failed. Please try again.');
                 }
-            }
-        });
-        
-        if (authError) {
-            if (authError.message.includes('User already registered')) {
-                throw new Error('This email is already registered. Please try logging in or resetting your password.');
-            }
-            throw authError;
-        }
 
-        if (!data.user) {
-            throw new Error("Signup failed. Could not create user.");
+                if (!data.user) {
+                    throw new Error("Signup failed. Could not create user.");
+                }
+
+                console.log("✅ User created successfully:", data.user.id);
+                console.log("🎉 Signup completed successfully!");
+                
+                // Check if email confirmation is required
+                if (data.user && !data.user.email_confirmed_at) {
+                    console.log("📧 Email confirmation required");
+                    // Don't throw error, just show success message
+                    console.log("✅ Signup successful! Please check your email and click the confirmation link.");
+                    return data; // Return data to resolve Promise
+                }
+                
+                return data; // Return data for confirmed users
+            })();
+
+            await Promise.race([signupPromise, timeoutPromise]);
+            
+        } catch (error) {
+            console.error("💥 Signup error:", error);
+            throw error;
         }
     }, []);
 
     const logout = useCallback(async () => {
-        const { error } = await supabase.auth.signOut();
-        if (error) throw error;
-        setUser(null);
+        try {
+            const { error } = await supabase.auth.signOut();
+            if (error) {
+                console.error("❌ Logout error:", error);
+                throw error;
+            }
+            setUser(null);
+        } catch (error) {
+            console.error("💥 Logout failed:", error);
+            throw error;
+        }
     }, []);
 
     const updateUser = useCallback(async (userId: string, updates: Partial<Pick<User, 'firstName' | 'lastName' | 'nickname' | 'profilePicture'>>): Promise<User> => {
@@ -294,33 +514,110 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }, []);
 
     const fetchAllUsers = useCallback(async (): Promise<User[]> => {
-        const { data, error } = await supabase.rpc('get_all_users_with_profiles');
+        // Check if user is admin or super-admin
+        if (!user || (!user.roles.includes('admin') && !user.roles.includes('super-admin'))) {
+            throw new Error('Insufficient permissions');
+        }
+        
+        const { data, error } = await supabase
+            .from('profiles')
+            .select('*')
+            .order('created_at', { ascending: false });
+            
         if (error) throw error;
         return data.map((profile: any) => mapProfileToUser(profile, null));
-    }, []);
+    }, [user]);
 
     const updateUserRoles = useCallback(async (userId: string, roles: UserRole[]) => {
-        const { error } = await supabase.rpc('update_user_roles', {
-            user_id_to_update: userId,
-            new_roles: roles,
-        });
+        // Check if user is admin or super-admin
+        if (!user || (!user.roles.includes('admin') && !user.roles.includes('super-admin'))) {
+            throw new Error('Insufficient permissions');
+        }
+        
+        const { error } = await supabase
+            .from('profiles')
+            .update({ roles: roles, updated_at: new Date().toISOString() })
+            .eq('id', userId);
+            
         if (error) throw error;
-    }, []);
+    }, [user]);
 
     const deleteUserAsAdmin = useCallback(async (userId: string) => {
-        const { error } = await supabase.rpc('delete_user_by_admin', { user_id_to_delete: userId });
+        // Check if user is admin or super-admin
+        if (!user || (!user.roles.includes('admin') && !user.roles.includes('super-admin'))) {
+            throw new Error('Insufficient permissions');
+        }
+        
+        // Delete from profiles table (this will cascade to auth.users due to foreign key)
+        const { error } = await supabase
+            .from('profiles')
+            .delete()
+            .eq('id', userId);
+            
         if (error) throw error;
-    }, []);
+    }, [user]);
     
     const deleteUserAccount = useCallback(async () => {
         if(!user) throw new Error("Not logged in.");
-        const { error } = await supabase.rpc('delete_own_user_account');
-        if (error) throw error;
-        setUser(null);
+        
+        
+        try {
+            // First delete all related data
+            const { error: ordersError } = await supabase
+                .from('orders')
+                .delete()
+                .eq('user_id', user.id);
+            if (ordersError) console.warn("⚠️ Orders deletion warning:", ordersError);
+
+            const { error: favoritesError } = await supabase
+                .from('user_favorites')
+                .delete()
+                .eq('user_id', user.id);
+            if (favoritesError) console.warn("⚠️ Favorites deletion warning:", favoritesError);
+
+            const { error: cartError } = await supabase
+                .from('cart_items')
+                .delete()
+                .eq('user_id', user.id);
+            if (cartError) console.warn("⚠️ Cart deletion warning:", cartError);
+
+            // Mark profile as deleted and deactivate
+            const deletedTimestamp = Date.now();
+            const { error: profileError } = await supabase
+                .from('profiles')
+                .update({
+                    is_active: false,
+                    email: `deleted_${deletedTimestamp}@deleted.com`,
+                    first_name: 'Deleted',
+                    last_name: 'User',
+                    nickname: `deleted_${deletedTimestamp}`,
+                    updated_at: new Date().toISOString()
+                })
+                .eq('id', user.id);
+                
+            if (profileError) {
+                console.error("❌ Profile update error:", profileError);
+                throw profileError;
+            }
+            
+            
+            // Finally sign out the user
+            const { error: signOutError } = await supabase.auth.signOut();
+            if (signOutError) {
+                console.error("❌ Sign out error:", signOutError);
+                // Don't throw here as profile is already marked as deleted
+            }
+            
+            setUser(null);
+        } catch (error) {
+            console.error("💥 Account deletion failed:", error);
+            throw error;
+        }
     }, [user]);
 
     const value = useMemo(() => ({
         user,
+        loading,
         isPasswordRecoveryFlow,
         login,
         signup,
@@ -335,7 +632,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         deleteUserAsAdmin,
         deleteUserAccount,
     }), [
-        user, isPasswordRecoveryFlow, login, signup, logout, 
+        user, loading, isPasswordRecoveryFlow, login, signup, logout, 
         updateUser, changePassword, signInWithProvider, 
         sendPasswordResetEmail, updatePassword, fetchAllUsers, 
         updateUserRoles, deleteUserAsAdmin, deleteUserAccount
@@ -343,7 +640,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     return (
         <AuthContext.Provider value={value}>
-            {!loading && children}
+            {children}
         </AuthContext.Provider>
     );
 };

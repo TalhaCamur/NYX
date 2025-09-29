@@ -7,13 +7,13 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Header } from './components/Header';
 import Footer from './components/Footer';
 import HomePage from './pages/HomePage';
-import { CartProvider } from './contexts/CartContext';
+import ProfilePage from './pages/ProfilePage';
 import CartSidebar from './components/CartSidebar';
 import AskNyx from './pages/AskNyxPage';
 import { FAQ_DATA, FEATURES_DATA } from './constants';
 import { useCart } from './contexts/CartContext';
 import { Product, User, UserRole, BlogPost } from './types';
-import { AuthProvider, useAuth, supabase } from './contexts/AuthContext';
+import { useAuth, supabase, testSupabaseConnection } from './contexts/AuthContext';
 import CookieConsentBanner from './components/CookieConsentBanner';
 import { ProductCard } from './components/ProductShowcase';
 import { ProductManagement } from './components/ProductManagement';
@@ -21,23 +21,220 @@ import { BlogManagement } from './components/BlogManagement';
 import { OrderManagement } from './components/OrderManagement';
 import { CouponManagement } from './components/CouponManagement';
 
+// Profile Dropdown Component - Header dışında
+const ProfileDropdown = ({ navigateTo, isUserMenuOpen, setIsUserMenuOpen, user, profileData, setShowProductManagement, setOpenAddForm }: { 
+    navigateTo: (page: string, params?: any) => void;
+    isUserMenuOpen: boolean;
+    setIsUserMenuOpen: (value: boolean) => void;
+    user: any;
+    profileData: any;
+    setShowProductManagement: (value: boolean) => void;
+    setOpenAddForm: (value: boolean) => void;
+}) => {
+    const { logout } = useAuth();
+    const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null);
+
+    // Hover delay için
+    const handleMouseEnter = () => {
+        if (hoverTimeout) {
+            clearTimeout(hoverTimeout);
+            setHoverTimeout(null);
+        }
+    };
+
+    const handleMouseLeave = () => {
+        const timeout = setTimeout(() => {
+            setIsUserMenuOpen(false);
+        }, 250); // 250ms delay
+        setHoverTimeout(timeout);
+    };
+    
+    if (!isUserMenuOpen) return null;
+
+    return (
+        <div
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+            className="fixed top-16 right-4 w-80 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl z-50 overflow-hidden"
+            style={{
+                animation: 'bubbleSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+                transform: 'translateZ(0)',
+                willChange: 'transform, opacity'
+            }}
+        >
+            {/* Header Section */}
+            <div className="p-6 border-b border-white/10 bg-white/5">
+                <div className="flex items-center gap-4 mb-4">
+                    <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center">
+                        <span className="text-white font-bold text-lg">
+                            {profileData?.nickname?.substring(0, 2).toUpperCase() || user?.user_metadata?.full_name?.split(' ').map(n => n[0]).join('') || user?.email?.split('@')[0].substring(0, 2).toUpperCase() || 'U'}
+                        </span>
+                    </div>
+                    <div className="flex-1">
+                        <h3 className="text-white font-semibold text-lg">
+                            {profileData?.nickname || user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User'}
+                        </h3>
+                        <p className="text-gray-300 text-sm">{user?.email || 'user@example.com'}</p>
+                        <div className="flex gap-1 mt-1">
+                            {(user?.roles || ['user']).slice(0, 2).map((role, index) => (
+                                <span 
+                                    key={index}
+                                    className={`px-2 py-0.5 text-xs rounded-full ${
+                                        role === 'super-admin' ? 'bg-red-500/20 text-red-300' :
+                                        role === 'admin' ? 'bg-purple-500/20 text-purple-300' :
+                                        role === 'seller' ? 'bg-green-500/20 text-green-300' :
+                                        role === 'content_writer' ? 'bg-orange-500/20 text-orange-300' :
+                                        'bg-blue-500/20 text-blue-300'
+                                    }`}
+                                >
+                                    {role.toUpperCase()}
+                                </span>
+                            ))}
+                            {(user?.roles || []).length > 2 && (
+                                <span className="px-2 py-0.5 text-xs rounded-full bg-gray-500/20 text-gray-300">
+                                    +{(user?.roles || []).length - 2}
+                                </span>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            {/* Menu Items */}
+            <div className="p-4 space-y-2">
+                {/* Profile */}
+                <button
+                    onClick={() => {
+                        navigateTo('profile');
+                        setIsUserMenuOpen(false);
+                    }}
+                    className="w-full flex items-center gap-3 p-3 text-white hover:bg-white/10 rounded-xl transition-all duration-200 group"
+                >
+                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                    </div>
+                    <span className="font-medium">Profile</span>
+                </button>
+
+                {/* Admin Dashboard */}
+                {(user?.roles?.includes('admin') || user?.roles?.includes('super-admin')) && (
+                    <button
+                        onClick={() => {
+                            navigateTo('admin');
+                            setIsUserMenuOpen(false);
+                        }}
+                        className="w-full flex items-center gap-3 p-3 text-white hover:bg-white/10 rounded-xl transition-all duration-200 group"
+                    >
+                        <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <span className="font-medium">Admin Dashboard</span>
+                    </button>
+                )}
+
+                {/* Product Management - Admin, Super Admin, Seller */}
+                {((user?.roles?.includes('admin') || user?.roles?.includes('super-admin') || user?.roles?.includes('seller'))) && (
+                    <>
+                        <button
+                            onClick={() => {
+                                setShowProductManagement(true);
+                                setIsUserMenuOpen(false);
+                            }}
+                            className="w-full flex items-center gap-3 p-3 text-white hover:bg-white/10 rounded-xl transition-all duration-200 group"
+                        >
+                            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                            </div>
+                            <span className="font-medium">Manage Products</span>
+                        </button>
+                        
+                        <button
+                            onClick={() => {
+                                setOpenAddForm(true);
+                                setShowProductManagement(true);
+                                setIsUserMenuOpen(false);
+                            }}
+                            className="w-full flex items-center gap-3 p-3 text-white hover:bg-white/10 rounded-xl transition-all duration-200 group"
+                        >
+                            <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                </svg>
+                            </div>
+                            <span className="font-medium">Add New Product</span>
+                        </button>
+                    </>
+                )}
+
+                {/* Add Blog Post - Admin, Super Admin */}
+                {((user?.roles?.includes('admin') || user?.roles?.includes('super-admin'))) && (
+                    <button
+                        onClick={() => {
+                            // Add blog post functionality
+                            setIsUserMenuOpen(false);
+                        }}
+                        className="w-full flex items-center gap-3 p-3 text-white hover:bg-white/10 rounded-xl transition-all duration-200 group"
+                    >
+                        <div className="w-8 h-8 bg-orange-600 rounded-lg flex items-center justify-center">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                        </div>
+                        <span className="font-medium">Add Blog Post</span>
+                    </button>
+                )}
+
+                {/* Divider */}
+                <div className="border-t border-white/10 my-2"></div>
+
+                {/* Logout */}
+                <button
+                    onClick={async () => {
+                        try {
+                            await logout();
+                            navigateTo('home');
+                        } catch (error) {
+                            console.error('❌ ProfileDropdown Logout failed:', error);
+                        }
+                        setIsUserMenuOpen(false);
+                    }}
+                    className="w-full flex items-center gap-3 p-3 text-red-400 hover:bg-red-500/10 rounded-xl transition-all duration-200 group"
+                >
+                    <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                    </div>
+                    <span className="font-medium">Logout</span>
+                </button>
+            </div>
+        </div>
+    );
+};
 
 // Define shared icons here to avoid creating new files
 const ArrowLeftIcon = (props: React.SVGProps<SVGSVGElement>) => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
         <line x1="19" y1="12" x2="5" y2="12"></line>
         <polyline points="12 19 5 12 12 5"></polyline>
     </svg>
 );
 
 const PlayIcon = (props: React.SVGProps<SVGSVGElement>) => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="currentColor" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" {...props}>
         <polygon points="5 3 19 12 5 21 5 3"></polygon>
     </svg>
 );
 
 const PlusMinusIcon = ({ isOpen, className }: { isOpen: boolean; className?: string }) => (
-    <svg className={className} width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg className={className} width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <line x1="12" y1="5" x2="12" y2="19"></line>
         <line x1="5" y1="12" x2="19" y2="12" className={`transition-transform duration-300 ${isOpen ? 'rotate-90' : ''}`}></line>
     </svg>
@@ -45,34 +242,34 @@ const PlusMinusIcon = ({ isOpen, className }: { isOpen: boolean; className?: str
 
 // Icons for Contact Page
 const MapPinIcon = (props: React.SVGProps<SVGSVGElement>) => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
         <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
         <circle cx="12" cy="10" r="3"></circle>
     </svg>
 );
 
 const MailIcon = (props: React.SVGProps<SVGSVGElement>) => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
         <rect width="20" height="16" x="2" y="4" rx="2"></rect>
         <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
     </svg>
 );
 
 const PhoneIcon = (props: React.SVGProps<SVGSVGElement>) => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
         <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
     </svg>
 );
 
 const EditIcon = (props: React.SVGProps<SVGSVGElement>) => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
       <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
       <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
     </svg>
   );
 
 const UsersIcon = (props: React.SVGProps<SVGSVGElement>) => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
       <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
       <circle cx="9" cy="7" r="4" />
       <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
@@ -81,7 +278,7 @@ const UsersIcon = (props: React.SVGProps<SVGSVGElement>) => (
 );
 
 const TrashIcon = (props: React.SVGProps<SVGSVGElement>) => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
         <polyline points="3 6 5 6 21 6"></polyline>
         <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
         <line x1="10" y1="11" x2="10" y2="17"></line>
@@ -111,7 +308,7 @@ const AuthForm = ({ navigateTo }: { navigateTo: (page: string) => void }) => {
     const [newsletterSubscribed, setNewsletterSubscribed] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [message, setMessage] = useState<string | null>(null);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(false); // INSTANT LOADING
     const { login, signup, signInWithProvider, sendPasswordResetEmail } = useAuth();
     
     // Forgot Password State
@@ -121,16 +318,33 @@ const AuthForm = ({ navigateTo }: { navigateTo: (page: string) => void }) => {
 
     const handleAuthAction = async (e: React.FormEvent) => {
         e.preventDefault();
+        console.log("🎯 Form submitted!");
         setError(null);
         setMessage(null);
         setLoading(true);
+        console.log("🔄 Loading set to true");
 
         if (isLogin) {
             try {
+                console.log("🚀 Starting login...");
+                console.log("📧 Email:", email);
+                console.log("🔑 Password length:", password.length);
+                
+                // Wait for login to complete
+                console.log("🔄 Calling login function...");
                 await login(email, password);
+                console.log("✅ Login successful!");
+                
+                // Only navigate if login was successful
+                setLoading(false);
+                setMessage("Login successful! Redirecting...");
+                console.log("🔄 Navigating to home...");
                 navigateTo('home');
+                
             } catch (err: any) {
+                console.error("❌ Login error:", err);
                 setError(err.message);
+                setLoading(false); // Stop loading on error
             }
         } else {
             if (password !== confirmPassword) {
@@ -145,9 +359,9 @@ const AuthForm = ({ navigateTo }: { navigateTo: (page: string) => void }) => {
                 setFirstName(''); setLastName(''); setNickname(''); setEmail(''); setPassword(''); setConfirmPassword(''); setNewsletterSubscribed(false);
             } catch (err: any) {
                 setError(err.message);
+                setLoading(false); // Stop loading on error
             }
         }
-        setLoading(false);
     };
     
     const handleProviderSignIn = async (provider: 'google') => {
@@ -185,7 +399,7 @@ const AuthForm = ({ navigateTo }: { navigateTo: (page: string) => void }) => {
                 value={value}
                 onChange={onChange}
                 placeholder={placeholder}
-                className="w-full bg-nyx-gray border border-gray-700 rounded-lg py-3 px-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-nyx-blue transition-all"
+                className="w-full bg-nyx-gray border border-gray-700 rounded-lg py-3 px-4 text-white placeholder-gray-500 focus:outline-none focus:border-nyx-blue transition-all"
                 required={required}
             />
         </div>
@@ -256,7 +470,7 @@ const AuthForm = ({ navigateTo }: { navigateTo: (page: string) => void }) => {
                             type="checkbox"
                             checked={newsletterSubscribed}
                             onChange={(e) => setNewsletterSubscribed(e.target.checked)}
-                            className="h-4 w-4 rounded border-gray-600 bg-nyx-black text-nyx-blue focus:ring-nyx-blue"
+                            className="h-4 w-4 rounded border-gray-600 bg-nyx-black text-nyx-blue focus:border-nyx-blue"
                         />
                         <label htmlFor="newsletter" className="ml-2 block text-sm text-gray-400">
                             Subscribe to our newsletter for updates.
@@ -359,7 +573,7 @@ const HowItWorksPage = () => {
                 </div>
                 
                 <div className="max-w-4xl mx-auto">
-                    <div className="relative aspect-video rounded-2xl overflow-hidden border border-brand-purple/50 shadow-2xl shadow-brand-purple/20">
+                    <div className="relative aspect-video rounded-2xl overflow-hidden border border-brand-purple/50">
                         <video ref={videoRef} className="w-full h-full object-cover" poster="https://images.unsplash.com/photo-1543286386-71314c48926b?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" src="https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" playsInline onClick={togglePlay}></video>
                          {!isPlaying && (
                              <div className="absolute inset-0 flex items-center justify-center bg-black/50 cursor-pointer" onClick={togglePlay}>
@@ -373,17 +587,17 @@ const HowItWorksPage = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-6xl mx-auto mt-24 text-center">
                     <div className="flex flex-col items-center">
-                        <div className="text-4xl font-bold bg-gradient-to-r from-brand-purple to-brand-pink text-transparent bg-clip-text mb-4">1</div>
+                        <div className="text-4xl font-bold text-brand-purple mb-4">1</div>
                         <h3 className="text-xl font-bold mb-2">Unbox & Power On</h3>
                         <p className="text-gray-400">Simply unbox your NYX device and connect it to power. The status light will guide you.</p>
                     </div>
                     <div className="flex flex-col items-center">
-                        <div className="text-4xl font-bold bg-gradient-to-r from-brand-purple to-brand-pink text-transparent bg-clip-text mb-4">2</div>
+                        <div className="text-4xl font-bold text-brand-purple mb-4">2</div>
                         <h3 className="text-xl font-bold mb-2">Connect to Wi-Fi</h3>
                         <p className="text-gray-400">Open the NYX app, and it will automatically detect your new device and guide you through a quick Wi-Fi setup.</p>
                     </div>
                     <div className="flex flex-col items-center">
-                        <div className="text-4xl font-bold bg-gradient-to-r from-brand-purple to-brand-pink text-transparent bg-clip-text mb-4">3</div>
+                        <div className="text-4xl font-bold text-brand-purple mb-4">3</div>
                         <h3 className="text-xl font-bold mb-2">Enjoy Smart Living</h3>
                         <p className="text-gray-400">That's it! Your device is now part of your smart home, ready to be controlled and automated.</p>
                     </div>
@@ -470,121 +684,280 @@ const ContactPage = () => {
     const [formState, setFormState] = useState({
         name: '',
         email: '',
+        subject: '',
         message: '',
     });
     const [status, setStatus] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setFormState({ ...formState, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setStatus('Sending...');
-        // Mock sending form
-        setTimeout(() => {
-            setStatus('Your message has been sent!');
-            setFormState({ name: '', email: '', message: '' });
-        }, 1000);
+        setIsSubmitting(true);
+        setStatus('Sending your message...');
+        
+        // Simulate API call
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        setStatus('✅ Message sent successfully! We\'ll get back to you within 24 hours.');
+        setFormState({ name: '', email: '', subject: '', message: '' });
+        setIsSubmitting(false);
     };
 
     return (
         <div className="min-h-screen bg-dark text-white">
             {/* Hero Section */}
             <section className="relative py-24 md:py-32 overflow-hidden">
-                {/* Background Effects */}
-                <div className="absolute inset-0 bg-gradient-to-br from-nyx-black via-nyx-blue/10 to-nyx-black"></div>
-                <div className="absolute top-1/4 right-1/4 w-80 h-80 bg-gradient-to-r from-nyx-blue/20 to-brand-purple/20 rounded-full blur-3xl animate-pulse"></div>
-                <div className="absolute bottom-1/4 left-1/4 w-72 h-72 bg-gradient-to-r from-brand-pink/20 to-nyx-blue/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+                {/* Animated Background */}
+                <div className="absolute inset-0 bg-nyx-black"></div>
                 
                 <div className="container mx-auto px-4 relative z-10">
-                    <div className="max-w-4xl mx-auto text-center">
-                        <div className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-nyx-blue/20 to-brand-purple/20 border border-nyx-blue/30 mb-6">
-                            <span className="w-2 h-2 bg-brand-pink rounded-full mr-2 animate-pulse"></span>
-                            <span className="text-sm font-medium text-gray-300">We're Here to Help</span>
+                    <div className="max-w-5xl mx-auto text-center">
+                        <div className="inline-flex items-center px-6 py-3 rounded-full bg-nyx-blue/20 border border-nyx-blue/30 mb-8 backdrop-blur-sm">
+                            <span className="w-3 h-3 bg-brand-pink rounded-full mr-3 animate-pulse"></span>
+                            <span className="text-sm font-medium text-gray-300">24/7 Support Available</span>
                         </div>
-                        <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6">
-                            Get in
-                            <span className="block bg-gradient-to-r from-nyx-blue via-brand-purple to-brand-pink text-transparent bg-clip-text">
-                                Touch
+                        <h1 className="text-6xl md:text-8xl font-bold tracking-tight mb-8">
+                            Let's
+                            <span className="block text-nyx-blue">
+                                Connect
                             </span>
                         </h1>
-                        <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
-                            We're here to help. Whether you have a question about our products or need 
-                            <span className="text-nyx-blue font-semibold"> support</span>, please feel free to 
-                            <span className="text-brand-purple font-semibold"> reach out</span>.
+                        <p className="text-xl md:text-2xl text-gray-300 mb-12 max-w-4xl mx-auto leading-relaxed">
+                            Have a question about our products? Need technical support? Want to share feedback? 
+                            <span className="text-nyx-blue font-semibold"> We're here to help</span> and 
+                            <span className="text-brand-purple font-semibold"> love hearing from you</span>.
                         </p>
+                        
+                        {/* Quick Stats */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-3xl mx-auto">
+                            <div className="text-center">
+                                <div className="text-3xl font-bold text-nyx-blue mb-2">&lt; 1hr</div>
+                                <div className="text-gray-400">Response Time</div>
+                </div>
+                            <div className="text-center">
+                                <div className="text-3xl font-bold text-brand-purple mb-2">24/7</div>
+                                <div className="text-gray-400">Support Available</div>
+                            </div>
+                            <div className="text-center">
+                                <div className="text-3xl font-bold text-brand-pink mb-2">100%</div>
+                                <div className="text-gray-400">Satisfaction Rate</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            {/* Contact Form */}
-            <section className="relative py-16 md:py-24 overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-nyx-black via-nyx-gray/10 to-nyx-black"></div>
+            {/* Contact Methods & Form */}
+            <section className="relative py-20 md:py-28 overflow-hidden">
+                <div className="absolute inset-0 bg-nyx-black"></div>
                 <div className="container mx-auto px-4 relative z-10">
-                    <div className="max-w-3xl mx-auto">
-
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 max-w-6xl mx-auto">
-                            <div className="lg:col-span-1 space-y-8">
-                                <div className="bg-nyx-gray/30 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-brand-purple/30 transition-all duration-300">
-                                    <div className="flex gap-4">
-                                        <div className="w-12 h-12 bg-gradient-to-br from-brand-purple to-brand-pink rounded-xl flex items-center justify-center">
-                                            <MapPinIcon className="w-6 h-6 text-white" />
-                                        </div>
-                                        <div>
-                                            <h3 className="text-xl font-semibold text-white">Our Office</h3>
-                                            <p className="text-gray-400">123 Innovation Drive, Tech City, 90210</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="bg-nyx-gray/30 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-nyx-blue/30 transition-all duration-300">
-                                    <div className="flex gap-4">
-                                        <div className="w-12 h-12 bg-gradient-to-br from-nyx-blue to-cyan-400 rounded-xl flex items-center justify-center">
-                                            <MailIcon className="w-6 h-6 text-white" />
-                                        </div>
-                                        <div>
-                                            <h3 className="text-xl font-semibold text-white">Email Us</h3>
-                                            <a href="mailto:support@nyx.com" className="text-gray-400 hover:text-nyx-blue transition">support@nyx.com</a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="bg-nyx-gray/30 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-brand-pink/30 transition-all duration-300">
-                                    <div className="flex gap-4">
-                                        <div className="w-12 h-12 bg-gradient-to-br from-brand-pink to-brand-purple rounded-xl flex items-center justify-center">
-                                            <PhoneIcon className="w-6 h-6 text-white" />
-                                        </div>
-                                        <div>
-                                            <h3 className="text-xl font-semibold text-white">Call Us</h3>
-                                            <a href="tel:+1-800-555-0199" className="text-gray-400 hover:text-brand-pink transition">+1 (800) 555-0199</a>
-                                        </div>
-                                    </div>
-                                </div>
+                    <div className="max-w-7xl mx-auto">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+                            
+                            {/* Contact Methods */}
+                            <div className="space-y-8">
+                                <div className="mb-12">
+                                    <h2 className="text-4xl font-bold mb-6 text-white">
+                                        Get in Touch
+                                    </h2>
+                                    <p className="text-gray-400 text-lg leading-relaxed">
+                                        Choose your preferred way to reach us. We're always here to help with any questions or concerns.
+                                    </p>
                             </div>
-                            <div className="lg:col-span-2 bg-nyx-gray/30 backdrop-blur-sm p-8 rounded-3xl border border-white/10 hover:border-brand-purple/30 transition-all duration-300">
-                                <h3 className="text-3xl font-bold mb-6 text-white">Send Us a Message</h3>
-                                <form onSubmit={handleSubmit} className="space-y-6">
-                                    <div>
-                                        <label htmlFor="name" className="sr-only">Name</label>
-                                        <input type="text" name="name" id="name" value={formState.name} onChange={handleChange} placeholder="Your Name" required className="w-full bg-dark/50 border border-white/20 rounded-xl py-4 px-6 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-purple focus:border-transparent transition-all" />
-                                    </div>
-                                    <div>
-                                        <label htmlFor="email" className="sr-only">Email</label>
-                                        <input type="email" name="email" id="email" value={formState.email} onChange={handleChange} placeholder="Your Email" required className="w-full bg-dark/50 border border-white/20 rounded-xl py-4 px-6 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-purple focus:border-transparent transition-all" />
-                                    </div>
-                                    <div>
-                                        <label htmlFor="message" className="sr-only">Message</label>
-                                        <textarea name="message" id="message" value={formState.message} onChange={handleChange} rows={5} placeholder="Your Message" required className="w-full bg-dark/50 border border-white/20 rounded-xl py-4 px-6 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-purple focus:border-transparent transition-all resize-none"></textarea>
-                                    </div>
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-sm text-green-400">{status}</span>
-                                        <button type="submit" className="group relative bg-gradient-to-r from-brand-purple to-brand-pink text-white font-semibold py-4 px-10 rounded-full hover:from-brand-pink hover:to-brand-purple transition-all duration-500 transform hover:scale-105 hover:shadow-2xl hover:shadow-brand-purple/25">
-                                            <span className="relative z-10">Send Message</span>
-                                            <div className="absolute inset-0 bg-gradient-to-r from-brand-purple to-brand-pink rounded-full blur opacity-0 group-hover:opacity-75 transition-opacity duration-500"></div>
-                                        </button>
-                                    </div>
-                                </form>
+
+                                {/* Contact Cards */}
+                                <div className="space-y-6">
+                                    {/* Email Card */}
+                                    <div className="group bg-nyx-gray/40 backdrop-blur-sm rounded-2xl p-8 border border-white/10 hover:border-nyx-blue/40 transition-all duration-500 hover:transform hover:scale-105">
+                                        <div className="flex items-start gap-6">
+                                            <div className="w-16 h-16 bg-nyx-blue rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                                <MailIcon className="w-8 h-8 text-white" />
+                        </div>
+                                            <div className="flex-1">
+                                                <h3 className="text-2xl font-bold text-white mb-2">Email Support</h3>
+                                                <p className="text-gray-400 mb-4">Get detailed help via email. Perfect for complex questions.</p>
+                                                <a href="mailto:support@nyx.com" className="text-nyx-blue hover:text-cyan-400 transition-colors text-lg font-semibold">
+                                                    support@nyx.com
+                                                </a>
+                                                <div className="text-sm text-gray-500 mt-2">Response within 1 hour</div>
                             </div>
                         </div>
+                            </div>
+
+                                    {/* Phone Card */}
+                                    <div className="group bg-nyx-gray/40 backdrop-blur-sm rounded-2xl p-8 border border-white/10 hover:border-brand-purple/40 transition-all duration-500 hover:transform hover:scale-105">
+                                        <div className="flex items-start gap-6">
+                                            <div className="w-16 h-16 bg-brand-purple rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                                <PhoneIcon className="w-8 h-8 text-white" />
+                        </div>
+                                            <div className="flex-1">
+                                                <h3 className="text-2xl font-bold text-white mb-2">Phone Support</h3>
+                                                <p className="text-gray-400 mb-4">Speak directly with our technical experts.</p>
+                                                <a href="tel:+1-800-555-0199" className="text-brand-purple hover:text-brand-pink transition-colors text-lg font-semibold">
+                                                    +1 (800) 555-0199
+                                                </a>
+                                                <div className="text-sm text-gray-500 mt-2">Mon-Fri 9AM-6PM EST</div>
+                    </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Office Card */}
+                                    <div className="group bg-nyx-gray/40 backdrop-blur-sm rounded-2xl p-8 border border-white/10 hover:border-brand-pink/40 transition-all duration-500 hover:transform hover:scale-105">
+                                        <div className="flex items-start gap-6">
+                                            <div className="w-16 h-16 bg-brand-pink rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                                <MapPinIcon className="w-8 h-8 text-white" />
+                                            </div>
+                                            <div className="flex-1">
+                                                <h3 className="text-2xl font-bold text-white mb-2">Visit Our Office</h3>
+                                                <p className="text-gray-400 mb-4">Come see us in person at our headquarters.</p>
+                                                <div className="text-brand-pink text-lg font-semibold">
+                                                    123 Innovation Drive<br />
+                                                    Tech City, CA 90210
+                                                </div>
+                                                <div className="text-sm text-gray-500 mt-2">By appointment only</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Contact Form */}
+                            <div className="bg-nyx-gray/40 backdrop-blur-sm rounded-3xl p-10 border border-white/10 hover:border-brand-purple/30 transition-all duration-500">
+                                <div className="mb-8">
+                                    <h3 className="text-3xl font-bold text-white mb-4">Send us a Message</h3>
+                                    <p className="text-gray-400 text-lg">Fill out the form below and we'll get back to you as soon as possible.</p>
+                                </div>
+
+                                <form onSubmit={handleSubmit} className="space-y-6">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                            <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
+                                            <input 
+                                                type="text" 
+                                                name="name" 
+                                                id="name" 
+                                                value={formState.name} 
+                                                onChange={handleChange} 
+                                                placeholder="Enter your full name" 
+                                                required 
+                                                className="w-full bg-dark/60 border border-white/20 rounded-xl py-4 px-6 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-purple focus:border-transparent transition-all duration-300" 
+                                            />
+                            </div>
+                            <div>
+                                            <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
+                                            <input 
+                                                type="email" 
+                                                name="email" 
+                                                id="email" 
+                                                value={formState.email} 
+                                                onChange={handleChange} 
+                                                placeholder="Enter your email" 
+                                                required 
+                                                className="w-full bg-dark/60 border border-white/20 rounded-xl py-4 px-6 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-purple focus:border-transparent transition-all duration-300" 
+                                            />
+                            </div>
+                                    </div>
+                                    
+                            <div>
+                                        <label htmlFor="subject" className="block text-sm font-medium text-gray-300 mb-2">Subject</label>
+                                        <input 
+                                            type="text" 
+                                            name="subject" 
+                                            id="subject" 
+                                            value={formState.subject} 
+                                            onChange={handleChange} 
+                                            placeholder="What's this about?" 
+                                            required 
+                                            className="w-full bg-dark/60 border border-white/20 rounded-xl py-4 px-6 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-purple focus:border-transparent transition-all duration-300" 
+                                        />
+                            </div>
+                                    
+                                    <div>
+                                        <label htmlFor="message" className="block text-sm font-medium text-gray-300 mb-2">Message</label>
+                                        <textarea 
+                                            name="message" 
+                                            id="message" 
+                                            value={formState.message} 
+                                            onChange={handleChange} 
+                                            rows={6} 
+                                            placeholder="Tell us how we can help you..." 
+                                            required 
+                                            className="w-full bg-dark/60 border border-white/20 rounded-xl py-4 px-6 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-purple focus:border-transparent transition-all duration-300 resize-none" 
+                                        />
+                                    </div>
+                                    
+                                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                                        <div className="text-sm text-green-400 font-medium min-h-[20px]">
+                                            {status}
+                                        </div>
+                                        <button 
+                                            type="submit" 
+                                            disabled={isSubmitting}
+                                            className="group relative bg-brand-purple text-white font-semibold py-4 px-12 rounded-full hover:bg-brand-pink transition-all duration-500 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                                        >
+                                            <span className="relative z-10 flex items-center gap-2">
+                                                {isSubmitting ? (
+                                                    <>
+                                                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                                        Sending...
+                                                    </>
+                                                ) : (
+                                                    <>
+                                    Send Message
+                                                        <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                                                        </svg>
+                                                    </>
+                                                )}
+                                            </span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+                </div>
+            </section>
+
+            {/* FAQ Section */}
+            <section className="relative py-20 md:py-28 overflow-hidden">
+                <div className="absolute inset-0 bg-nyx-black"></div>
+                <div className="container mx-auto px-4 relative z-10">
+                    <div className="max-w-4xl mx-auto text-center mb-16">
+                        <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">
+                            Frequently Asked Questions
+                        </h2>
+                        <p className="text-gray-400 text-lg">Quick answers to common questions</p>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        {[
+                            {
+                                question: "How do I set up my NYX device?",
+                                answer: "Simply unbox your device, connect it to power, and follow the guided setup in our mobile app. The entire process takes less than 5 minutes."
+                            },
+                            {
+                                question: "What's your return policy?",
+                                answer: "We offer a 30-day money-back guarantee. If you're not completely satisfied, return your device for a full refund."
+                            },
+                            {
+                                question: "Do you offer international shipping?",
+                                answer: "Yes! We ship to over 50 countries worldwide. Shipping times vary by location but typically range from 3-7 business days."
+                            },
+                            {
+                                question: "How can I track my order?",
+                                answer: "Once your order ships, you'll receive a tracking number via email. You can also track your order in your account dashboard."
+                            }
+                        ].map((faq, index) => (
+                            <div key={index} className="bg-nyx-gray/30 backdrop-blur-sm rounded-2xl p-8 border border-white/10 hover:border-brand-purple/30 transition-all duration-300">
+                                <h3 className="text-xl font-bold text-white mb-4">{faq.question}</h3>
+                                <p className="text-gray-400 leading-relaxed">{faq.answer}</p>
+                            </div>
+                        ))}
                     </div>
                 </div>
             </section>
@@ -636,104 +1009,421 @@ const WhyUsPage = () => (
         </div>
     </div>
 );
-const ProductsPage = ({ navigateTo, allProducts }: { navigateTo: (page: string, params?: any) => void, allProducts: Product[] }) => {
+const ProductsPage = ({ navigateTo, showProductManagement, setShowProductManagement, setOpenAddForm }: { navigateTo: (page: string, params?: any) => void, showProductManagement: boolean, setShowProductManagement: (value: boolean) => void, setOpenAddForm: (value: boolean) => void }) => {
      const { user } = useAuth();
+    const [products, setProducts] = useState<Product[]>([]);
+    const [loading, setLoading] = useState(false); // INSTANT LOADING
+    const [forceUpdate, setForceUpdate] = useState(0); // Added for force re-render
      const isAuthorized = user && (user.roles.includes('seller') || user.roles.includes('admin') || user.roles.includes('super-admin'));
-     const displayedProducts = isAuthorized ? allProducts : allProducts.filter(p => p.isVisible);
+    
+    // Fetch products from database - INSTANT LOADING
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                // NO LOADING STATE - INSTANT
+                
+                // Use environment variables for Supabase configuration
+                const supabaseUrl = (import.meta as any).env?.VITE_SUPABASE_URL || 'https://dpbyrvnvxjlhvtooyuru.supabase.co';
+                const supabaseKey = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwYnlydm52eGpsaHZ0b295dXJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxMTExODAsImV4cCI6MjA3MzY4NzE4MH0.txkD2Awid_RJhWhFJb0I13QBseIHdrDqHfeGgXrG0EE';
+                
+                // Test with direct fetch instead of Supabase client
+                
+                try {
+                    const response = await fetch(`${supabaseUrl}/rest/v1/products?select=id,name&limit=1`, {
+                        headers: {
+                            'apikey': supabaseKey,
+                            'Authorization': `Bearer ${supabaseKey}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    
+                    if (!response.ok) {
+                        console.error("❌ ProductsPage: Fetch failed:", response.status, response.statusText);
+                        setProducts([]);
+                        return;
+                    }
+                    
+                    const testData = await response.json();
+                    
+                    // If test works, do full query with direct fetch
+                    
+                    const fullResponse = await fetch(`${supabaseUrl}/rest/v1/products?select=*&order=created_at.desc`, {
+                        headers: {
+                            'apikey': supabaseKey,
+                            'Authorization': `Bearer ${supabaseKey}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    if (!fullResponse.ok) {
+                        console.error("❌ ProductsPage: Full query failed:", fullResponse.status, fullResponse.statusText);
+                        setProducts([]);
+                        return;
+                    }
+                    
+                    const data = await fullResponse.json();
+                    
+                    // Format products
+                    const formattedProducts = data?.map(product => ({
+                        id: product.id,
+                        name: product.name,
+                        price: product.price,
+                        imageUrl: product.images?.[0] || 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=400&fit=crop&crop=center',
+                        images: product.images || ['https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=400&fit=crop&crop=center'],
+                        description: product.description,
+                        category: product.category,
+                        isVisible: product.is_visible,
+                        stock: product.stock,
+                        created_at: product.created_at
+                    })) || [];
+                    
+                    
+                    // Use setTimeout to ensure state update happens after current execution
+                    setTimeout(() => {
+                        setProducts(formattedProducts);
+                        setLoading(false);
+                        setForceUpdate(prev => prev + 1); // Trigger re-render
+                    }, 0);
+                        
+                } catch (fetchError) {
+                    console.error("❌ ProductsPage: Fetch error:", fetchError);
+                    setProducts([]);
+                    return;
+                }
+                
+                
+            } catch (error) {
+                console.error('Error fetching products:', error);
+                setProducts([]);
+                setLoading(false); // Set to false immediately
+            }
+        };
+        
+        fetchProducts();
+    }, [forceUpdate]); // Depend on forceUpdate to trigger re-fetch
+    
+    const displayedProducts = isAuthorized ? products : products.filter(p => p.isVisible);
 
     return (
         <div className="min-h-screen bg-dark text-white">
-            {/* Hero Section */}
-            <section className="relative py-24 md:py-32 overflow-hidden">
-                {/* Background Effects */}
-                <div className="absolute inset-0 bg-gradient-to-br from-nyx-black via-purple-900/20 to-nyx-black"></div>
-                <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-gradient-to-r from-brand-purple/20 to-brand-pink/20 rounded-full blur-3xl animate-pulse"></div>
-                <div className="absolute top-3/4 right-1/4 w-96 h-96 bg-gradient-to-r from-nyx-blue/20 to-brand-purple/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-                
-                <div className="container mx-auto px-4 relative z-10">
-                    <div className="max-w-4xl mx-auto text-center">
-                        <div className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-brand-purple/20 to-brand-pink/20 border border-brand-purple/30 mb-6">
-                            <span className="w-2 h-2 bg-nyx-blue rounded-full mr-2 animate-pulse"></span>
-                            <span className="text-sm font-medium text-gray-300">Complete Collection</span>
-                        </div>
-                        <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6">
-                            Our
-                            <span className="block bg-gradient-to-r from-brand-purple via-brand-pink to-nyx-blue text-transparent bg-clip-text">
-                                Collection
-                            </span>
-                        </h1>
-                        <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
-                            Explore the full range of NYX smart home devices, designed to work together to create a 
-                            <span className="text-nyx-blue font-semibold"> seamless</span> and 
-                            <span className="text-brand-purple font-semibold"> intelligent</span> living experience.
-                        </p>
+            {/* Products Content - No Hero Section */}
+            <div className="container mx-auto px-4 relative z-10">
+                <div className="max-w-4xl mx-auto text-center">
+                    <div className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-brand-purple/20 to-brand-pink/20 border border-brand-purple/30 mb-6">
+                        <span className="w-2 h-2 bg-nyx-blue rounded-full mr-2 animate-pulse"></span>
+                        <span className="text-sm font-medium text-gray-300">Complete Collection</span>
                     </div>
+                    <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6">
+                        Our
+                        <span className="block bg-gradient-to-r from-brand-purple via-brand-pink to-nyx-blue text-transparent bg-clip-text">
+                            Collection
+                        </span>
+                    </h1>
+                    <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
+                        Explore the full range of NYX smart home devices, designed to work together to create a 
+                        <span className="text-nyx-blue font-semibold"> seamless</span> and 
+                        <span className="text-brand-purple font-semibold"> intelligent</span> living experience.
+                    </p>
+                    
+                    {/* Product Management Buttons - Only for authorized users */}
+                    {isAuthorized && (
+                        <div className="flex justify-center gap-4 mb-8">
+                            <button
+                                onClick={() => {
+                                    setShowProductManagement(true);
+                                }}
+                                className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-blue-500/25"
+                            >
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                Manage Products
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setOpenAddForm(true);
+                                    setShowProductManagement(true);
+                                }}
+                                className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-green-500/25"
+                            >
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                </svg>
+                                Add New Product
+                            </button>
                 </div>
-            </section>
+                    )}
+                </div>
+            </div>
 
             {/* Products Grid */}
             <section className="relative py-16 md:py-24 overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-nyx-black via-nyx-gray/10 to-nyx-black"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-nyx-black via-nyx-gray/20 to-nyx-black"></div>
                 <div className="container mx-auto px-4 relative z-10">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                        {displayedProducts.map(product => (
-                            <ProductCard key={product.id} product={product} navigateTo={navigateTo} />
-                        ))}
-                    </div>
+                    {loading ? (
+                        <div className="flex justify-center items-center py-20">
+                            <div className="flex flex-col items-center gap-4">
+                                <div className="w-12 h-12 border-4 border-nyx-blue/30 border-t-nyx-blue rounded-full animate-spin"></div>
+                                <p className="text-gray-400 text-lg">Loading products...</p>
+                                {/* Show buttons even while loading for authorized users */}
+                                {isAuthorized && (
+                                    <div className="flex gap-4 mt-6">
+                                        <button
+                                            onClick={() => {
+                                                setShowProductManagement(true);
+                                            }}
+                                            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold rounded-xl transition-all duration-300"
+                                        >
+                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            </svg>
+                                            Manage Products
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                setOpenAddForm(true);
+                                                setShowProductManagement(true);
+                                            }}
+                                            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-xl transition-all duration-300"
+                                        >
+                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                            </svg>
+                                            Add New Product
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    ) : displayedProducts.length === 0 ? (
+                        <div className="flex justify-center items-center py-20">
+                            <div className="text-center">
+                                <div className="w-24 h-24 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-6">
+                                    <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                    </svg>
+                                </div>
+                                <h3 className="text-2xl font-bold text-white mb-2">No Products Found</h3>
+                                <p className="text-gray-400 mb-6">There are no products available at the moment.</p>
+                                {isAuthorized && (
+                                    <div className="flex gap-4">
+                                        <button
+                                            onClick={() => setShowProductManagement(true)}
+                                            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold rounded-xl transition-all duration-300"
+                                        >
+                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            </svg>
+                                            Manage Products
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                setOpenAddForm(true);
+                                                setShowProductManagement(true);
+                                            }}
+                                            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-xl transition-all duration-300"
+                                        >
+                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                            </svg>
+                                            Add First Product
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                    {displayedProducts.map(product => (
+                        <ProductCard key={product.id} product={product} navigateTo={navigateTo} />
+                    ))}
                 </div>
+                    )}
+            </div>
             </section>
+            
+            {/* Product Management Modal */}
+            {showProductManagement && (
+                <ProductManagement 
+                    onClose={() => setShowProductManagement(false)} 
+                />
+            )}
         </div>
     );
 };
 const BlogPage = ({ navigateTo }: { navigateTo: (page: string, params?: any) => void }) => {
-    // Dummy blog post data. In a real app, this would come from a database.
-    const blogPosts: BlogPost[] = [
-        { id: '1', title: 'The Future of Ambient Computing', author: 'Jane Doe', date: '2025-07-15T10:00:00Z', imageUrl: 'https://images.unsplash.com/photo-1558655146-364adaf1fcc9?q=80&w=1964&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', excerpt: 'How smart devices are fading into the background of our lives.', content: 'Full content here...' },
-        { id: '2', title: 'Designing for Simplicity: The NYX Philosophy', author: 'John Smith', date: '2025-07-10T14:30:00Z', imageUrl: 'https://images.unsplash.com/photo-1522199755839-a2bacb67c546?q=80&w=2072&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', excerpt: 'A deep dive into the principles that guide our product design.', content: 'Full content here...' },
-        { id: '3', title: '5 Ways to Automate Your Home with NYX', author: 'Emily White', date: '2025-07-05T09:00:00Z', imageUrl: 'https://images.unsplash.com/photo-1565538813994-714046a55198?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', excerpt: 'Practical tips and tricks to get the most out of your devices.', content: 'Full content here...' },
-    ];
+    const { user } = useAuth();
+    const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+    const [loading, setLoading] = useState(false); // INSTANT LOADING
+    const [forceUpdate, setForceUpdate] = useState(0); // Added for force re-render
+    const isAuthorized = user && (user.roles.includes('admin') || user.roles.includes('super-admin'));
+    
+    // Fetch blog posts from database - INSTANT LOADING
+    useEffect(() => {
+        const fetchBlogPosts = async () => {
+            try {
+                // NO LOADING STATE - INSTANT
+                
+                // Use environment variables for Supabase configuration
+                const supabaseUrl = (import.meta as any).env?.VITE_SUPABASE_URL || 'https://dpbyrvnvxjlhvtooyuru.supabase.co';
+                const supabaseKey = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwYnlydm52eGpsaHZ0b295dXJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxMTExODAsImV4cCI6MjA3MzY4NzE4MH0.txkD2Awid_RJhWhFJb0I13QBseIHdrDqHfeGgXrG0EE';
+                
+                // Test with direct fetch instead of Supabase client
+                
+                try {
+                    const response = await fetch(`${supabaseUrl}/rest/v1/blog_posts?select=id,title&status=eq.published&limit=1`, {
+                        headers: {
+                            'apikey': supabaseKey,
+                            'Authorization': `Bearer ${supabaseKey}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    
+                    if (!response.ok) {
+                        console.error("❌ BlogPage: Fetch failed:", response.status, response.statusText);
+                        setBlogPosts([]);
+                        return;
+                    }
+                    
+                    const testData = await response.json();
+                    // If test works, do full query with direct fetch
+                    
+                    const fullResponse = await fetch(`${supabaseUrl}/rest/v1/blog_posts?select=*&status=eq.published&order=created_at.desc`, {
+                        headers: {
+                            'apikey': supabaseKey,
+                            'Authorization': `Bearer ${supabaseKey}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    if (!fullResponse.ok) {
+                        console.error("❌ BlogPage: Full query failed:", fullResponse.status, fullResponse.statusText);
+                        setBlogPosts([]);
+                        return;
+                    }
+                    
+                    const data = await fullResponse.json();
+                    
+                    // Format blog posts
+                    const formattedPosts = data?.map(post => ({
+                        id: post.id,
+                        title: post.title,
+                        author: post.author_name || 'NYX Team',
+                        date: post.created_at,
+                        imageUrl: post.featured_image || 'https://images.unsplash.com/photo-1558655146-364adaf1fcc9?q=80&w=1964&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+                        excerpt: post.excerpt || post.content?.substring(0, 150) + '...' || 'Read more about this topic...',
+                        content: post.content || 'Full content here...'
+                    })) || [];
+                    
+                    
+                    // Use setTimeout to ensure state update happens after current execution
+                    setTimeout(() => {
+                        setBlogPosts(formattedPosts);
+                        setLoading(false);
+                        setForceUpdate(prev => prev + 1); // Trigger re-render
+                    }, 0);
+                        
+                } catch (fetchError) {
+                    console.error("❌ BlogPage: Fetch error:", fetchError);
+                    setBlogPosts([]);
+                    return;
+                }
+                
+                
+            } catch (error) {
+                console.error('Error fetching blog posts:', error);
+                setBlogPosts([]);
+                setLoading(false); // Set to false immediately
+            }
+        };
+        
+        fetchBlogPosts();
+    }, [forceUpdate]); // Depend on forceUpdate to trigger re-fetch
     
     return (
         <div className="min-h-screen bg-dark text-white">
-            {/* Hero Section */}
-            <section className="relative py-24 md:py-32 overflow-hidden">
-                {/* Background Effects */}
-                <div className="absolute inset-0 bg-gradient-to-br from-nyx-black via-brand-purple/10 to-nyx-black"></div>
-                <div className="absolute top-1/4 right-1/4 w-80 h-80 bg-gradient-to-r from-brand-pink/20 to-brand-purple/20 rounded-full blur-3xl animate-pulse"></div>
-                <div className="absolute bottom-1/4 left-1/4 w-72 h-72 bg-gradient-to-r from-nyx-blue/20 to-brand-pink/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-                
-                <div className="container mx-auto px-4 relative z-10">
-                    <div className="max-w-4xl mx-auto text-center">
-                        <div className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-brand-pink/20 to-brand-purple/20 border border-brand-pink/30 mb-6">
-                            <span className="w-2 h-2 bg-nyx-blue rounded-full mr-2 animate-pulse"></span>
-                            <span className="text-sm font-medium text-gray-300">Latest Insights</span>
-                        </div>
-                        <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6">
-                            NYX
-                            <span className="block bg-gradient-to-r from-brand-pink via-brand-purple to-nyx-blue text-transparent bg-clip-text">
-                                Blog
-                            </span>
-                        </h1>
-                        <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
-                            News, insights, and updates from the team building the 
-                            <span className="text-brand-purple font-semibold"> future</span> of 
-                            <span className="text-nyx-blue font-semibold"> smart living</span>.
-                        </p>
+            {/* Blog Content - No Hero Section */}
+            <div className="container mx-auto px-4 relative z-10">
+                <div className="max-w-4xl mx-auto text-center">
+                    <div className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-brand-pink/20 to-brand-purple/20 border border-brand-pink/30 mb-6">
+                        <span className="w-2 h-2 bg-nyx-blue rounded-full mr-2 animate-pulse"></span>
+                        <span className="text-sm font-medium text-gray-300">Latest Insights</span>
                     </div>
+                    <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6">
+                        NYX
+                        <span className="block bg-gradient-to-r from-brand-pink via-brand-purple to-nyx-blue text-transparent bg-clip-text">
+                            Blog
+                        </span>
+                    </h1>
+                    <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
+                        News, insights, and updates from the team building the 
+                        <span className="text-brand-purple font-semibold"> future</span> of 
+                        <span className="text-nyx-blue font-semibold"> smart living</span>.
+                    </p>
+                    
+                    {/* Add Blog Post Button - Only for authorized users */}
+                    {isAuthorized && (
+                        <div className="flex justify-center mb-8">
+                            <button
+                                onClick={() => {
+                                    // Navigate to blog management or open add blog post modal
+                                }}
+                                className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-orange-500/25"
+                            >
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                                Add New Blog Post
+                            </button>
                 </div>
-            </section>
+                    )}
+                </div>
+            </div>
 
             {/* Blog Posts */}
             <section className="relative py-16 md:py-24 overflow-hidden">
-                {/* Background Effects */}
-                <div className="absolute inset-0 bg-gradient-to-br from-nyx-black via-nyx-gray/20 to-nyx-black"></div>
-                <div className="absolute top-0 left-1/4 w-96 h-96 bg-gradient-to-r from-brand-purple/10 to-brand-pink/10 rounded-full blur-3xl"></div>
-                <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-gradient-to-r from-nyx-blue/10 to-brand-purple/10 rounded-full blur-3xl"></div>
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-r from-brand-pink/10 to-nyx-blue/10 rounded-full blur-3xl"></div>
+                {/* Background Effects - Simplified */}
+                <div className="absolute inset-0 bg-gradient-to-br from-nyx-black via-nyx-gray/10 to-nyx-black"></div>
                 
                 <div className="container mx-auto px-4 relative z-10">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-                        {blogPosts.map((post, index) => (
+                    {loading ? (
+                        <div className="flex justify-center items-center py-20">
+                            <div className="flex flex-col items-center gap-4">
+                                <div className="w-12 h-12 border-4 border-nyx-blue/30 border-t-nyx-blue rounded-full animate-spin"></div>
+                                <p className="text-gray-400 text-lg">Loading blog posts...</p>
+                            </div>
+                        </div>
+                    ) : blogPosts.length === 0 ? (
+                        <div className="flex justify-center items-center py-20">
+                            <div className="text-center">
+                                <div className="w-24 h-24 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-6">
+                                    <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                                    </svg>
+                                </div>
+                                <h3 className="text-2xl font-bold text-white mb-2">No Blog Posts Found</h3>
+                                <p className="text-gray-400 mb-6">There are no blog posts available at the moment.</p>
+                                {isAuthorized && (
+                                    <button
+                                        onClick={() => {}}
+                                        className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold rounded-xl transition-all duration-300"
+                                    >
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                        Add First Blog Post
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                            {blogPosts.map((post, index) => (
                             <div key={post.id} className="group relative">
                                 {/* Card Glow Effect */}
                                 <div className="absolute -inset-0.5 bg-gradient-to-r from-brand-purple via-brand-pink to-nyx-blue rounded-3xl blur opacity-0 group-hover:opacity-75 transition-opacity duration-500"></div>
@@ -741,16 +1431,16 @@ const BlogPage = ({ navigateTo }: { navigateTo: (page: string, params?: any) => 
                                 <div className="relative bg-nyx-gray/30 backdrop-blur-sm rounded-3xl overflow-hidden flex flex-col border border-white/20 hover:border-brand-purple/50 transition-all duration-500 hover:transform hover:scale-105 hover:shadow-2xl hover:shadow-brand-purple/20">
                                     {/* Image with overlay */}
                                     <div className="aspect-video overflow-hidden relative">
-                                        <img src={post.imageUrl} alt={post.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                                <img src={post.imageUrl} alt={post.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                                         <div className="absolute inset-0 bg-gradient-to-t from-nyx-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                                         <div className="absolute top-4 left-4">
                                             <div className="bg-brand-purple/90 backdrop-blur-sm text-white text-xs font-semibold px-3 py-1 rounded-full">
                                                 {new Date(post.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                                            </div>
+                            </div>
                                         </div>
                                     </div>
                                     
-                                    <div className="p-6 flex flex-col flex-grow">
+                            <div className="p-6 flex flex-col flex-grow">
                                         <div className="flex items-center gap-2 mb-3">
                                             <div className="w-2 h-2 bg-nyx-blue rounded-full animate-pulse"></div>
                                             <span className="text-xs text-gray-400 font-medium">BLOG POST</span>
@@ -770,18 +1460,19 @@ const BlogPage = ({ navigateTo }: { navigateTo: (page: string, params?: any) => 
                                                 onClick={(e) => { e.preventDefault(); navigateTo('blog-post', { post: post }); }} 
                                                 className="group/link flex items-center gap-2 text-nyx-blue hover:text-cyan-400 font-semibold text-sm transition-colors"
                                             >
-                                                Read More
+                                    Read More
                                                 <svg className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                                                 </svg>
-                                            </a>
+                                </a>
                                         </div>
                                     </div>
-                                </div>
                             </div>
-                        ))}
-                    </div>
+                        </div>
+                    ))}
                 </div>
+                    )}
+            </div>
             </section>
         </div>
     );
@@ -800,16 +1491,16 @@ const BlogPostPage = ({ navigateTo, post }: { navigateTo: (page: string) => void
                     <div className="max-w-4xl mx-auto">
                         <button onClick={() => navigateTo('blog')} className="flex items-center gap-2 text-brand-purple hover:text-brand-purple/80 mb-8 group">
                             <ArrowLeftIcon className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-                            Back to Blog
-                        </button>
+                        Back to Blog
+                    </button>
                         <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6 leading-tight">
                             {post.title}
                         </h1>
-                        <div className="flex items-center gap-4 text-gray-400 mb-8">
+                    <div className="flex items-center gap-4 text-gray-400 mb-8">
                             <span>By <span className="text-nyx-blue font-semibold">{post.author}</span></span>
-                            <span>&bull;</span>
-                            <span>{new Date(post.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
-                        </div>
+                        <span>&bull;</span>
+                        <span>{new Date(post.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                    </div>
                     </div>
                 </div>
             </section>
@@ -823,13 +1514,13 @@ const BlogPostPage = ({ navigateTo, post }: { navigateTo: (page: string) => void
                             <img src={post.imageUrl} alt={post.title} className="w-full aspect-video object-cover" />
                         </div>
                         <div className="prose prose-invert prose-lg max-w-none text-gray-300 leading-relaxed">
-                            {/* In a real app, this would be sanitized HTML */}
+                        {/* In a real app, this would be sanitized HTML */}
                             <p className="text-xl text-gray-200 mb-6">{post.excerpt} {post.content}</p>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-                            <p>Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis et commodo pharetra, est eros bibendum elit, nec luctus magna felis sollicitudin mauris. Integer in mauris eu nibh euismod gravida. Duis ac tellus et risus vulputate vehicula. Donec lobortis risus a elit. Etiam tempor. Ut ullamcorper, ligula eu tempor congue, eros est euismod turpis, id tincidunt sapien risus a quam. Maecenas fermentum consequat mi. Donec fermentum. Pellentesque malesuada nulla a mi. Duis sapien sem, aliquet nec, commodo eget, consequat quis, neque. Aliquam faucibus, elit ut dictum aliquet, felis nisl adipiscing sapien, sed malesuada diam lacus eget erat. Cras mollis scelerisque nunc. Nullam arcu. Aliquam consequat.</p>
-                        </div>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                        <p>Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis et commodo pharetra, est eros bibendum elit, nec luctus magna felis sollicitudin mauris. Integer in mauris eu nibh euismod gravida. Duis ac tellus et risus vulputate vehicula. Donec lobortis risus a elit. Etiam tempor. Ut ullamcorper, ligula eu tempor congue, eros est euismod turpis, id tincidunt sapien risus a quam. Maecenas fermentum consequat mi. Donec fermentum. Pellentesque malesuada nulla a mi. Duis sapien sem, aliquet nec, commodo eget, consequat quis, neque. Aliquam faucibus, elit ut dictum aliquet, felis nisl adipiscing sapien, sed malesuada diam lacus eget erat. Cras mollis scelerisque nunc. Nullam arcu. Aliquam consequat.</p>
                     </div>
                 </div>
+            </div>
             </section>
         </div>
      );
@@ -978,6 +1669,10 @@ const AdminDashboardPage = () => {
     const [error, setError] = useState<string | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
 
+    // Role-based access control
+    const isAuthorized = currentUser && (currentUser.roles.includes('admin') || currentUser.roles.includes('super-admin'));
+    const isSuperAdmin = currentUser && currentUser.roles.includes('super-admin');
+
     // State for modals
     const [editingUser, setEditingUser] = useState<User | null>(null);
     const [deletingUser, setDeletingUser] = useState<User | null>(null);
@@ -1120,6 +1815,24 @@ const AdminDashboardPage = () => {
         </>
     );
 
+    // Access control check
+    if (!isAuthorized) {
+        return (
+            <div className="py-24 md:py-32 bg-dark text-white min-h-screen flex items-center justify-center">
+                <div className="text-center">
+                    <div className="w-20 h-20 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <svg className="w-10 h-10 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                        </svg>
+                    </div>
+                    <h1 className="text-2xl font-bold text-white mb-4">Access Denied</h1>
+                    <p className="text-gray-400 mb-6">You don't have permission to access the admin panel.</p>
+                    <p className="text-sm text-gray-500">Required roles: Admin or Super Admin</p>
+                </div>
+            </div>
+        );
+    }
+
     if (loading) {
         return <div className="py-24 md:py-32 bg-dark text-white min-h-screen flex items-center justify-center">Loading users...</div>;
     }
@@ -1127,7 +1840,7 @@ const AdminDashboardPage = () => {
     if (error) {
          return <div className="py-24 md:py-32 bg-dark text-red-400 min-h-screen flex items-center justify-center">Error: {error}</div>;
     }
-
+    
     return (
         <>
             {renderModals()}
@@ -1136,7 +1849,7 @@ const AdminDashboardPage = () => {
             {showOrderManagement && <OrderManagement onClose={() => setShowOrderManagement(false)} />}
             {showCouponManagement && <CouponManagement onClose={() => setShowCouponManagement(false)} />}
             
-            <div className="py-24 md:py-32 bg-dark text-white min-h-screen">
+        <div className="py-24 md:py-32 bg-dark text-white min-h-screen">
             <div className="container mx-auto px-4">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
                     <div className="flex items-center gap-3">
@@ -1270,61 +1983,152 @@ const AdminDashboardPage = () => {
 const App = () => {
     const [currentPage, setCurrentPage] = useState('home');
     const [pageParams, setPageParams] = useState<any>(null);
+    const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+    const [showProductManagement, setShowProductManagement] = useState(false);
+    const [openAddForm, setOpenAddForm] = useState(false);
+    
+    // Debug state changes
+    React.useEffect(() => {
+    }, [showProductManagement]);
+    
+    React.useEffect(() => {
+    }, [openAddForm]);
+    const [profileData, setProfileData] = useState<any>(null);
+    const { user, loading } = useAuth();
+    const [connectionStatus, setConnectionStatus] = useState<'testing' | 'connected' | 'failed'>('testing');
+
+    // Skip connection test for now - just set as connected
+    React.useEffect(() => {
+        setConnectionStatus('connected');
+    }, []);
+
+    // Load profile data
+    React.useEffect(() => {
+        const loadProfileData = async () => {
+            if (!user) {
+                setProfileData(null);
+                return;
+            }
+            
+            try {
+                const { data: profile, error } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', user.id)
+                    .single();
+
+                if (error && error.code !== 'PGRST116') {
+                    console.error('Error loading profile:', error);
+                    setProfileData(null);
+                } else if (profile) {
+                    setProfileData(profile);
+                } else {
+                    setProfileData(null);
+                }
+            } catch (error) {
+                console.error('Error loading profile data:', error);
+                setProfileData(null);
+            }
+        };
+
+        loadProfileData();
+    }, [user]);
+
+    // Global event listener
+    React.useEffect(() => {
+        const handleProfileClick = () => {
+            setIsUserMenuOpen(prev => {
+                return !prev;
+            });
+        };
+
+        window.addEventListener('profileClick', handleProfileClick);
+        return () => {
+            window.removeEventListener('profileClick', handleProfileClick);
+        };
+    }, []);
 
     const navigateTo = (page: string, params?: any) => {
         setCurrentPage(page);
         setPageParams(params);
     };
 
-    const renderPage = () => {
-        switch (currentPage) {
-            case 'home':
-                return <HomePage navigateTo={navigateTo} />;
-            case 'login':
-                return <LoginPage navigateTo={navigateTo} />;
-            case 'products':
-                return <ProductsPage navigateTo={navigateTo} allProducts={[]} />;
-            case 'blog':
-                return <BlogPage navigateTo={navigateTo} />;
-            case 'blog-post':
-                return <BlogPostPage navigateTo={navigateTo} post={pageParams?.post} />;
-            case 'how-it-works':
-                return <HowItWorksPage />;
-            case 'setup-videos':
-                return <SetupVideosPage />;
-            case 'faq':
-                return <FAQPage />;
-            case 'contact':
-                return <ContactPage />;
-            case 'our-story':
-                return <OurStoryPage />;
-            case 'why-us':
-                return <WhyUsPage />;
-            case 'ask':
-                return <AskNyxPage navigateTo={navigateTo} />;
-            case 'admin':
-                return <AdminDashboardPage />;
-            case 'legal':
-                return <LegalPage navigateTo={navigateTo} slug={pageParams?.slug} title={pageParams?.title} />;
-            default:
-                return <HomePage navigateTo={navigateTo} />;
-        }
-    };
+        const renderPage = () => {
+            switch (currentPage) {
+                case 'home':
+                    return <HomePage navigateTo={navigateTo} />;
+                case 'login':
+                    return <LoginPage navigateTo={navigateTo} />;
+                case 'profile':
+                    return <ProfilePage navigateTo={navigateTo} />;
+                case 'products':
+                    return <ProductsPage navigateTo={navigateTo} showProductManagement={showProductManagement} setShowProductManagement={setShowProductManagement} setOpenAddForm={setOpenAddForm} />;
+                case 'blog':
+                    return <BlogPage navigateTo={navigateTo} />;
+                case 'blog-post':
+                    return <BlogPostPage navigateTo={navigateTo} post={pageParams?.post} />;
+                case 'how-it-works':
+                    return <HowItWorksPage />;
+                case 'setup-videos':
+                    return <SetupVideosPage />;
+                case 'faq':
+                    return <FAQPage />;
+                case 'contact':
+                    return <ContactPage />;
+                case 'our-story':
+                    return <OurStoryPage />;
+                case 'why-us':
+                    return <WhyUsPage />;
+                case 'ask':
+                    return <div style={{ padding: '100px', textAlign: 'center', color: 'white' }}>
+                        <h1>Ask NYX</h1>
+                        <p>Coming Soon...</p>
+                    </div>;
+                case 'admin':
+                    return <AdminDashboardPage />;
+                case 'legal':
+                    return <LegalPage navigateTo={navigateTo} slug={pageParams?.slug} title={pageParams?.title} />;
+                default:
+                    return <HomePage navigateTo={navigateTo} />;
+            }
+        };
+
+        // INSTANT LOADING - No loading screen
 
     return (
-        <AuthProvider>
-            <CartProvider>
-                <div className="min-h-screen bg-dark text-white">
-                    <Header navigateTo={navigateTo} />
-                    <main>
-                        {renderPage()}
-                    </main>
-                    <Footer navigateTo={navigateTo} />
-                    <CartSidebar navigateTo={navigateTo} />
-                    <CookieConsentBanner />
-                </div>
-            </CartProvider>
-        </AuthProvider>
+        <div className="min-h-screen bg-dark text-white">
+            <Header navigateTo={navigateTo} />
+            <main>
+                {renderPage()}
+            </main>
+            <Footer navigateTo={navigateTo} />
+            <CartSidebar navigateTo={navigateTo} />
+            <CookieConsentBanner />
+            
+            {/* Profile Dropdown - App Level */}
+            {user && (
+                <ProfileDropdown 
+                    navigateTo={navigateTo} 
+                    isUserMenuOpen={isUserMenuOpen}
+                    setIsUserMenuOpen={setIsUserMenuOpen}
+                    user={user}
+                    profileData={profileData}
+                    setShowProductManagement={setShowProductManagement}
+                    setOpenAddForm={setOpenAddForm}
+                />
+            )}
+            
+            {/* Product Management Modal - App Level */}
+            {showProductManagement && (
+                <ProductManagement 
+                    onClose={() => {
+                        setShowProductManagement(false);
+                        setOpenAddForm(false);
+                    }} 
+                    openAddForm={openAddForm}
+                />
+            )}
+        </div>
     );
 };
 

@@ -150,6 +150,83 @@ body {
   }
 }
 
+@keyframes bubbleSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+    filter: blur(5px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%) translateY(-100%) rotate(45deg);
+  }
+  100% {
+    transform: translateX(100%) translateY(100%) rotate(45deg);
+  }
+}
+
+@keyframes avatarGlow {
+  0% {
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  }
+  50% {
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.6), 0 0 20px rgba(59, 130, 246, 0.4);
+  }
+  100% {
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  }
+}
+
+@keyframes avatarShimmer {
+  0% {
+    opacity: 0;
+    transform: translateX(-100%) translateY(-100%) rotate(45deg);
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(100%) translateY(100%) rotate(45deg);
+  }
+}
+
+@keyframes bounce {
+  0% {
+    transform: rotate(180deg) scale(1.3) translateY(0);
+  }
+  100% {
+    transform: rotate(180deg) scale(1.3) translateY(-3px);
+  }
+}
+
+@keyframes gradientRotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
 /* Focus styles */
 .focus-ring {
   @apply focus:outline-none focus:ring-2 focus:ring-nyx-blue focus:ring-offset-2 focus:ring-offset-nyx-black;
@@ -335,4 +412,36 @@ body {
 
 .skeleton-button {
   @apply skeleton h-10 w-24 rounded-lg;
+}
+
+/* Remove all focus effects from phone inputs */
+.no-focus,
+.no-focus:focus,
+.no-focus:focus-visible,
+.no-focus:active,
+.no-focus:hover {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  ring: none !important;
+  --tw-ring-width: 0 !important;
+  --tw-ring-color: transparent !important;
+  --tw-ring-offset-width: 0 !important;
+  --tw-ring-offset-color: transparent !important;
+}
+
+/* Specific for select elements */
+.no-focus select,
+.no-focus select:focus,
+.no-focus select:focus-visible,
+.no-focus select:active,
+.no-focus select:hover {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  ring: none !important;
+  --tw-ring-width: 0 !important;
+  --tw-ring-color: transparent !important;
+  --tw-ring-offset-width: 0 !important;
+  --tw-ring-offset-color: transparent !important;
 }
