@@ -1,20 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NYX - Smart Home Technology</title>
-    <meta name="description" content="Experience the next generation of smart home technology with NYX">
-    <link rel="stylesheet" href="assets/index-CXpwCnwR.css">
-    <script>
-        // Force cache refresh
-        const timestamp = new Date().getTime();
-        const script = document.createElement("script");
-        script.src = "assets/index-1759135803.js?v=" + timestamp;
-        document.head.appendChild(script);
-    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NYX | Smart Home</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+        @keyframes gradient-flow {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+        .animate-gradient-flow {
+            background-image: linear-gradient(to right, #9333ea, #f472b6, #db2777, #f472b6, #9333ea);
+            background-size: 300% auto;
+            animation: gradient-flow 3s linear infinite;
+        }
+        
+    </style>
+
+
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@19.1.1",
+    "react-dom/client": "https://aistudiocdn.com/react-dom@19.1.1/client",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.1.1/",
+    "react/": "https://aistudiocdn.com/react@^19.1.1/",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.20.0",
+    "@supabase/supabase-js": "https://aistudiocdn.com/@supabase/supabase-js@^2.57.4"
+  }
+}
+</script>
+  <script type="module" crossorigin src="/NYX/assets/index-88GXvtbB.js"></script>
+  <link rel="stylesheet" crossorigin href="/NYX/assets/index-CXpwCnwR.css">
 </head>
-<body>
+<body class="bg-dark text-gray-200 font-sans">
     <div id="root"></div>
 </body>
 </html>
