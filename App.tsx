@@ -1020,83 +1020,41 @@ const ProductsPage = ({ navigateTo, showProductManagement, setShowProductManagem
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                // NO LOADING STATE - INSTANT
+                // Use Supabase client instead of direct fetch
+                const { data, error } = await supabase
+                    .from('products')
+                    .select('*')
+                    .order('created_at', { ascending: false });
                 
-                // Use environment variables for Supabase configuration
-                const supabaseUrl = (import.meta as any).env?.VITE_SUPABASE_URL || 'https://dpbyrvnvxjlhvtooyuru.supabase.co';
-                const supabaseKey = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwYnlydm52eGpsaHZ0b295dXJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxMTExODAsImV4cCI6MjA3MzY4NzE4MH0.txkD2Awid_RJhWhFJb0I13QBseIHdrDqHfeGgXrG0EE';
-                
-                // Test with direct fetch instead of Supabase client
-                
-                try {
-                    const response = await fetch(`${supabaseUrl}/rest/v1/products?select=id,name&limit=1`, {
-                        headers: {
-                            'apikey': supabaseKey,
-                            'Authorization': `Bearer ${supabaseKey}`,
-                            'Content-Type': 'application/json'
-                        }
-                    });
-                    
-                    
-                    if (!response.ok) {
-                        console.error("❌ ProductsPage: Fetch failed:", response.status, response.statusText);
-                        setProducts([]);
-                        return;
-                    }
-                    
-                    const testData = await response.json();
-                    
-                    // If test works, do full query with direct fetch
-                    
-                    const fullResponse = await fetch(`${supabaseUrl}/rest/v1/products?select=*&order=created_at.desc`, {
-                        headers: {
-                            'apikey': supabaseKey,
-                            'Authorization': `Bearer ${supabaseKey}`,
-                            'Content-Type': 'application/json'
-                        }
-                    });
-                    
-                    if (!fullResponse.ok) {
-                        console.error("❌ ProductsPage: Full query failed:", fullResponse.status, fullResponse.statusText);
-                        setProducts([]);
-                        return;
-                    }
-                    
-                    const data = await fullResponse.json();
-                    
-                    // Format products
-                    const formattedProducts = data?.map(product => ({
-                        id: product.id,
-                        name: product.name,
-                        price: product.price,
-                        imageUrl: product.images?.[0] || 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=400&fit=crop&crop=center',
-                        images: product.images || ['https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=400&fit=crop&crop=center'],
-                        description: product.description,
-                        category: product.category,
-                        isVisible: product.is_visible,
-                        stock: product.stock,
-                        created_at: product.created_at
-                    })) || [];
-                    
-                    
-                    // Use setTimeout to ensure state update happens after current execution
-                    setTimeout(() => {
-                        setProducts(formattedProducts);
-                        setLoading(false);
-                        setForceUpdate(prev => prev + 1); // Trigger re-render
-                    }, 0);
-                        
-                } catch (fetchError) {
-                    console.error("❌ ProductsPage: Fetch error:", fetchError);
+                if (error) {
+                    console.error("❌ ProductsPage: Supabase error:", error);
                     setProducts([]);
+                    setLoading(false);
                     return;
                 }
                 
+                // Format products
+                const formattedProducts = data?.map(product => ({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    imageUrl: product.images?.[0] || 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=400&fit=crop&crop=center',
+                    images: product.images || ['https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=400&fit=crop&crop=center'],
+                    description: product.description,
+                    category: product.category,
+                    isVisible: product.is_visible,
+                    stock: product.stock,
+                    created_at: product.created_at
+                })) || [];
+                
+                setProducts(formattedProducts);
+                setLoading(false);
+                setForceUpdate(prev => prev + 1); // Trigger re-render
                 
             } catch (error) {
                 console.error('Error fetching products:', error);
                 setProducts([]);
-                setLoading(false); // Set to false immediately
+                setLoading(false);
             }
         };
         
