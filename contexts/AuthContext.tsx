@@ -3,8 +3,8 @@ import { User, UserRole } from '../types';
 import { createClient, Session, User as SupabaseUser } from '@supabase/supabase-js';
 
 // --- Supabase Client Initialization ---
-const supabaseUrl = (import.meta as any).env?.VITE_SUPABASE_URL || 'https://dpbyrvnvxjlhvtooyuru.supabase.co';
-const supabaseKey = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwYnlydm52eGpsaHZ0b295dXJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxMTExODAsImV4cCI6MjA3MzY4NzE4MH0.txkD2Awid_RJxWhFJb0I13QBseIHdrDqFfeGgXrOEE';
+const supabaseUrl = 'https://dpbyrvnvxjlhvtooyuru.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwYnlydm52eGpsaHZ0b295dXJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxMTExODAsImV4cCI6MjA3MzY4NzE4MH0.txkD2Awid_RJxWhFJb0I13QBseIHdrDqFfeGgXrOEE';
 export const supabase = createClient(supabaseUrl, supabaseKey, {
     auth: {
         persistSession: true,
