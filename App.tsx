@@ -1224,79 +1224,39 @@ const BlogPage = ({ navigateTo }: { navigateTo: (page: string, params?: any) => 
     useEffect(() => {
         const fetchBlogPosts = async () => {
             try {
-                // NO LOADING STATE - INSTANT
+                // Use Supabase client instead of direct fetch
+                const { data, error } = await supabase
+                    .from('blog_posts')
+                    .select('*')
+                    .eq('status', 'published')
+                    .order('created_at', { ascending: false });
                 
-                // Use environment variables for Supabase configuration
-                const supabaseUrl = (import.meta as any).env?.VITE_SUPABASE_URL || 'https://dpbyrvnvxjlhvtooyuru.supabase.co';
-                const supabaseKey = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwYnlydm52eGpsaHZ0b295dXJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxMTExODAsImV4cCI6MjA3MzY4NzE4MH0.txkD2Awid_RJhWhFJb0I13QBseIHdrDqHfeGgXrG0EE';
-                
-                // Test with direct fetch instead of Supabase client
-                
-                try {
-                    const response = await fetch(`${supabaseUrl}/rest/v1/blog_posts?select=id,title&status=eq.published&limit=1`, {
-                        headers: {
-                            'apikey': supabaseKey,
-                            'Authorization': `Bearer ${supabaseKey}`,
-                            'Content-Type': 'application/json'
-                        }
-                    });
-                    
-                    
-                    if (!response.ok) {
-                        console.error("❌ BlogPage: Fetch failed:", response.status, response.statusText);
-                        setBlogPosts([]);
-                        return;
-                    }
-                    
-                    const testData = await response.json();
-                    // If test works, do full query with direct fetch
-                    
-                    const fullResponse = await fetch(`${supabaseUrl}/rest/v1/blog_posts?select=*&status=eq.published&order=created_at.desc`, {
-                        headers: {
-                            'apikey': supabaseKey,
-                            'Authorization': `Bearer ${supabaseKey}`,
-                            'Content-Type': 'application/json'
-                        }
-                    });
-                    
-                    if (!fullResponse.ok) {
-                        console.error("❌ BlogPage: Full query failed:", fullResponse.status, fullResponse.statusText);
-                        setBlogPosts([]);
-                        return;
-                    }
-                    
-                    const data = await fullResponse.json();
-                    
-                    // Format blog posts
-                    const formattedPosts = data?.map(post => ({
-                        id: post.id,
-                        title: post.title,
-                        author: post.author_name || 'NYX Team',
-                        date: post.created_at,
-                        imageUrl: post.featured_image || 'https://images.unsplash.com/photo-1558655146-364adaf1fcc9?q=80&w=1964&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-                        excerpt: post.excerpt || post.content?.substring(0, 150) + '...' || 'Read more about this topic...',
-                        content: post.content || 'Full content here...'
-                    })) || [];
-                    
-                    
-                    // Use setTimeout to ensure state update happens after current execution
-                    setTimeout(() => {
-                        setBlogPosts(formattedPosts);
-                        setLoading(false);
-                        setForceUpdate(prev => prev + 1); // Trigger re-render
-                    }, 0);
-                        
-                } catch (fetchError) {
-                    console.error("❌ BlogPage: Fetch error:", fetchError);
+                if (error) {
+                    console.error("❌ BlogPage: Supabase error:", error);
                     setBlogPosts([]);
+                    setLoading(false);
                     return;
                 }
                 
+                // Format blog posts
+                const formattedPosts = data?.map(post => ({
+                    id: post.id,
+                    title: post.title,
+                    author: post.author_name || 'NYX Team',
+                    date: post.created_at,
+                    imageUrl: post.featured_image || 'https://images.unsplash.com/photo-1558655146-364adaf1fcc9?q=80&w=1964&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+                    excerpt: post.excerpt || post.content?.substring(0, 150) + '...' || 'Read more about this topic...',
+                    content: post.content || 'Full content here...'
+                })) || [];
+                
+                setBlogPosts(formattedPosts);
+                setLoading(false);
+                setForceUpdate(prev => prev + 1); // Trigger re-render
                 
             } catch (error) {
                 console.error('Error fetching blog posts:', error);
                 setBlogPosts([]);
-                setLoading(false); // Set to false immediately
+                setLoading(false);
             }
         };
         
