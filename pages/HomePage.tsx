@@ -20,28 +20,18 @@ const HomePage: React.FC<HomePageProps> = ({ navigateTo }) => {
   const fetchFeaturedProducts = async () => {
     try {
       
-      // Use environment variables for Supabase configuration
-      const supabaseUrl = (import.meta as any).env?.VITE_SUPABASE_URL || 'https://dpbyrvnvxjlhvtooyuru.supabase.co';
-      const supabaseKey = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwYnlydm52eGpsaHZ0b295dXJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxMTExODAsImV4cCI6MjA3MzY4NzE4MH0.txkD2Awid_RJxWhFJb0I13QBseIHdrDqFfeGgXrOEE';
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('is_featured', true)
+        .eq('is_visible', true)
+        .limit(4);
       
-      // Test with direct fetch
-      
-      const response = await fetch(`${supabaseUrl}/rest/v1/products?select=*&is_featured=eq.true&is_visible=eq.true&limit=4`, {
-        headers: {
-          'apikey': supabaseKey,
-          'Authorization': `Bearer ${supabaseKey}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      
-      if (!response.ok) {
-        console.error("❌ HomePage: Fetch failed:", response.status, response.statusText);
+      if (error) {
+        console.error("❌ HomePage: Supabase error:", error);
         setFeaturedProducts([]);
         return;
       }
-      
-      const data = await response.json();
       
       // Format products
       const formattedProducts = data?.map(product => ({
