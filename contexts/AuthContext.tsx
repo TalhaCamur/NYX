@@ -5,6 +5,10 @@ import { createClient, Session, User as SupabaseUser } from '@supabase/supabase-
 // --- Supabase Client Initialization ---
 const supabaseUrl = 'https://dpbyrvnvxjlhvtooyuru.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwYnlydm52eGpsaHZ0b295dXJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxMTExODAsImV4cCI6MjA3MzY4NzE4MH0.txkD2Awid_RJxWhFJb0I13QBseIHdrDqFfeGgXrOEE';
+
+console.log('🔧 Supabase URL:', supabaseUrl);
+console.log('🔧 Supabase Key:', supabaseKey.substring(0, 20) + '...');
+
 export const supabase = createClient(supabaseUrl, supabaseKey, {
     auth: {
         persistSession: true,
