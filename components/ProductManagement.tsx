@@ -119,6 +119,7 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('🚀 Form submitted!', formData);
     try {
       // Combine uploaded images with URL images
       const allImages = [
