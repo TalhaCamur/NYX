@@ -29,7 +29,7 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
     specs: '',
     features: '',
     isVisible: false,
-    isFeatured: false
+    is_featured: false
   });
   
   // New states for enhanced form
@@ -183,7 +183,7 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
       specs: '',
       features: '',
       isVisible: false,
-      isFeatured: false
+      is_featured: false
     });
     setApplyDiscount(false);
     setDiscountedPrice('');
@@ -206,7 +206,7 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
       specs: JSON.stringify(product.specs, null, 2),
       features: product.features.join(', '),
       isVisible: product.isVisible,
-      isFeatured: product.isFeatured || false
+      is_featured: product.is_featured || false
     });
     
     // Set discount state
@@ -519,15 +519,15 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
                     <div className="relative inline-block w-12 h-6 mr-3">
                       <input
                         type="checkbox"
-                        checked={formData.isFeatured}
-                        onChange={(e) => setFormData({ ...formData, isFeatured: e.target.checked })}
+                        checked={formData.is_featured}
+                        onChange={(e) => setFormData({ ...formData, is_featured: e.target.checked })}
                         className="sr-only"
                       />
                       <div className={`w-12 h-6 rounded-full transition-colors duration-200 ${
-                        formData.isFeatured ? 'bg-yellow-500' : 'bg-gray-600'
+                        formData.is_featured ? 'bg-yellow-500' : 'bg-gray-600'
                       }`}>
                         <div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-200 ${
-                          formData.isFeatured ? 'translate-x-6' : 'translate-x-0.5'
+                          formData.is_featured ? 'translate-x-6' : 'translate-x-0.5'
                         } mt-0.5`}></div>
                       </div>
                     </div>
@@ -570,7 +570,7 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
                         <span className={product.isVisible ? 'text-green-400' : 'text-red-400'}>
                           {product.isVisible ? 'Visible' : 'Hidden'}
                         </span>
-                        {product.isFeatured && <span className="text-yellow-400">Featured</span>}
+                        {product.is_featured && <span className="text-yellow-400">Featured</span>}
                       </div>
                     </div>
                     <div className="flex gap-2">
