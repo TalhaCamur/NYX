@@ -28,7 +28,7 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
     images: '',
     specs: '',
     features: '',
-    isVisible: false,
+    is_visible: false,
     is_featured: false
   });
   
@@ -182,7 +182,7 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
       images: '',
       specs: '',
       features: '',
-      isVisible: false,
+      is_visible: false,
       is_featured: false
     });
     setApplyDiscount(false);
@@ -205,7 +205,7 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
       images: product.images.join(', '),
       specs: JSON.stringify(product.specs, null, 2),
       features: product.features.join(', '),
-      isVisible: product.isVisible,
+      is_visible: product.is_visible,
       is_featured: product.is_featured || false
     });
     
@@ -494,15 +494,15 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
                     <div className="relative inline-block w-12 h-6 mr-3">
                       <input
                         type="checkbox"
-                        checked={formData.isVisible}
-                        onChange={(e) => setFormData({ ...formData, isVisible: e.target.checked })}
+                        checked={formData.is_visible}
+                        onChange={(e) => setFormData({ ...formData, is_visible: e.target.checked })}
                         className="sr-only"
                       />
                       <div className={`w-12 h-6 rounded-full transition-colors duration-200 ${
-                        formData.isVisible ? 'bg-green-500' : 'bg-gray-600'
+                        formData.is_visible ? 'bg-green-500' : 'bg-gray-600'
                       }`}>
                         <div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-200 ${
-                          formData.isVisible ? 'translate-x-6' : 'translate-x-0.5'
+                          formData.is_visible ? 'translate-x-6' : 'translate-x-0.5'
                         } mt-0.5`}></div>
                       </div>
                     </div>
@@ -567,8 +567,8 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
                         <span>Price: ${product.price}</span>
                         <span>Stock: {product.stock}</span>
                         <span>SKU: {product.sku || 'N/A'}</span>
-                        <span className={product.isVisible ? 'text-green-400' : 'text-red-400'}>
-                          {product.isVisible ? 'Visible' : 'Hidden'}
+                        <span className={product.is_visible ? 'text-green-400' : 'text-red-400'}>
+                          {product.is_visible ? 'Visible' : 'Hidden'}
                         </span>
                         {product.is_featured && <span className="text-yellow-400">Featured</span>}
                       </div>
