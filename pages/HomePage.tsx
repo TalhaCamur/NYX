@@ -205,9 +205,14 @@ const HomePage: React.FC<HomePageProps> = ({ navigateTo }) => {
 
                     <button
                       onClick={() => handleAddToCart(product)}
-                      className="w-full bg-nyx-blue text-nyx-black py-2 rounded-lg font-semibold hover:bg-white transition-colors"
+                      disabled={product.stock === 0}
+                      className={`w-full py-2 rounded-lg font-semibold transition-colors ${
+                        product.stock > 0 
+                          ? 'bg-nyx-blue text-nyx-black hover:bg-white' 
+                          : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                      }`}
                     >
-                      Add to Cart
+                      {product.stock > 0 ? 'Add to Cart' : 'Out of Stock'}
                     </button>
                   </div>
                 </div>

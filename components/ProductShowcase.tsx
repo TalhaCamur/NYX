@@ -54,7 +54,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, navigateTo })
           <button
             onClick={handleAddToCart}
             disabled={product.stock === 0}
-            className="bg-nyx-blue text-nyx-black px-4 py-2 rounded-lg font-semibold hover:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
+              product.stock > 0 
+                ? 'bg-nyx-blue text-nyx-black hover:bg-white' 
+                : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+            }`}
           >
             {product.stock > 0 ? 'Add to Cart' : 'Out of Stock'}
           </button>
