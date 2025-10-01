@@ -22,7 +22,7 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
     tagline: '',
     description: '',
     price: '',
-    originalPrice: '',
+    original_price: '',
     stock: '',
     sku: '',
     images: '',
@@ -138,7 +138,7 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
       const productData = {
         ...formData,
         price: applyDiscount ? parseFloat(discountedPrice) : parseFloat(formData.price),
-        originalPrice: applyDiscount ? parseFloat(formData.price) : null,
+        original_price: applyDiscount ? parseFloat(formData.price) : null,
         stock: parseInt(formData.stock),
         images: allImages,
         specs: specsObject,
@@ -176,7 +176,7 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
       tagline: '',
       description: '',
       price: '',
-      originalPrice: '',
+      original_price: '',
       stock: '',
       sku: '',
       images: '',
@@ -199,7 +199,7 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
       tagline: product.tagline,
       description: product.description || '',
       price: product.price.toString(),
-      originalPrice: product.originalPrice?.toString() || '',
+      original_price: product.original_price?.toString() || '',
       stock: product.stock.toString(),
       sku: product.sku || '',
       images: product.images.join(', '),
@@ -210,8 +210,8 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
     });
     
     // Set discount state
-    setApplyDiscount(!!product.originalPrice);
-    setDiscountedPrice(product.originalPrice ? product.price.toString() : '');
+    setApplyDiscount(!!product.original_price);
+    setDiscountedPrice(product.original_price ? product.price.toString() : '');
     
     // Set images
     setUploadedImages([]);
