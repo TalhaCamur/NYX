@@ -3,15 +3,23 @@
 import React from 'react';
 
 export interface Product {
-  id: string;
+  id: number;
   name: string;
-  tagline: string;
+  tag_line?: string;
+  tagline?: string;
+  description?: string;
   price: number;
   original_price?: number | null;
   stock: number;
-  images: string[];
-  specs: { name: string; value: string }[];
-  isVisible: boolean;
+  sku?: string;
+  images?: string[];
+  imageUrl?: string;
+  specs?: Record<string, string> | null;
+  features?: string[];
+  is_visible?: boolean;
+  isVisible?: boolean;
+  is_featured?: boolean;
+  created_at?: string;
   ownerId?: string;
 }
 

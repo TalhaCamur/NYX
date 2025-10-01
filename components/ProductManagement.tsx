@@ -26,17 +26,15 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
     stock: '',
     sku: '',
     images: '',
-    specs: '',
     features: '',
+    specs: '',
     is_visible: false,
     is_featured: false
   });
   
   // New states for enhanced form
   const [applyDiscount, setApplyDiscount] = useState(false);
-  const [discountedPrice, setDiscountedPrice] = useState('');
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
-  const [imageUrls, setImageUrls] = useState('');
   const [specs, setSpecs] = useState<Array<{name: string, value: string}>>([{name: '', value: ''}]);
   const [uploading, setUploading] = useState(false);
 
@@ -68,16 +66,27 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
 
   const handleEdit = (product: Product) => {
     setEditingProduct(product);
+    
+    // Check if there's a discount (original_price exists and is different from price)
+    const hasDiscount = product.original_price && product.original_price > product.price;
+    setApplyDiscount(hasDiscount || false);
+    
+    // Convert specs object to array format for the form
+    const specsArray = product.specs 
+      ? Object.entries(product.specs).map(([name, value]) => ({ name, value: String(value) }))
+      : [{name: '', value: ''}];
+    setSpecs(specsArray);
+    
     setFormData({
       name: product.name || '',
       tag_line: product.tag_line || '',
       description: product.description || '',
-      price: product.price?.toString() || '',
-      original_price: product.original_price?.toString() || '',
+      price: hasDiscount ? (product.original_price?.toString() || '') : (product.price?.toString() || ''),
+      original_price: product.price?.toString() || '',
       stock: product.stock?.toString() || '',
       sku: product.sku || '',
       images: product.images?.join(', ') || '',
-      specs: product.specs ? JSON.stringify(product.specs, null, 2) : '',
+      specs: '',
       features: product.features?.join(', ') || '',
       is_visible: product.is_visible || false,
       is_featured: product.is_featured || false
@@ -118,8 +127,8 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
     });
     setEditingProduct(null);
     setUploadedImages([]);
-    setImageUrls('');
     setSpecs([{name: '', value: ''}]);
+    setApplyDiscount(false);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -149,12 +158,27 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
         imageArray = formData.images.split(',').map(url => url.trim()).filter(url => url);
       }
 
+      // Calculate prices based on discount
+      let finalPrice: number;
+      let originalPrice: number | null = null;
+      
+      if (applyDiscount && formData.original_price) {
+        // If discount is applied, the price field is the original price
+        // and original_price field is the discounted price
+        originalPrice = parseFloat(formData.price);
+        finalPrice = parseFloat(formData.original_price);
+      } else {
+        // No discount, just use the price field
+        finalPrice = parseFloat(formData.price);
+        originalPrice = null;
+      }
+
       const productData = {
         name: formData.name,
         tag_line: formData.tag_line,
         description: formData.description,
-        price: parseFloat(formData.price),
-        original_price: formData.original_price ? parseFloat(formData.original_price) : null,
+        price: finalPrice,
+        original_price: originalPrice,
         stock: parseInt(formData.stock) || 0,
         sku: formData.sku,
         images: imageArray,
@@ -312,116 +336,226 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
                 </h3>
               </div>
               
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Product Name and Tagline */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-white mb-2">Product Name</label>
+                    <label className="block text-white mb-2 font-medium">Product Name *</label>
                     <input
                       type="text"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full bg-nyx-gray border border-gray-700 rounded-lg py-2 px-3 text-white"
+                      className="w-full bg-nyx-gray border border-gray-700 rounded-lg py-2 px-3 text-white focus:border-nyx-blue focus:outline-none transition-colors"
+                      placeholder="Enter product name"
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-white mb-2">Tagline</label>
+                    <label className="block text-white mb-2 font-medium">Tagline</label>
                     <input
                       type="text"
                       value={formData.tag_line}
                       onChange={(e) => setFormData({ ...formData, tag_line: e.target.value })}
-                      className="w-full bg-nyx-gray border border-gray-700 rounded-lg py-2 px-3 text-white"
+                      className="w-full bg-nyx-gray border border-gray-700 rounded-lg py-2 px-3 text-white focus:border-nyx-blue focus:outline-none transition-colors"
+                      placeholder="Short product tagline"
                     />
                   </div>
                 </div>
 
+                {/* Description */}
                 <div>
-                  <label className="block text-white mb-2">Description</label>
+                  <label className="block text-white mb-2 font-medium">Description *</label>
                   <textarea
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    className="w-full bg-nyx-gray border border-gray-700 rounded-lg py-2 px-3 text-white h-24"
+                    className="w-full bg-nyx-gray border border-gray-700 rounded-lg py-2 px-3 text-white focus:border-nyx-blue focus:outline-none transition-colors h-24 resize-none"
+                    placeholder="Describe your product..."
                     required
                   />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-white mb-2">Price (€)</label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      value={formData.price}
-                      onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                      className="w-full bg-nyx-gray border border-gray-700 rounded-lg py-2 px-3 text-white"
-                      required
-                    />
+                {/* Price Section */}
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-white mb-2 font-medium">Price (€) *</label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={formData.price}
+                        onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                        className="w-full bg-nyx-gray border border-gray-700 rounded-lg py-2 px-3 text-white focus:border-nyx-blue focus:outline-none transition-colors"
+                        placeholder="0.00"
+                        required
+                      />
+                    </div>
+                    
+                    {/* Apply Discount Switch */}
+                    <div className="flex items-end">
+                      <label className="flex items-center cursor-pointer">
+                        <div className="relative inline-block w-12 h-6 mr-3">
+                          <input
+                            type="checkbox"
+                            checked={applyDiscount}
+                            onChange={(e) => {
+                              setApplyDiscount(e.target.checked);
+                              if (!e.target.checked) {
+                                setFormData({ ...formData, original_price: '' });
+                              }
+                            }}
+                            className="sr-only"
+                          />
+                          <div className={`w-12 h-6 rounded-full transition-colors duration-200 ${
+                            applyDiscount ? 'bg-nyx-blue' : 'bg-gray-600'
+                          }`}>
+                            <div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-200 ${
+                              applyDiscount ? 'translate-x-6' : 'translate-x-0.5'
+                            } mt-0.5`}></div>
+                          </div>
+                        </div>
+                        <div>
+                          <span className="text-white font-medium">Apply Discount</span>
+                        </div>
+                      </label>
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-white mb-2">Original Price (€)</label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      value={formData.original_price}
-                      onChange={(e) => setFormData({ ...formData, original_price: e.target.value })}
-                      className="w-full bg-nyx-gray border border-gray-700 rounded-lg py-2 px-3 text-white"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-white mb-2">Stock</label>
-                    <input
-                      type="number"
-                      value={formData.stock}
-                      onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
-                      className="w-full bg-nyx-gray border border-gray-700 rounded-lg py-2 px-3 text-white"
-                    />
-                  </div>
+
+                  {/* Discounted Price - Shows only when Apply Discount is ON */}
+                  {applyDiscount && (
+                    <div className="bg-nyx-blue/10 border border-nyx-blue/30 rounded-lg p-4">
+                      <label className="block text-white mb-2 font-medium">Discounted Price (€) *</label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={formData.original_price}
+                        onChange={(e) => setFormData({ ...formData, original_price: e.target.value })}
+                        className="w-full bg-nyx-gray border border-gray-700 rounded-lg py-2 px-3 text-white focus:border-nyx-blue focus:outline-none transition-colors"
+                        placeholder="0.00"
+                        required={applyDiscount}
+                      />
+                      <p className="text-sm text-gray-400 mt-2">
+                        Original: €{formData.price || '0.00'} → Discounted: €{formData.original_price || '0.00'}
+                        {formData.price && formData.original_price && parseFloat(formData.price) > parseFloat(formData.original_price) && (
+                          <span className="text-nyx-blue ml-2">
+                            ({Math.round((1 - parseFloat(formData.original_price) / parseFloat(formData.price)) * 100)}% off)
+                          </span>
+                        )}
+                      </p>
+                    </div>
+                  )}
                 </div>
 
+                {/* Stock and SKU */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-white mb-2">SKU</label>
+                    <label className="block text-white mb-2 font-medium">Stock</label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={formData.stock}
+                      onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
+                      className="w-full bg-nyx-gray border border-gray-700 rounded-lg py-2 px-3 text-white focus:border-nyx-blue focus:outline-none transition-colors"
+                      placeholder="0"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-white mb-2 font-medium">SKU</label>
                     <input
                       type="text"
                       value={formData.sku}
                       onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
-                      className="w-full bg-nyx-gray border border-gray-700 rounded-lg py-2 px-3 text-white"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-white mb-2">Image URLs (comma separated)</label>
-                    <input
-                      type="text"
-                      value={formData.images}
-                      onChange={(e) => setFormData({ ...formData, images: e.target.value })}
-                      className="w-full bg-nyx-gray border border-gray-700 rounded-lg py-2 px-3 text-white"
-                      placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
+                      className="w-full bg-nyx-gray border border-gray-700 rounded-lg py-2 px-3 text-white focus:border-nyx-blue focus:outline-none transition-colors"
+                      placeholder="Product SKU"
                     />
                   </div>
                 </div>
 
+                {/* Image URLs */}
                 <div>
-                  <label className="block text-white mb-2">Features (comma separated)</label>
+                  <label className="block text-white mb-2 font-medium">Image URLs</label>
+                  <input
+                    type="text"
+                    value={formData.images}
+                    onChange={(e) => setFormData({ ...formData, images: e.target.value })}
+                    className="w-full bg-nyx-gray border border-gray-700 rounded-lg py-2 px-3 text-white focus:border-nyx-blue focus:outline-none transition-colors"
+                    placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
+                  />
+                  <p className="text-sm text-gray-400 mt-1">Separate multiple URLs with commas</p>
+                </div>
+
+                {/* Features */}
+                <div>
+                  <label className="block text-white mb-2 font-medium">Features</label>
                   <input
                     type="text"
                     value={formData.features}
                     onChange={(e) => setFormData({ ...formData, features: e.target.value })}
-                    className="w-full bg-nyx-gray border border-gray-700 rounded-lg py-2 px-3 text-white"
+                    className="w-full bg-nyx-gray border border-gray-700 rounded-lg py-2 px-3 text-white focus:border-nyx-blue focus:outline-none transition-colors"
                     placeholder="WiFi, Bluetooth, Voice Control"
                   />
+                  <p className="text-sm text-gray-400 mt-1">Separate features with commas</p>
                 </div>
 
+                {/* Specifications */}
                 <div>
-                  <label className="block text-white mb-2">Specifications (JSON format)</label>
-                  <textarea
-                    value={formData.specs}
-                    onChange={(e) => setFormData({ ...formData, specs: e.target.value })}
-                    className="w-full bg-nyx-gray border border-gray-700 rounded-lg py-2 px-3 text-white h-24"
-                    placeholder='{"Weight": "1.2kg", "Dimensions": "10x10x5cm"}'
-                  />
+                  <label className="block text-white mb-2 font-medium">Specifications</label>
+                  <div className="space-y-3">
+                    {specs.map((spec, index) => (
+                      <div key={index} className="grid grid-cols-2 gap-3">
+                        <input
+                          type="text"
+                          value={spec.name}
+                          onChange={(e) => {
+                            const newSpecs = [...specs];
+                            newSpecs[index].name = e.target.value;
+                            setSpecs(newSpecs);
+                          }}
+                          className="bg-nyx-gray border border-gray-700 rounded-lg py-2 px-3 text-white focus:border-nyx-blue focus:outline-none transition-colors"
+                          placeholder="Spec name (e.g., Weight)"
+                        />
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={spec.value}
+                            onChange={(e) => {
+                              const newSpecs = [...specs];
+                              newSpecs[index].value = e.target.value;
+                              setSpecs(newSpecs);
+                            }}
+                            className="flex-1 bg-nyx-gray border border-gray-700 rounded-lg py-2 px-3 text-white focus:border-nyx-blue focus:outline-none transition-colors"
+                            placeholder="Value (e.g., 1.2kg)"
+                          />
+                          {specs.length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() => setSpecs(specs.filter((_, i) => i !== index))}
+                              className="bg-red-600 text-white px-3 py-2 rounded-lg hover:bg-red-700 transition-colors"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => setSpecs([...specs, { name: '', value: '' }])}
+                      className="bg-nyx-gray text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors flex items-center gap-2"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                      </svg>
+                      Add Specification
+                    </button>
+                  </div>
                 </div>
 
-                <div className="space-y-4">
+                {/* Switches Section */}
+                <div className="space-y-4 border-t border-gray-700 pt-4">
                   <div className="flex items-center">
                     <label className="flex items-center cursor-pointer">
                       <div className="relative inline-block w-12 h-6 mr-3">
@@ -465,7 +599,7 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
                       </div>
                       <div>
                         <span className="text-white font-medium">Featured Product</span>
-                        <p className="text-sm text-gray-400">Product will be shown in featured section</p>
+                        <p className="text-sm text-gray-400">Product will be shown in featured section on homepage</p>
                       </div>
                     </label>
                   </div>
