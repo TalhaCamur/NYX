@@ -87,7 +87,7 @@ const ContactPage: React.FC<ContactPageProps> = ({ navigateTo }) => {
   return (
     <div className="min-h-screen bg-dark text-white">
       {/* Creative Header */}
-      <section className="relative py-20 overflow-hidden">
+      <section className="relative py-32 overflow-hidden">
         {/* Animated background elements */}
         <div className="absolute inset-0">
           <div className="absolute top-0 left-1/4 w-96 h-96 bg-gradient-to-r from-nyx-blue/10 to-brand-purple/10 rounded-full blur-3xl animate-pulse"></div>
@@ -97,34 +97,38 @@ const ContactPage: React.FC<ContactPageProps> = ({ navigateTo }) => {
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-4xl mx-auto text-center">
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-nyx-blue/10 to-brand-purple/10 border border-nyx-blue/20 mb-8">
-              <div className="w-1.5 h-1.5 bg-nyx-blue rounded-full animate-pulse"></div>
-              <span className="text-xs font-medium text-gray-300 tracking-wide">GET IN TOUCH</span>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-nyx-blue/10 border border-nyx-blue/30 mb-8">
+              <div className="w-2 h-2 bg-brand-pink rounded-full animate-pulse"></div>
+              <span className="text-sm font-medium text-gray-200 tracking-wide">24/7 Support Available</span>
             </div>
 
             {/* Title with creative typography */}
-            <h1 className="text-5xl md:text-7xl font-bold mb-6">
-              Let's Build
-              <span className="block bg-gradient-to-r from-nyx-blue via-brand-purple to-brand-pink text-transparent bg-clip-text">
-                Something Great
+            <h1 className="text-6xl md:text-8xl font-bold mb-6 leading-tight">
+              Let's
+              <span className="block bg-gradient-to-r from-nyx-blue via-cyan-400 to-nyx-blue text-transparent bg-clip-text">
+                Connect
               </span>
             </h1>
 
-            <p className="text-xl text-gray-400 max-w-2xl mx-auto mb-8">
-              Have a question or want to work together? We'd love to hear from you.
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-12">
+              Have a question about our products? Need technical support? Want to share feedback? 
+              <span className="text-nyx-blue font-semibold"> We're here to help</span> and 
+              <span className="text-brand-purple font-semibold"> love hearing from you.</span>
             </p>
 
             {/* Quick stats */}
-            <div className="flex items-center justify-center gap-8 text-sm">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                <span className="text-gray-400">Usually responds in 24h</span>
+            <div className="flex items-center justify-center gap-12 text-base">
+              <div className="text-center">
+                <div className="text-3xl md:text-4xl font-bold text-nyx-blue mb-1">&lt; 1hr</div>
+                <div className="text-sm text-gray-400">Response Time</div>
               </div>
-              <div className="hidden md:flex items-center gap-2">
-                <svg className="w-4 h-4 text-nyx-blue" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
-                <span className="text-gray-400">4.9/5 rating</span>
+              <div className="text-center">
+                <div className="text-3xl md:text-4xl font-bold text-brand-purple">24/7</div>
+                <div className="text-sm text-gray-400">Support Available</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl md:text-4xl font-bold text-brand-pink">100%</div>
+                <div className="text-sm text-gray-400">Satisfaction Rate</div>
               </div>
             </div>
           </div>
