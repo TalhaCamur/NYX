@@ -121,6 +121,8 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
     e.preventDefault();
     console.log('🚀 Form submitted!', formData);
     try {
+      setLoading(true);
+      
       // Combine uploaded images with URL images
       const allImages = [
         ...uploadedImages,
@@ -165,8 +167,11 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
       setShowAddForm(false);
       resetForm();
       fetchProducts();
+      console.log('✅ Product saved successfully!');
     } catch (error) {
       console.error('Error saving product:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
