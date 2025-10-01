@@ -163,7 +163,11 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
         if (error) throw error;
       }
 
-      console.log('✅ Product saved successfully!');
+      if (editingProduct) {
+        console.log('✅ Product updated successfully!');
+      } else {
+        console.log('✅ Product created successfully!');
+      }
       
       // Reset form and stay in manage products
       setEditingProduct(null);
