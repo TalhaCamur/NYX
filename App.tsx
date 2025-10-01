@@ -1303,20 +1303,39 @@ const ProductsPage = ({ navigateTo, setOpenAddForm }: { navigateTo: (page: strin
 
     return (
         <div className="min-h-screen bg-dark text-white">
-            {/* Compact Header with Filters */}
-            <section className="sticky top-0 z-40 bg-nyx-black/95 backdrop-blur-lg border-b border-gray-800">
-                <div className="container mx-auto px-4 py-6">
-                    <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
-                        {/* Page Title & Count */}
-                        <div>
-                            <h1 className="text-3xl font-bold text-white mb-1">Products</h1>
-                            <p className="text-sm text-gray-400">
-                                {displayedProducts.length} {displayedProducts.length === 1 ? 'item' : 'items'}
-                            </p>
+            {/* Elegant Products Header */}
+            <section className="relative py-16 border-b border-gray-800/50">
+                {/* Subtle background gradient */}
+                <div className="absolute inset-0 bg-gradient-to-b from-nyx-blue/5 via-transparent to-transparent"></div>
+                
+                <div className="container mx-auto px-4 relative z-10">
+                    <div className="max-w-3xl mx-auto text-center">
+                        {/* Small badge */}
+                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-nyx-blue/10 to-brand-purple/10 border border-nyx-blue/20 mb-6">
+                            <div className="w-1.5 h-1.5 bg-nyx-blue rounded-full animate-pulse"></div>
+                            <span className="text-xs font-medium text-gray-300 tracking-wide">SMART HOME COLLECTION</span>
                         </div>
                         
-                        {/* Controls */}
-                        <div className="flex items-center gap-3 w-full lg:w-auto">
+                        {/* Title */}
+                        <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+                            NYX <span className="bg-gradient-to-r from-nyx-blue via-brand-purple to-brand-pink text-transparent bg-clip-text">Products</span>
+                        </h1>
+                        
+                        {/* Subtitle */}
+                        <p className="text-gray-400 text-lg mb-6">
+                            Discover our complete range of smart home devices
+                        </p>
+                        
+                        {/* Controls Row */}
+                        <div className="flex items-center justify-center gap-4 text-sm">
+                            {/* Product count */}
+                            <div className="flex items-center gap-2 text-gray-500">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                </svg>
+                                <span>{displayedProducts.length} {displayedProducts.length === 1 ? 'Product' : 'Products'}</span>
+                            </div>
+                            
                             {/* Sort Dropdown */}
                             <select
                                 value={sortBy}
@@ -1363,13 +1382,13 @@ const ProductsPage = ({ navigateTo, setOpenAddForm }: { navigateTo: (page: strin
                             {isAuthorized && (
                                 <button
                                     onClick={() => setOpenAddForm(true)}
-                                    className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 text-white rounded-lg hover:bg-white/20 font-medium text-sm border border-white/10"
+                                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/5 text-white rounded-lg hover:bg-white/10 font-medium text-xs border border-white/10"
                                 >
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                     </svg>
-                                    Manage Products
+                                    Manage
                                 </button>
                             )}
                         </div>
