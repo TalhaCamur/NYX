@@ -47,78 +47,179 @@ const ProductDetailPage = ({ navigateTo, product }: { navigateTo: (page: string,
 
   return (
     <div className="min-h-screen bg-dark text-white">
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Product Image */}
-          <div className="aspect-square overflow-hidden rounded-2xl">
-            <img 
-              src={product.images?.[0] || product.imageUrl || 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=800&fit=crop&crop=center'} 
-              alt={product.name}
-              className="w-full h-full object-cover"
-            />
-          </div>
-          
-          {/* Product Info */}
-          <div className="space-y-6">
-            <div>
-              <h1 className="text-4xl font-bold text-white mb-4">{product.name}</h1>
-              <p className="text-xl text-gray-300 mb-6">{product.description}</p>
-            </div>
-            
-            {/* Price */}
-            <div className="flex items-center space-x-4">
-              {product.original_price && product.original_price > product.price ? (
-                <div className="flex items-center space-x-4">
-                  <span className="text-2xl text-gray-400 line-through">€{product.original_price}</span>
-                  <span className="text-4xl font-bold text-white">€{product.price}</span>
+      {/* Hero Section */}
+      <div className="relative py-16 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-nyx-black via-purple-900/20 to-nyx-black"></div>
+        <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-gradient-to-r from-brand-purple/20 to-brand-pink/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-gradient-to-r from-nyx-blue/20 to-brand-purple/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Product Image */}
+            <div className="space-y-4">
+              <div className="aspect-square overflow-hidden rounded-3xl shadow-2xl">
+                <img 
+                  src={product.images?.[0] || product.imageUrl || 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=800&fit=crop&crop=center'} 
+                  alt={product.name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              
+              {/* Additional Images */}
+              {product.images && product.images.length > 1 && (
+                <div className="grid grid-cols-4 gap-2">
+                  {product.images.slice(1, 5).map((image, index) => (
+                    <div key={index} className="aspect-square overflow-hidden rounded-lg">
+                      <img 
+                        src={image} 
+                        alt={`${product.name} ${index + 2}`}
+                        className="w-full h-full object-cover hover:scale-105 transition-transform cursor-pointer"
+                      />
+                    </div>
+                  ))}
                 </div>
-              ) : (
-                <span className="text-4xl font-bold text-white">€{product.price}</span>
               )}
             </div>
             
-            {/* Stock */}
-            <div className="text-lg">
-              <span className={product.stock > 0 ? 'text-green-400' : 'text-red-400'}>
-                {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
-              </span>
-            </div>
-            
-            {/* Features */}
-            {product.features && product.features.length > 0 && (
+            {/* Product Info */}
+            <div className="space-y-8">
+              {/* Tagline */}
+              {product.tag_line && (
+                <div className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-nyx-blue/20 to-brand-purple/20 border border-nyx-blue/30">
+                  <span className="w-2 h-2 bg-nyx-blue rounded-full mr-2 animate-pulse"></span>
+                  <span className="text-sm font-medium text-gray-300">{product.tag_line}</span>
+                </div>
+              )}
+              
+              {/* Title */}
               <div>
-                <h3 className="text-xl font-semibold mb-3">Features:</h3>
-                <ul className="space-y-2">
-                  {product.features.map((feature, index) => (
-                    <li key={index} className="flex items-center">
-                      <span className="w-2 h-2 bg-nyx-blue rounded-full mr-3"></span>
-                      <span className="text-gray-300">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
+                <h1 className="text-5xl font-bold text-white mb-4 leading-tight">{product.name}</h1>
+                <p className="text-xl text-gray-300 leading-relaxed">{product.description}</p>
               </div>
-            )}
+              
+              {/* Price */}
+              <div className="flex items-center space-x-6">
+                {product.original_price && product.original_price > product.price ? (
+                  <div className="flex items-center space-x-4">
+                    <span className="text-3xl text-gray-400 line-through">€{product.original_price}</span>
+                    <span className="text-5xl font-bold text-white">€{product.price}</span>
+                    <div className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                      {Math.round(((product.original_price - product.price) / product.original_price) * 100)}% OFF
+                    </div>
+                  </div>
+                ) : (
+                  <span className="text-5xl font-bold text-white">€{product.price}</span>
+                )}
+              </div>
+              
+              {/* Stock */}
+              <div className="flex items-center space-x-4">
+                <span className={`text-lg font-semibold ${product.stock > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                  {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
+                </span>
+                {product.sku && (
+                  <span className="text-gray-400 text-sm">SKU: {product.sku}</span>
+                )}
+              </div>
+              
+              {/* Features */}
+              {product.features && product.features.length > 0 && (
+                <div className="bg-nyx-gray/30 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
+                  <h3 className="text-2xl font-bold mb-4 text-white">Key Features</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {product.features.map((feature, index) => (
+                      <div key={index} className="flex items-center">
+                        <span className="w-3 h-3 bg-nyx-blue rounded-full mr-3 flex-shrink-0"></span>
+                        <span className="text-gray-300">{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {/* Specifications */}
+              {product.specs && Object.keys(product.specs).length > 0 && (
+                <div className="bg-nyx-gray/30 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
+                  <h3 className="text-2xl font-bold mb-4 text-white">Specifications</h3>
+                  <div className="space-y-3">
+                    {Object.entries(product.specs).map(([key, value]) => (
+                      <div key={key} className="flex justify-between items-center py-2 border-b border-gray-700/50">
+                        <span className="text-gray-400 font-medium">{key}:</span>
+                        <span className="text-white">{value}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {/* Action Buttons */}
+              <div className="space-y-4">
+                <button
+                  onClick={handleAddToCart}
+                  disabled={product.stock === 0}
+                  className={`w-full py-4 rounded-xl font-bold text-lg transition-all duration-300 transform hover:scale-105 ${
+                    product.stock > 0 
+                      ? 'bg-gradient-to-r from-nyx-blue to-cyan-400 text-nyx-black hover:from-cyan-400 hover:to-nyx-blue shadow-lg hover:shadow-nyx-blue/25' 
+                      : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                  }`}
+                >
+                  {product.stock > 0 ? 'Add to Cart' : 'Out of Stock'}
+                </button>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <button
+                    onClick={() => navigateTo('products')}
+                    className="py-3 border border-gray-600 text-gray-300 rounded-xl font-semibold hover:border-nyx-blue hover:text-nyx-blue transition-colors"
+                  >
+                    Back to Products
+                  </button>
+                  <button
+                    onClick={() => navigateTo('home')}
+                    className="py-3 border border-gray-600 text-gray-300 rounded-xl font-semibold hover:border-brand-purple hover:text-brand-purple transition-colors"
+                  >
+                    Go to Home
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {/* Additional Info Section */}
+      <div className="py-16 bg-dark-accent">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-3xl font-bold text-white mb-8 text-center">Product Information</h2>
             
-            {/* Add to Cart Button */}
-            <button
-              onClick={handleAddToCart}
-              disabled={product.stock === 0}
-              className={`w-full py-4 rounded-lg font-semibold text-lg transition-colors ${
-                product.stock > 0 
-                  ? 'bg-nyx-blue text-nyx-black hover:bg-white' 
-                  : 'bg-gray-600 text-gray-400 cursor-not-allowed'
-              }`}
-            >
-              {product.stock > 0 ? 'Add to Cart' : 'Out of Stock'}
-            </button>
-            
-            {/* Back Button */}
-            <button
-              onClick={() => navigateTo('products')}
-              className="w-full py-3 border border-gray-600 text-gray-300 rounded-lg font-semibold hover:border-nyx-blue hover:text-nyx-blue transition-colors"
-            >
-              Back to Products
-            </button>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {/* Shipping Info */}
+              <div className="text-center p-6 bg-nyx-gray/20 rounded-2xl border border-white/10">
+                <div className="w-16 h-16 bg-gradient-to-br from-nyx-blue to-cyan-400 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl">🚚</span>
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">Free Shipping</h3>
+                <p className="text-gray-400">Free shipping on all orders over €50</p>
+              </div>
+              
+              {/* Warranty Info */}
+              <div className="text-center p-6 bg-nyx-gray/20 rounded-2xl border border-white/10">
+                <div className="w-16 h-16 bg-gradient-to-br from-brand-purple to-brand-pink rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl">🛡️</span>
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">2 Year Warranty</h3>
+                <p className="text-gray-400">Comprehensive warranty coverage</p>
+              </div>
+              
+              {/* Support Info */}
+              <div className="text-center p-6 bg-nyx-gray/20 rounded-2xl border border-white/10">
+                <div className="w-16 h-16 bg-gradient-to-br from-brand-pink to-nyx-blue rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl">💬</span>
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">24/7 Support</h3>
+                <p className="text-gray-400">Round-the-clock customer support</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
