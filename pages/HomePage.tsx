@@ -176,7 +176,11 @@ const HomePage: React.FC<HomePageProps> = ({ navigateTo }) => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {featuredProducts.map((product) => (
-                <div key={product.id} className="product-card">
+                <div 
+                  key={product.id} 
+                  className="product-card cursor-pointer"
+                  onClick={() => navigateTo('product-detail', { product })}
+                >
                   <div className="aspect-square overflow-hidden">
                     <img 
                       src={product.images?.[0] || product.imageUrl || 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=400&fit=crop&crop=center'} 
@@ -204,7 +208,10 @@ const HomePage: React.FC<HomePageProps> = ({ navigateTo }) => {
                     </div>
 
                     <button
-                      onClick={() => handleAddToCart(product)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleAddToCart(product);
+                      }}
                       disabled={product.stock === 0}
                       className={`w-full py-2 rounded-lg font-semibold transition-colors ${
                         product.stock > 0 
