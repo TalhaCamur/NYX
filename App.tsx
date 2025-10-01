@@ -1331,7 +1331,7 @@ const ProductsPage = ({ navigateTo, setOpenAddForm }: { navigateTo: (page: strin
                             <select
                                 value={sortBy}
                                 onChange={(e) => setSortBy(e.target.value as any)}
-                                className="bg-nyx-gray text-white px-3 py-2 rounded text-sm"
+                                className="text-white text-sm"
                             >
                                 <option value="newest">Newest</option>
                                 <option value="price-low">Price: Low to High</option>
