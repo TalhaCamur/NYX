@@ -38,6 +38,7 @@ const HomePage: React.FC<HomePageProps> = ({ navigateTo }) => {
         id: product.id,
         name: product.name,
         price: product.price,
+        original_price: product.original_price,
         imageUrl: product.images?.[0] || 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=400&fit=crop&crop=center',
         images: product.images || ['https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=400&fit=crop&crop=center'],
         description: product.description,
