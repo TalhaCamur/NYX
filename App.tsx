@@ -1298,75 +1298,46 @@ const ProductsPage = ({ navigateTo, setOpenAddForm }: { navigateTo: (page: strin
 
     return (
         <div className="min-h-screen bg-dark text-white">
-            {/* Hero Section */}
-            <div className="relative py-20 md:py-32 overflow-hidden">
-                {/* Animated background */}
-                <div className="absolute inset-0 bg-gradient-to-br from-nyx-black via-brand-purple/5 to-nyx-black"></div>
-                <div className="absolute inset-0 opacity-30">
-                    <div className="absolute top-0 left-1/4 w-96 h-96 bg-brand-purple/20 rounded-full blur-3xl animate-pulse"></div>
-                    <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-nyx-blue/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-                </div>
-                
-                <div className="container mx-auto px-4 relative z-10">
-                    <div className="max-w-4xl mx-auto text-center">
-                        <div className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-brand-purple/20 to-brand-pink/20 border border-brand-purple/30 mb-6">
-                            <span className="w-2 h-2 bg-nyx-blue rounded-full mr-2 animate-pulse"></span>
-                            <span className="text-sm font-medium text-gray-300">{displayedProducts.length} Products Available</span>
-                        </div>
-                        <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6">
-                            Our Smart
-                            <span className="block bg-gradient-to-r from-brand-purple via-brand-pink to-nyx-blue text-transparent bg-clip-text">
-                                Products
-                            </span>
-                        </h1>
-                        <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
-                            Explore our complete range of smart home devices, designed to work together seamlessly
-                        </p>
-                        
-                        {/* Product Management Button - Only for authorized users */}
-                        {isAuthorized && (
-                            <div className="flex justify-center gap-4 mb-8">
+            {/* Compact Header with Filters */}
+            <section className="sticky top-0 z-40 bg-nyx-black/95 backdrop-blur-lg border-b border-gray-800">
+                <div className="container mx-auto px-4 py-6">
+                    <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+                        {/* Page Title & Count */}
+                        <div className="flex items-center gap-4">
+                            <div>
+                                <h1 className="text-3xl font-bold text-white mb-1">Products</h1>
+                                <p className="text-sm text-gray-400">
+                                    {displayedProducts.length} {displayedProducts.length === 1 ? 'item' : 'items'}
+                                </p>
+                            </div>
+                            
+                            {/* Management Button - Only for authorized users */}
+                            {isAuthorized && (
                                 <button
                                     onClick={() => setOpenAddForm(true)}
-                                    className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-blue-500/25"
+                                    className="inline-flex items-center gap-2 px-4 py-2 bg-nyx-blue text-nyx-black rounded-lg hover:bg-white transition-colors font-medium"
                                 >
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                                     </svg>
-                                    Manage Products
+                                    Add Product
                                 </button>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </div>
-
-            {/* Filter and Sort Bar */}
-            <section className="relative py-8 border-b border-gray-800">
-                <div className="container mx-auto px-4">
-                    <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-                        {/* Results count */}
-                        <div className="text-gray-400">
-                            Showing <span className="text-white font-semibold">{displayedProducts.length}</span> products
+                            )}
                         </div>
                         
-                        {/* Sort and View Controls */}
-                        <div className="flex items-center gap-4">
+                        {/* Controls */}
+                        <div className="flex items-center gap-4 w-full lg:w-auto">
                             {/* Sort Dropdown */}
-                            <div className="flex items-center gap-2">
-                                <label className="text-sm text-gray-400">Sort by:</label>
-                                <select
-                                    value={sortBy}
-                                    onChange={(e) => setSortBy(e.target.value as any)}
-                                    className="bg-nyx-gray border border-gray-700 text-white rounded-lg px-4 py-2 focus:border-nyx-blue focus:outline-none transition-colors cursor-pointer"
-                                >
-                                    <option value="newest">Newest First</option>
-                                    <option value="price-low">Price: Low to High</option>
-                                    <option value="price-high">Price: High to Low</option>
-                                    <option value="name">Name: A-Z</option>
-                                </select>
-                            </div>
+                            <select
+                                value={sortBy}
+                                onChange={(e) => setSortBy(e.target.value as any)}
+                                className="flex-1 lg:flex-none bg-nyx-gray border border-gray-700 text-white rounded-lg px-4 py-2.5 focus:border-nyx-blue focus:outline-none transition-colors cursor-pointer text-sm"
+                            >
+                                <option value="newest">Newest</option>
+                                <option value="price-low">Price: Low to High</option>
+                                <option value="price-high">Price: High to Low</option>
+                                <option value="name">Name: A-Z</option>
+                            </select>
                             
                             {/* View Mode Toggle */}
                             <div className="flex items-center gap-1 bg-nyx-gray rounded-lg p-1">
@@ -1403,56 +1374,35 @@ const ProductsPage = ({ navigateTo, setOpenAddForm }: { navigateTo: (page: strin
             </section>
 
             {/* Products Grid */}
-            <section className="relative py-16 md:py-24 overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-nyx-black via-nyx-gray/20 to-nyx-black"></div>
-                <div className="container mx-auto px-4 relative z-10">
+            <section className="py-8">
+                <div className="container mx-auto px-4">
                     {loading ? (
-                        <div className="flex justify-center items-center py-20">
+                        <div className="flex justify-center items-center py-32">
                             <div className="flex flex-col items-center gap-4">
-                                <div className="w-12 h-12 border-4 border-nyx-blue/30 border-t-nyx-blue rounded-full animate-spin"></div>
-                                <p className="text-gray-400 text-lg">Loading products...</p>
-                                {/* Show buttons even while loading for authorized users */}
-                                {isAuthorized && (
-                                    <div className="flex gap-4 mt-6">
-                                        <button
-                                            onClick={() => {
-                                                setOpenAddForm(true);
-                                            }}
-                                            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold rounded-xl transition-all duration-300"
-                                        >
-                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            </svg>
-                                            Manage Products
-                                        </button>
-                                    </div>
-                                )}
+                                <div className="w-10 h-10 border-3 border-nyx-blue/30 border-t-nyx-blue rounded-full animate-spin"></div>
+                                <p className="text-gray-400">Loading...</p>
                             </div>
                         </div>
                     ) : displayedProducts.length === 0 ? (
-                        <div className="flex justify-center items-center py-20">
-                            <div className="text-center">
-                                <div className="w-24 h-24 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-6">
-                                    <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className="flex justify-center items-center py-32">
+                            <div className="text-center max-w-md">
+                                <div className="w-20 h-20 bg-nyx-gray/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <svg className="w-10 h-10 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                                     </svg>
                                 </div>
-                                <h3 className="text-2xl font-bold text-white mb-2">No Products Found</h3>
-                                <p className="text-gray-400 mb-6">There are no products available at the moment.</p>
+                                <h3 className="text-xl font-semibold text-white mb-2">No Products Found</h3>
+                                <p className="text-gray-400 text-sm mb-6">No products are currently available.</p>
                                 {isAuthorized && (
-                                    <div className="flex gap-4">
-                                        <button
-                                            onClick={() => setOpenAddForm(true)}
-                                            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold rounded-xl transition-all duration-300"
-                                        >
-                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            </svg>
-                                            Manage Products
-                                        </button>
-                                    </div>
+                                    <button
+                                        onClick={() => setOpenAddForm(true)}
+                                        className="inline-flex items-center gap-2 px-6 py-2.5 bg-nyx-blue text-nyx-black rounded-lg hover:bg-white transition-colors font-medium"
+                                    >
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                        </svg>
+                                        Add Your First Product
+                                    </button>
                                 )}
                             </div>
                         </div>
