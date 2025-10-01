@@ -8,6 +8,7 @@ import { Header } from './components/Header';
 import Footer from './components/Footer';
 import HomePage from './pages/HomePage';
 import ProfilePage from './pages/ProfilePage';
+import ContactPage from './pages/ContactPage';
 import CartSidebar from './components/CartSidebar';
 import AskNyx from './pages/AskNyxPage';
 import { FAQ_DATA, FEATURES_DATA } from './constants';
@@ -2241,7 +2242,7 @@ const App = () => {
                 case 'faq':
                     return <FAQPage />;
                 case 'contact':
-                    return <ContactPage />;
+                    return <ContactPage navigateTo={navigateTo} />;
                 case 'our-story':
                     return <OurStoryPage />;
                 case 'why-us':
