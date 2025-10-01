@@ -1331,7 +1331,7 @@ const ProductsPage = ({ navigateTo, setOpenAddForm }: { navigateTo: (page: strin
                             <select
                                 value={sortBy}
                                 onChange={(e) => setSortBy(e.target.value as any)}
-                                className="flex-1 lg:flex-none bg-nyx-gray border border-gray-700 text-white rounded-lg px-4 py-2.5 focus:border-gray-600 focus:outline-none transition-colors cursor-pointer text-sm"
+                                className="flex-1 lg:flex-none bg-nyx-gray border border-gray-700 text-white rounded-lg px-4 py-2.5 outline-none cursor-pointer text-sm"
                             >
                                 <option value="newest">Newest</option>
                                 <option value="price-low">Price: Low to High</option>
@@ -1343,10 +1343,10 @@ const ProductsPage = ({ navigateTo, setOpenAddForm }: { navigateTo: (page: strin
                             <div className="flex items-center gap-1 bg-nyx-gray rounded-lg p-1">
                                 <button
                                     onClick={() => setViewMode('grid')}
-                                    className={`p-2 rounded transition-colors ${
+                                    className={`p-2 rounded ${
                                         viewMode === 'grid' 
                                             ? 'bg-gray-700 text-white' 
-                                            : 'text-gray-400 hover:text-white'
+                                            : 'text-gray-400'
                                     }`}
                                     title="Grid View"
                                 >
@@ -1356,10 +1356,10 @@ const ProductsPage = ({ navigateTo, setOpenAddForm }: { navigateTo: (page: strin
                                 </button>
                                 <button
                                     onClick={() => setViewMode('list')}
-                                    className={`p-2 rounded transition-colors ${
+                                    className={`p-2 rounded ${
                                         viewMode === 'list' 
                                             ? 'bg-gray-700 text-white' 
-                                            : 'text-gray-400 hover:text-white'
+                                            : 'text-gray-400'
                                     }`}
                                     title="List View"
                                 >
