@@ -1331,7 +1331,7 @@ const ProductsPage = ({ navigateTo, setOpenAddForm }: { navigateTo: (page: strin
                             <select
                                 value={sortBy}
                                 onChange={(e) => setSortBy(e.target.value as any)}
-                                className="flex-1 lg:flex-none bg-nyx-gray border border-gray-700 text-white rounded-lg px-4 py-2.5 focus:border-nyx-blue focus:outline-none transition-colors cursor-pointer text-sm"
+                                className="flex-1 lg:flex-none bg-nyx-gray border border-gray-700 text-white rounded-lg px-4 py-2.5 focus:border-gray-600 focus:outline-none transition-colors cursor-pointer text-sm"
                             >
                                 <option value="newest">Newest</option>
                                 <option value="price-low">Price: Low to High</option>
