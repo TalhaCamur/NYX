@@ -19,17 +19,17 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
   const canManageAllProducts = user && (user.roles.includes('admin') || user.roles.includes('super-admin'));
   const [formData, setFormData] = useState({
     name: '',
-    tagline: '',
+    tag_line: '',
     description: '',
     price: '',
-    originalPrice: '',
+    original_price: '',
     stock: '',
     sku: '',
     images: '',
     specs: '',
     features: '',
-    isVisible: false,
-    isFeatured: false
+    is_visible: false,
+    is_featured: false
   });
   
   // New states for enhanced form
@@ -70,17 +70,17 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
     setEditingProduct(product);
     setFormData({
       name: product.name || '',
-      tagline: product.tagline || '',
+      tag_line: product.tag_line || '',
       description: product.description || '',
       price: product.price?.toString() || '',
-      originalPrice: product.originalPrice?.toString() || '',
+      original_price: product.original_price?.toString() || '',
       stock: product.stock?.toString() || '',
       sku: product.sku || '',
       images: product.images?.join(', ') || '',
       specs: product.specs ? JSON.stringify(product.specs, null, 2) : '',
       features: product.features?.join(', ') || '',
-      isVisible: product.isVisible || false,
-      isFeatured: product.isFeatured || false
+      is_visible: product.is_visible || false,
+      is_featured: product.is_featured || false
     });
     setShowAddForm(true);
   };
@@ -104,17 +104,17 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
   const resetForm = () => {
     setFormData({
       name: '',
-      tagline: '',
+      tag_line: '',
       description: '',
       price: '',
-      originalPrice: '',
+      original_price: '',
       stock: '',
       sku: '',
       images: '',
       specs: '',
       features: '',
-      isVisible: false,
-      isFeatured: false
+      is_visible: false,
+      is_featured: false
     });
     setEditingProduct(null);
     setUploadedImages([]);
@@ -151,17 +151,17 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
 
       const productData = {
         name: formData.name,
-        tagline: formData.tagline,
+        tag_line: formData.tag_line,
         description: formData.description,
         price: parseFloat(formData.price),
-        originalPrice: formData.originalPrice ? parseFloat(formData.originalPrice) : null,
+        original_price: formData.original_price ? parseFloat(formData.original_price) : null,
         stock: parseInt(formData.stock) || 0,
         sku: formData.sku,
         images: imageArray,
         specs: Object.keys(specsObj).length > 0 ? specsObj : null,
         features: featuresArray,
-        isVisible: formData.isVisible,
-        isFeatured: formData.isFeatured
+        is_visible: formData.is_visible,
+        is_featured: formData.is_featured
       };
 
       if (editingProduct) {
@@ -328,8 +328,8 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
                     <label className="block text-white mb-2">Tagline</label>
                     <input
                       type="text"
-                      value={formData.tagline}
-                      onChange={(e) => setFormData({ ...formData, tagline: e.target.value })}
+                      value={formData.tag_line}
+                      onChange={(e) => setFormData({ ...formData, tag_line: e.target.value })}
                       className="w-full bg-nyx-gray border border-gray-700 rounded-lg py-2 px-3 text-white"
                     />
                   </div>
@@ -362,8 +362,8 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
                     <input
                       type="number"
                       step="0.01"
-                      value={formData.originalPrice}
-                      onChange={(e) => setFormData({ ...formData, originalPrice: e.target.value })}
+                      value={formData.original_price}
+                      onChange={(e) => setFormData({ ...formData, original_price: e.target.value })}
                       className="w-full bg-nyx-gray border border-gray-700 rounded-lg py-2 px-3 text-white"
                     />
                   </div>
@@ -427,15 +427,15 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
                       <div className="relative inline-block w-12 h-6 mr-3">
                         <input
                           type="checkbox"
-                          checked={formData.isVisible}
-                          onChange={(e) => setFormData({ ...formData, isVisible: e.target.checked })}
+                          checked={formData.is_visible}
+                          onChange={(e) => setFormData({ ...formData, is_visible: e.target.checked })}
                           className="sr-only"
                         />
                         <div className={`w-12 h-6 rounded-full transition-colors duration-200 ${
-                          formData.isVisible ? 'bg-green-500' : 'bg-gray-600'
+                          formData.is_visible ? 'bg-green-500' : 'bg-gray-600'
                         }`}>
                           <div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-200 ${
-                            formData.isVisible ? 'translate-x-6' : 'translate-x-0.5'
+                            formData.is_visible ? 'translate-x-6' : 'translate-x-0.5'
                           } mt-0.5`}></div>
                         </div>
                       </div>
@@ -451,15 +451,15 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
                       <div className="relative inline-block w-12 h-6 mr-3">
                         <input
                           type="checkbox"
-                          checked={formData.isFeatured}
-                          onChange={(e) => setFormData({ ...formData, isFeatured: e.target.checked })}
+                          checked={formData.is_featured}
+                          onChange={(e) => setFormData({ ...formData, is_featured: e.target.checked })}
                           className="sr-only"
                         />
                         <div className={`w-12 h-6 rounded-full transition-colors duration-200 ${
-                          formData.isFeatured ? 'bg-yellow-500' : 'bg-gray-600'
+                          formData.is_featured ? 'bg-yellow-500' : 'bg-gray-600'
                         }`}>
                           <div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-200 ${
-                            formData.isFeatured ? 'translate-x-6' : 'translate-x-0.5'
+                            formData.is_featured ? 'translate-x-6' : 'translate-x-0.5'
                           } mt-0.5`}></div>
                         </div>
                       </div>
