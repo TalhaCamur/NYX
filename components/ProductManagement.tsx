@@ -77,6 +77,10 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
       : [{name: '', value: ''}];
     setSpecs(specsArray);
     
+    // Set uploaded images from product
+    const productImages = product.images || [];
+    setUploadedImages(productImages);
+    
     setFormData({
       name: product.name || '',
       tag_line: product.tag_line || '',
@@ -85,7 +89,7 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
       original_price: product.price?.toString() || '',
       stock: product.stock?.toString() || '',
       sku: product.sku || '',
-      images: product.images?.join(', ') || '',
+      images: productImages.join(', '),
       specs: '',
       features: product.features?.join(', ') || '',
       is_visible: product.is_visible || false,
@@ -108,6 +112,49 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
     } catch (error) {
       console.error('Error deleting product:', error);
     }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    try {
+      setUploading(true);
+      const uploadedUrls: string[] = [];
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
+        const filePath = `products/${fileName}`;
+
+        const { error: uploadError, data } = await supabase.storage
+          .from('product-images')
+          .upload(filePath, file);
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('product-images')
+          .getPublicUrl(filePath);
+
+        uploadedUrls.push(publicUrl);
+      }
+
+      setUploadedImages([...uploadedImages, ...uploadedUrls]);
+      setFormData({ ...formData, images: [...uploadedImages, ...uploadedUrls].join(', ') });
+    } catch (error) {
+      console.error('Error uploading images:', error);
+      alert('Error uploading images. Please try again.');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const removeUploadedImage = (index: number) => {
+    const newImages = uploadedImages.filter((_, i) => i !== index);
+    setUploadedImages(newImages);
+    setFormData({ ...formData, images: newImages.join(', ') });
   };
 
   const resetForm = () => {
@@ -392,7 +439,7 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
                     </div>
                     
                     {/* Apply Discount Switch */}
-                    <div className="flex items-end">
+                    <div className="flex items-center">
                       <label className="flex items-center cursor-pointer">
                         <div className="relative inline-block w-12 h-6 mr-3">
                           <input
@@ -472,17 +519,76 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
                   </div>
                 </div>
 
-                {/* Image URLs */}
-                <div>
-                  <label className="block text-white mb-2 font-medium">Image URLs</label>
-                  <input
-                    type="text"
-                    value={formData.images}
-                    onChange={(e) => setFormData({ ...formData, images: e.target.value })}
-                    className="w-full bg-nyx-gray border border-gray-700 rounded-lg py-2 px-3 text-white focus:border-nyx-blue focus:outline-none transition-colors"
-                    placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
-                  />
-                  <p className="text-sm text-gray-400 mt-1">Separate multiple URLs with commas</p>
+                {/* Image Upload Section */}
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-white mb-2 font-medium">Product Images</label>
+                    
+                    {/* Upload Button */}
+                    <div className="flex gap-4">
+                      <label className="flex-1 cursor-pointer">
+                        <div className="bg-nyx-gray border-2 border-dashed border-gray-600 rounded-lg py-8 px-4 text-center hover:border-nyx-blue transition-colors">
+                          <svg className="w-12 h-12 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                          </svg>
+                          <p className="text-white font-medium mb-1">
+                            {uploading ? 'Uploading...' : 'Click to upload images'}
+                          </p>
+                          <p className="text-sm text-gray-400">PNG, JPG, WEBP up to 10MB</p>
+                        </div>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          onChange={handleImageUpload}
+                          disabled={uploading}
+                          className="sr-only"
+                        />
+                      </label>
+                    </div>
+
+                    {/* Uploaded Images Preview */}
+                    {uploadedImages.length > 0 && (
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                        {uploadedImages.map((url, index) => (
+                          <div key={index} className="relative group">
+                            <img
+                              src={url}
+                              alt={`Product ${index + 1}`}
+                              className="w-full h-32 object-cover rounded-lg border border-gray-700"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => removeUploadedImage(index)}
+                              className="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Or use Image URLs */}
+                  <div>
+                    <label className="block text-white mb-2 font-medium">Or paste Image URLs</label>
+                    <input
+                      type="text"
+                      value={formData.images}
+                      onChange={(e) => {
+                        setFormData({ ...formData, images: e.target.value });
+                        // Update uploaded images array from URLs
+                        const urls = e.target.value.split(',').map(url => url.trim()).filter(url => url);
+                        setUploadedImages(urls);
+                      }}
+                      className="w-full bg-nyx-gray border border-gray-700 rounded-lg py-2 px-3 text-white focus:border-nyx-blue focus:outline-none transition-colors"
+                      placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
+                    />
+                    <p className="text-sm text-gray-400 mt-1">Separate multiple URLs with commas</p>
+                  </div>
                 </div>
 
                 {/* Features */}
