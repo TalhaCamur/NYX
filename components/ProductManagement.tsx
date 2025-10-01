@@ -165,18 +165,13 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
 
       console.log('✅ Product saved successfully!');
       
-      // Reset form and close modal immediately
+      // Reset form and stay in manage products
       setEditingProduct(null);
       setShowAddForm(false);
       resetForm();
       
-      // Close modal first, then fetch products
-      onClose();
-      
-      // Fetch products in background
-      setTimeout(async () => {
-        await fetchProducts();
-      }, 100);
+      // Fetch products to update the list
+      await fetchProducts();
       
     } catch (error) {
       console.error('Error saving product:', error);
