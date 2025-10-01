@@ -36,7 +36,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, navigateTo })
         
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-2">
-            <span className="text-2xl font-bold text-white">${product.price}</span>
+            {product.original_price && product.original_price > product.price ? (
+              <div className="flex items-center space-x-2">
+                <span className="text-lg text-gray-400 line-through">€{product.original_price}</span>
+                <span className="text-2xl font-bold text-white">€{product.price}</span>
+              </div>
+            ) : (
+              <span className="text-2xl font-bold text-white">€{product.price}</span>
+            )}
           </div>
         </div>
 
