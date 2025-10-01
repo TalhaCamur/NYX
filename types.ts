@@ -7,7 +7,7 @@ export interface Product {
   name: string;
   tagline: string;
   price: number;
-  originalPrice?: number | null;
+  original_price?: number | null;
   stock: number;
   images: string[];
   specs: { name: string; value: string }[];
