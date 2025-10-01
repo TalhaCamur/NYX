@@ -45,11 +45,8 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
   }, []);
 
   useEffect(() => {
-    if (openAddForm) {
-      setShowAddForm(true);
-      setEditingProduct(null);
-      resetForm();
-    }
+    // Don't automatically open add form when openAddForm is true
+    // Only open when explicitly requested
   }, [openAddForm]);
 
   const fetchProducts = async () => {

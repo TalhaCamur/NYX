@@ -2247,7 +2247,7 @@ const App = () => {
                     onClose={() => {
                         setOpenAddForm(false);
                     }} 
-                    openAddForm={openAddForm}
+                    openAddForm={false}
                 />
             )}
         </div>
