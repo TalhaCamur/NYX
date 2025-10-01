@@ -228,13 +228,12 @@ const ProductDetailPage = ({ navigateTo, product }: { navigateTo: (page: string,
 };
 
 // Profile Dropdown Component - Header dışında
-const ProfileDropdown = ({ navigateTo, isUserMenuOpen, setIsUserMenuOpen, user, profileData, setShowProductManagement, setOpenAddForm }: { 
+const ProfileDropdown = ({ navigateTo, isUserMenuOpen, setIsUserMenuOpen, user, profileData, setOpenAddForm }: { 
     navigateTo: (page: string, params?: any) => void;
     isUserMenuOpen: boolean;
     setIsUserMenuOpen: (value: boolean) => void;
     user: any;
     profileData: any;
-    setShowProductManagement: (value: boolean) => void;
     setOpenAddForm: (value: boolean) => void;
 }) => {
     const { logout } = useAuth();
@@ -347,7 +346,7 @@ const ProfileDropdown = ({ navigateTo, isUserMenuOpen, setIsUserMenuOpen, user, 
                     <>
                         <button
                             onClick={() => {
-                                setShowProductManagement(true);
+                                                setOpenAddForm(true);
                                 setIsUserMenuOpen(false);
                             }}
                             className="w-full flex items-center gap-3 p-3 text-white hover:bg-white/10 rounded-xl transition-all duration-200 group"
@@ -364,7 +363,7 @@ const ProfileDropdown = ({ navigateTo, isUserMenuOpen, setIsUserMenuOpen, user, 
                         <button
                             onClick={() => {
                                 setOpenAddForm(true);
-                                setShowProductManagement(true);
+                                                setOpenAddForm(true);
                                 setIsUserMenuOpen(false);
                             }}
                             className="w-full flex items-center gap-3 p-3 text-white hover:bg-white/10 rounded-xl transition-all duration-200 group"
@@ -1215,7 +1214,7 @@ const WhyUsPage = () => (
         </div>
     </div>
 );
-const ProductsPage = ({ navigateTo, showProductManagement, setShowProductManagement, setOpenAddForm }: { navigateTo: (page: string, params?: any) => void, showProductManagement: boolean, setShowProductManagement: (value: boolean) => void, setOpenAddForm: (value: boolean) => void }) => {
+const ProductsPage = ({ navigateTo, setOpenAddForm }: { navigateTo: (page: string, params?: any) => void, setOpenAddForm: (value: boolean) => void }) => {
      const { user } = useAuth();
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(false); // INSTANT LOADING
@@ -1295,7 +1294,7 @@ const ProductsPage = ({ navigateTo, showProductManagement, setShowProductManagem
                         <div className="flex justify-center gap-4 mb-8">
                             <button
                                 onClick={() => {
-                                    setShowProductManagement(true);
+                                    setOpenAddForm(true);
                                 }}
                                 className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-blue-500/25"
                             >
@@ -1308,7 +1307,7 @@ const ProductsPage = ({ navigateTo, showProductManagement, setShowProductManagem
                             <button
                                 onClick={() => {
                                     setOpenAddForm(true);
-                                    setShowProductManagement(true);
+                                    setOpenAddForm(true);
                                 }}
                                 className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-green-500/25"
                             >
@@ -1336,7 +1335,7 @@ const ProductsPage = ({ navigateTo, showProductManagement, setShowProductManagem
                                     <div className="flex gap-4 mt-6">
                                         <button
                                             onClick={() => {
-                                                setShowProductManagement(true);
+                                                setOpenAddForm(true);
                                             }}
                                             className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold rounded-xl transition-all duration-300"
                                         >
@@ -1349,7 +1348,7 @@ const ProductsPage = ({ navigateTo, showProductManagement, setShowProductManagem
                                         <button
                                             onClick={() => {
                                                 setOpenAddForm(true);
-                                                setShowProductManagement(true);
+                                                setOpenAddForm(true);
                                             }}
                                             className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-xl transition-all duration-300"
                                         >
@@ -1375,7 +1374,7 @@ const ProductsPage = ({ navigateTo, showProductManagement, setShowProductManagem
                                 {isAuthorized && (
                                     <div className="flex gap-4">
                                         <button
-                                            onClick={() => setShowProductManagement(true)}
+                                            onClick={() => setOpenAddForm(true)}
                                             className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold rounded-xl transition-all duration-300"
                                         >
                                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1387,7 +1386,7 @@ const ProductsPage = ({ navigateTo, showProductManagement, setShowProductManagem
                                         <button
                                             onClick={() => {
                                                 setOpenAddForm(true);
-                                                setShowProductManagement(true);
+                                                setOpenAddForm(true);
                                             }}
                                             className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-xl transition-all duration-300"
                                         >
@@ -1410,12 +1409,6 @@ const ProductsPage = ({ navigateTo, showProductManagement, setShowProductManagem
             </div>
             </section>
             
-            {/* Product Management Modal */}
-            {showProductManagement && (
-                <ProductManagement 
-                    onClose={() => setShowProductManagement(false)} 
-                />
-            )}
         </div>
     );
 };
@@ -1804,7 +1797,6 @@ const AdminDashboardPage = () => {
     const [modalActionLoading, setModalActionLoading] = useState(false);
 
     // State for management components
-    const [showProductManagement, setShowProductManagement] = useState(false);
     const [showBlogManagement, setShowBlogManagement] = useState(false);
     const [showOrderManagement, setShowOrderManagement] = useState(false);
     const [showCouponManagement, setShowCouponManagement] = useState(false);
@@ -1968,7 +1960,6 @@ const AdminDashboardPage = () => {
     return (
         <>
             {renderModals()}
-            {showProductManagement && <ProductManagement onClose={() => setShowProductManagement(false)} />}
             {showBlogManagement && <BlogManagement onClose={() => setShowBlogManagement(false)} />}
             {showOrderManagement && <OrderManagement onClose={() => setShowOrderManagement(false)} />}
             {showCouponManagement && <CouponManagement onClose={() => setShowCouponManagement(false)} />}
@@ -1992,7 +1983,7 @@ const AdminDashboardPage = () => {
                 {/* Management Buttons */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                     <button
-                        onClick={() => setShowProductManagement(true)}
+                        onClick={() => setOpenAddForm(true)}
                         className="bg-nyx-blue text-nyx-black p-4 rounded-lg hover:bg-white transition-colors text-center"
                     >
                         <h3 className="font-semibold mb-2">Product Management</h3>
@@ -2108,12 +2099,11 @@ const App = () => {
     const [currentPage, setCurrentPage] = useState('home');
     const [pageParams, setPageParams] = useState<any>(null);
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-    const [showProductManagement, setShowProductManagement] = useState(false);
     const [openAddForm, setOpenAddForm] = useState(false);
     
     // Debug state changes
     React.useEffect(() => {
-    }, [showProductManagement]);
+    }, []);
     
     React.useEffect(() => {
     }, [openAddForm]);
@@ -2186,7 +2176,7 @@ const App = () => {
                 case 'profile':
                     return <ProfilePage navigateTo={navigateTo} />;
                 case 'products':
-                    return <ProductsPage navigateTo={navigateTo} showProductManagement={showProductManagement} setShowProductManagement={setShowProductManagement} setOpenAddForm={setOpenAddForm} />;
+                    return <ProductsPage navigateTo={navigateTo} setOpenAddForm={setOpenAddForm} />;
                 case 'product-detail':
                     return <ProductDetailPage navigateTo={navigateTo} product={pageParams?.product} />;
                 case 'blog':
@@ -2239,16 +2229,14 @@ const App = () => {
                     setIsUserMenuOpen={setIsUserMenuOpen}
                     user={user}
                     profileData={profileData}
-                    setShowProductManagement={setShowProductManagement}
                     setOpenAddForm={setOpenAddForm}
                 />
             )}
             
             {/* Product Management Modal - App Level */}
-            {showProductManagement && (
+            {openAddForm && (
                 <ProductManagement 
                     onClose={() => {
-                        setShowProductManagement(false);
                         setOpenAddForm(false);
                     }} 
                     openAddForm={openAddForm}
