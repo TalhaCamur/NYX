@@ -86,117 +86,90 @@ const ContactPage: React.FC<ContactPageProps> = ({ navigateTo }) => {
 
   return (
     <div className="min-h-screen bg-dark text-white">
-      {/* Creative Header */}
-      <section className="relative py-32 overflow-hidden">
-        {/* Animated background elements */}
-        <div className="absolute inset-0">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-gradient-to-r from-nyx-blue/10 to-brand-purple/10 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-gradient-to-r from-brand-pink/10 to-nyx-blue/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        </div>
-
+      {/* Minimalist Elegant Header */}
+      <section className="relative py-20 border-b border-gray-800/50">
+        {/* Subtle background gradient */}
+        <div className="absolute inset-0 bg-gradient-to-b from-nyx-blue/5 via-transparent to-transparent"></div>
+        
         <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-4xl mx-auto text-center">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-nyx-blue/10 border border-nyx-blue/30 mb-8">
-              <div className="w-2 h-2 bg-brand-pink rounded-full animate-pulse"></div>
-              <span className="text-sm font-medium text-gray-200 tracking-wide">24/7 Support Available</span>
+          <div className="max-w-3xl mx-auto text-center">
+            {/* Small badge */}
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-nyx-blue/10 to-brand-purple/10 border border-nyx-blue/20 mb-6">
+              <div className="w-1.5 h-1.5 bg-nyx-blue rounded-full animate-pulse"></div>
+              <span className="text-xs font-medium text-gray-300 tracking-wide">GET IN TOUCH</span>
             </div>
-
-            {/* Title with creative typography */}
-            <h1 className="text-6xl md:text-8xl font-bold mb-6 leading-tight">
-              Let's
-              <span className="block bg-gradient-to-r from-nyx-blue via-cyan-400 to-nyx-blue text-transparent bg-clip-text">
-                Connect
-              </span>
+            
+            {/* Title */}
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+              Contact <span className="bg-gradient-to-r from-nyx-blue via-brand-purple to-brand-pink text-transparent bg-clip-text">NYX</span>
             </h1>
-
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-12">
-              Have a question about our products? Need technical support? Want to share feedback? 
-              <span className="text-nyx-blue font-semibold"> We're here to help</span> and 
-              <span className="text-brand-purple font-semibold"> love hearing from you.</span>
+            
+            {/* Subtitle */}
+            <p className="text-gray-400 text-lg mb-8">
+              We're here to help with any questions or feedback you may have
             </p>
-
-            {/* Quick stats */}
-            <div className="flex items-center justify-center gap-12 text-base">
-              <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-nyx-blue mb-1">&lt; 1hr</div>
-                <div className="text-sm text-gray-400">Response Time</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-brand-purple">24/7</div>
-                <div className="text-sm text-gray-400">Support Available</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-brand-pink">100%</div>
-                <div className="text-sm text-gray-400">Satisfaction Rate</div>
-              </div>
-            </div>
           </div>
         </div>
       </section>
 
       {/* Main Content */}
-      <section className="py-12">
+      <section className="py-16">
         <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
-            <div className="grid lg:grid-cols-5 gap-12">
+          <div className="max-w-5xl mx-auto">
+            <div className="grid lg:grid-cols-3 gap-12">
               {/* Left Side - Contact Info */}
-              <div className="lg:col-span-2 space-y-8">
-                {/* Contact Methods */}
-                <div className="space-y-4">
-                  {contactMethods.map((method, index) => (
-                    <a
-                      key={index}
-                      href={method.link}
-                      className="block p-4 rounded-xl bg-white/5 border border-white/10 hover:border-nyx-blue/50 hover:bg-white/10 transition-all group"
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-gradient-to-br from-nyx-blue/20 to-brand-purple/20 flex items-center justify-center text-nyx-blue group-hover:scale-110 transition-transform">
+              <div className="lg:col-span-1 space-y-6">
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Contact Info</h3>
+                  <div className="space-y-3">
+                    {contactMethods.map((method, index) => (
+                      <a
+                        key={index}
+                        href={method.link}
+                        className="flex items-center gap-3 text-gray-300 hover:text-white transition-colors group"
+                      >
+                        <div className="w-8 h-8 flex items-center justify-center text-gray-400 group-hover:text-nyx-blue transition-colors">
                           {method.icon}
                         </div>
                         <div>
-                          <div className="text-sm text-gray-400 mb-1">{method.title}</div>
-                          <div className="font-medium text-white">{method.value}</div>
+                          <div className="text-xs text-gray-500">{method.title}</div>
+                          <div className="text-sm font-medium">{method.value}</div>
                         </div>
-                      </div>
-                    </a>
-                  ))}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Response Time Badge */}
+                <div className="p-4 rounded-lg bg-nyx-blue/5 border border-nyx-blue/20">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                    <span className="text-sm font-medium text-white">We're Online</span>
+                  </div>
+                  <p className="text-xs text-gray-400">Average response time: &lt;1 hour</p>
                 </div>
 
                 {/* Social Links */}
-                <div className="p-6 rounded-xl bg-gradient-to-br from-white/5 to-transparent border border-white/10">
-                  <h3 className="text-lg font-semibold mb-4">Follow Us</h3>
-                  <div className="flex gap-3">
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Follow Us</h3>
+                  <div className="flex gap-2">
                     {socialLinks.map((social, index) => (
                       <a
                         key={index}
                         href={social.link}
-                        className={`w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-sm font-bold transition-all ${social.color} hover:scale-110 hover:bg-white/10`}
+                        className={`w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-xs font-bold transition-all ${social.color} hover:bg-white/10`}
                       >
                         {social.icon}
                       </a>
                     ))}
                   </div>
                 </div>
-
-                {/* Fun fact */}
-                <div className="p-6 rounded-xl bg-gradient-to-br from-nyx-blue/5 via-brand-purple/5 to-brand-pink/5 border border-nyx-blue/20">
-                  <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0 text-2xl">💡</div>
-                    <div>
-                      <h4 className="font-semibold mb-2 text-nyx-blue">Did you know?</h4>
-                      <p className="text-sm text-gray-400">
-                        Our support team is powered by AI and human expertise to give you the best experience possible.
-                      </p>
-                    </div>
-                  </div>
-                </div>
               </div>
 
               {/* Right Side - Contact Form */}
-              <div className="lg:col-span-3">
-                <div className="p-8 rounded-2xl bg-gradient-to-br from-white/5 to-transparent border border-white/10 backdrop-blur-sm">
-                  <h2 className="text-2xl font-bold mb-6">Send us a message</h2>
+              <div className="lg:col-span-2">
+                <div className="p-8 rounded-xl bg-white/5 border border-white/10">
+                  <h2 className="text-xl font-semibold mb-6">Send a Message</h2>
 
                   {submitStatus === 'success' && (
                     <div className="mb-6 p-4 rounded-lg bg-green-500/10 border border-green-500/20 text-green-400 flex items-center gap-3">
@@ -293,22 +266,21 @@ const ContactPage: React.FC<ContactPageProps> = ({ navigateTo }) => {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-16 border-t border-gray-800/50">
+      <section className="py-12 border-t border-gray-800/50">
         <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl font-bold mb-4">Quick Answers</h2>
-            <p className="text-gray-400 mb-8">Find answers to common questions</p>
+          <div className="max-w-5xl mx-auto">
+            <h2 className="text-2xl font-bold mb-8 text-center">Frequently Asked Questions</h2>
             
-            <div className="grid md:grid-cols-2 gap-4 text-left">
+            <div className="grid md:grid-cols-2 gap-6">
               {[
                 { q: 'What are your response times?', a: 'We typically respond within 24 hours on business days.' },
                 { q: 'Do you offer technical support?', a: 'Yes! Our team provides full technical support for all products.' },
                 { q: 'Can I schedule a demo?', a: 'Absolutely! Contact us to schedule a personalized demo.' },
                 { q: 'Where are you located?', a: "We're based in San Francisco, CA with remote team members worldwide." }
               ].map((item, index) => (
-                <div key={index} className="p-4 rounded-lg bg-white/5 border border-white/10 hover:border-nyx-blue/50 transition-colors">
-                  <h3 className="font-semibold mb-2 text-white">{item.q}</h3>
-                  <p className="text-sm text-gray-400">{item.a}</p>
+                <div key={index} className="p-5 rounded-lg bg-white/5 border border-white/10">
+                  <h3 className="font-semibold mb-2 text-white text-sm">{item.q}</h3>
+                  <p className="text-sm text-gray-400 leading-relaxed">{item.a}</p>
                 </div>
               ))}
             </div>
