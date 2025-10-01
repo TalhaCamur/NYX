@@ -21,6 +21,111 @@ import { BlogManagement } from './components/BlogManagement';
 import { OrderManagement } from './components/OrderManagement';
 import { CouponManagement } from './components/CouponManagement';
 
+// Product Detail Page Component
+const ProductDetailPage = ({ navigateTo, product }: { navigateTo: (page: string, params?: any) => void, product?: Product }) => {
+  const { addToCart } = useCart();
+  
+  if (!product) {
+    return (
+      <div className="min-h-screen bg-dark text-white flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Product Not Found</h1>
+          <button 
+            onClick={() => navigateTo('products')}
+            className="bg-nyx-blue text-nyx-black px-6 py-2 rounded-lg font-semibold hover:bg-white transition-colors"
+          >
+            Back to Products
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const handleAddToCart = () => {
+    addToCart(product, 1);
+  };
+
+  return (
+    <div className="min-h-screen bg-dark text-white">
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          {/* Product Image */}
+          <div className="aspect-square overflow-hidden rounded-2xl">
+            <img 
+              src={product.images?.[0] || product.imageUrl || 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=800&fit=crop&crop=center'} 
+              alt={product.name}
+              className="w-full h-full object-cover"
+            />
+          </div>
+          
+          {/* Product Info */}
+          <div className="space-y-6">
+            <div>
+              <h1 className="text-4xl font-bold text-white mb-4">{product.name}</h1>
+              <p className="text-xl text-gray-300 mb-6">{product.description}</p>
+            </div>
+            
+            {/* Price */}
+            <div className="flex items-center space-x-4">
+              {product.original_price && product.original_price > product.price ? (
+                <div className="flex items-center space-x-4">
+                  <span className="text-2xl text-gray-400 line-through">€{product.original_price}</span>
+                  <span className="text-4xl font-bold text-white">€{product.price}</span>
+                </div>
+              ) : (
+                <span className="text-4xl font-bold text-white">€{product.price}</span>
+              )}
+            </div>
+            
+            {/* Stock */}
+            <div className="text-lg">
+              <span className={product.stock > 0 ? 'text-green-400' : 'text-red-400'}>
+                {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
+              </span>
+            </div>
+            
+            {/* Features */}
+            {product.features && product.features.length > 0 && (
+              <div>
+                <h3 className="text-xl font-semibold mb-3">Features:</h3>
+                <ul className="space-y-2">
+                  {product.features.map((feature, index) => (
+                    <li key={index} className="flex items-center">
+                      <span className="w-2 h-2 bg-nyx-blue rounded-full mr-3"></span>
+                      <span className="text-gray-300">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            
+            {/* Add to Cart Button */}
+            <button
+              onClick={handleAddToCart}
+              disabled={product.stock === 0}
+              className={`w-full py-4 rounded-lg font-semibold text-lg transition-colors ${
+                product.stock > 0 
+                  ? 'bg-nyx-blue text-nyx-black hover:bg-white' 
+                  : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+              }`}
+            >
+              {product.stock > 0 ? 'Add to Cart' : 'Out of Stock'}
+            </button>
+            
+            {/* Back Button */}
+            <button
+              onClick={() => navigateTo('products')}
+              className="w-full py-3 border border-gray-600 text-gray-300 rounded-lg font-semibold hover:border-nyx-blue hover:text-nyx-blue transition-colors"
+            >
+              Back to Products
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // Profile Dropdown Component - Header dışında
 const ProfileDropdown = ({ navigateTo, isUserMenuOpen, setIsUserMenuOpen, user, profileData, setShowProductManagement, setOpenAddForm }: { 
     navigateTo: (page: string, params?: any) => void;
@@ -1981,6 +2086,8 @@ const App = () => {
                     return <ProfilePage navigateTo={navigateTo} />;
                 case 'products':
                     return <ProductsPage navigateTo={navigateTo} showProductManagement={showProductManagement} setShowProductManagement={setShowProductManagement} setOpenAddForm={setOpenAddForm} />;
+                case 'product-detail':
+                    return <ProductDetailPage navigateTo={navigateTo} product={pageParams?.product} />;
                 case 'blog':
                     return <BlogPage navigateTo={navigateTo} />;
                 case 'blog-post':
