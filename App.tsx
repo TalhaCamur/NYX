@@ -1345,7 +1345,7 @@ const ProductsPage = ({ navigateTo, setOpenAddForm }: { navigateTo: (page: strin
                                     onClick={() => setViewMode('grid')}
                                     className={`p-2 rounded transition-colors ${
                                         viewMode === 'grid' 
-                                            ? 'bg-nyx-blue text-nyx-black' 
+                                            ? 'bg-gray-700 text-white' 
                                             : 'text-gray-400 hover:text-white'
                                     }`}
                                     title="Grid View"
@@ -1358,7 +1358,7 @@ const ProductsPage = ({ navigateTo, setOpenAddForm }: { navigateTo: (page: strin
                                     onClick={() => setViewMode('list')}
                                     className={`p-2 rounded transition-colors ${
                                         viewMode === 'list' 
-                                            ? 'bg-nyx-blue text-nyx-black' 
+                                            ? 'bg-gray-700 text-white' 
                                             : 'text-gray-400 hover:text-white'
                                     }`}
                                     title="List View"
