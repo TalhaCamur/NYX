@@ -1438,6 +1438,11 @@ const BlogPage = ({ navigateTo }: { navigateTo: (page: string, params?: any) => 
     const [forceUpdate, setForceUpdate] = useState(0); // Added for force re-render
     const isAuthorized = user && (user.roles.includes('admin') || user.roles.includes('super-admin'));
     
+    // Scroll to top when component mounts
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
+    
     // Fetch blog posts from database - INSTANT LOADING
     useEffect(() => {
         const fetchBlogPosts = async () => {
@@ -1483,50 +1488,56 @@ const BlogPage = ({ navigateTo }: { navigateTo: (page: string, params?: any) => 
     
     return (
         <div className="min-h-screen bg-dark text-white">
-            {/* Blog Content - No Hero Section */}
-            <div className="container mx-auto px-4 relative z-10">
-                <div className="max-w-4xl mx-auto text-center">
-                    <div className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-brand-pink/20 to-brand-purple/20 border border-brand-pink/30 mb-6">
-                        <span className="w-2 h-2 bg-nyx-blue rounded-full mr-2 animate-pulse"></span>
-                        <span className="text-sm font-medium text-gray-300">Latest Insights</span>
-                    </div>
-                    <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6">
-                        NYX
-                        <span className="block bg-gradient-to-r from-brand-pink via-brand-purple to-nyx-blue text-transparent bg-clip-text">
-                            Blog
-                        </span>
-                    </h1>
-                    <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
-                        News, insights, and updates from the team building the 
-                        <span className="text-brand-purple font-semibold"> future</span> of 
-                        <span className="text-nyx-blue font-semibold"> smart living</span>.
-                    </p>
-                    
-                    {/* Add Blog Post Button - Only for authorized users */}
-                    {isAuthorized && (
-                        <div className="flex justify-center mb-8">
-                            <button
-                                onClick={() => {
-                                    // Navigate to blog management or open add blog post modal
-                                }}
-                                className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-orange-500/25"
-                            >
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                </svg>
-                                Add New Blog Post
-                            </button>
-                </div>
-                    )}
-                </div>
-            </div>
-
-            {/* Blog Posts */}
-            <section className="relative py-16 md:py-24 overflow-hidden">
-                {/* Background Effects - Simplified */}
-                <div className="absolute inset-0 bg-gradient-to-br from-nyx-black via-nyx-gray/10 to-nyx-black"></div>
+            {/* Elegant Blog Header */}
+            <section className="relative py-16 border-b border-gray-800/50">
+                {/* Subtle background gradient */}
+                <div className="absolute inset-0 bg-gradient-to-b from-brand-purple/5 via-transparent to-transparent"></div>
                 
                 <div className="container mx-auto px-4 relative z-10">
+                    <div className="max-w-3xl mx-auto text-center">
+                        {/* Small badge */}
+                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-brand-pink/10 to-brand-purple/10 border border-brand-pink/20 mb-6">
+                            <div className="w-1.5 h-1.5 bg-brand-pink rounded-full animate-pulse"></div>
+                            <span className="text-xs font-medium text-gray-300 tracking-wide">LATEST INSIGHTS</span>
+                        </div>
+                        
+                        {/* Title */}
+                        <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+                            NYX <span className="bg-gradient-to-r from-brand-pink via-brand-purple to-nyx-blue text-transparent bg-clip-text">Blog</span>
+                        </h1>
+                        
+                        {/* Subtitle */}
+                        <p className="text-gray-400 text-lg mb-6">
+                            Stories, insights, and updates from the NYX team
+                        </p>
+                        
+                        {/* Stats */}
+                        <div className="flex items-center justify-center gap-6 text-sm text-gray-500">
+                            <div className="flex items-center gap-2">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                                </svg>
+                                <span>{blogPosts.length} {blogPosts.length === 1 ? 'Post' : 'Posts'}</span>
+                            </div>
+                            {isAuthorized && (
+                                <button
+                                    onClick={() => {}}
+                                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/5 text-white rounded-lg hover:bg-white/10 font-medium text-xs border border-white/10"
+                                >
+                                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                    </svg>
+                                    New Post
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Blog Posts */}
+            <section className="py-12">
+                <div className="container mx-auto px-4">
                     {loading ? (
                         <div className="flex justify-center items-center py-20">
                             <div className="flex flex-col items-center gap-4">
