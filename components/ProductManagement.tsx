@@ -19,7 +19,7 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
   const canManageAllProducts = user && (user.roles.includes('admin') || user.roles.includes('super-admin'));
   const [formData, setFormData] = useState({
     name: '',
-    tagline: '',
+    tag_line: '',
     description: '',
     price: '',
     original_price: '',
@@ -173,7 +173,7 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
   const resetForm = () => {
     setFormData({
       name: '',
-      tagline: '',
+      tag_line: '',
       description: '',
       price: '',
       original_price: '',
@@ -196,7 +196,7 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
     setEditingProduct(product);
     setFormData({
       name: product.name,
-      tagline: product.tagline,
+      tag_line: product.tag_line,
       description: product.description || '',
       price: product.price.toString(),
       original_price: product.original_price?.toString() || '',
@@ -310,8 +310,8 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
                   <label className="block text-white mb-2">Tagline</label>
                   <input
                     type="text"
-                    value={formData.tagline}
-                    onChange={(e) => setFormData({ ...formData, tagline: e.target.value })}
+                    value={formData.tag_line}
+                    onChange={(e) => setFormData({ ...formData, tag_line: e.target.value })}
                     className="w-full bg-nyx-gray border border-gray-700 rounded-lg py-2 px-3 text-white"
                   />
                 </div>
@@ -562,7 +562,7 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
                       <h3 className="text-xl font-semibold text-white mb-2">{product.name}</h3>
-                      <p className="text-gray-300 mb-2">{product.tagline}</p>
+                      <p className="text-gray-300 mb-2">{product.tag_line}</p>
                       <div className="flex gap-4 text-sm text-gray-400">
                         <span>Price: ${product.price}</span>
                         <span>Stock: {product.stock}</span>
