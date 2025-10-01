@@ -15,7 +15,7 @@ import { useCart } from './contexts/CartContext';
 import { Product, User, UserRole, BlogPost } from './types';
 import { useAuth, supabase, testSupabaseConnection } from './contexts/AuthContext';
 import CookieConsentBanner from './components/CookieConsentBanner';
-import { ProductCard } from './components/ProductShowcase';
+import { ProductCard, ProductListItem } from './components/ProductShowcase';
 import { ProductManagement } from './components/ProductManagement';
 import { BlogManagement } from './components/BlogManagement';
 import { OrderManagement } from './components/OrderManagement';
@@ -1224,6 +1224,8 @@ const ProductsPage = ({ navigateTo, setOpenAddForm }: { navigateTo: (page: strin
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(false); // INSTANT LOADING
     const [forceUpdate, setForceUpdate] = useState(0); // Added for force re-render
+    const [sortBy, setSortBy] = useState<'newest' | 'price-low' | 'price-high' | 'name'>('newest');
+    const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
      const isAuthorized = user && (user.roles.includes('seller') || user.roles.includes('admin') || user.roles.includes('super-admin'));
     
     // Fetch products from database - INSTANT LOADING
@@ -1272,48 +1274,133 @@ const ProductsPage = ({ navigateTo, setOpenAddForm }: { navigateTo: (page: strin
         fetchProducts();
     }, [forceUpdate]); // Depend on forceUpdate to trigger re-fetch
     
-    const displayedProducts = isAuthorized ? products : products.filter(p => p.isVisible);
+    // Sort and filter products
+    const displayedProducts = React.useMemo(() => {
+        let filtered = isAuthorized ? products : products.filter(p => p.isVisible);
+        
+        // Sort products
+        const sorted = [...filtered].sort((a, b) => {
+            switch (sortBy) {
+                case 'price-low':
+                    return a.price - b.price;
+                case 'price-high':
+                    return b.price - a.price;
+                case 'name':
+                    return a.name.localeCompare(b.name);
+                case 'newest':
+                default:
+                    return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
+            }
+        });
+        
+        return sorted;
+    }, [products, isAuthorized, sortBy]);
 
     return (
         <div className="min-h-screen bg-dark text-white">
-            {/* Products Content - No Hero Section */}
-            <div className="container mx-auto px-4 relative z-10">
-                <div className="max-w-4xl mx-auto text-center">
-                    <div className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-brand-purple/20 to-brand-pink/20 border border-brand-purple/30 mb-6">
-                        <span className="w-2 h-2 bg-nyx-blue rounded-full mr-2 animate-pulse"></span>
-                        <span className="text-sm font-medium text-gray-300">Complete Collection</span>
-                    </div>
-                    <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6">
-                        Our
-                        <span className="block bg-gradient-to-r from-brand-purple via-brand-pink to-nyx-blue text-transparent bg-clip-text">
-                            Collection
-                        </span>
-                    </h1>
-                    <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
-                        Explore the full range of NYX smart home devices, designed to work together to create a 
-                        <span className="text-nyx-blue font-semibold"> seamless</span> and 
-                        <span className="text-brand-purple font-semibold"> intelligent</span> living experience.
-                    </p>
-                    
-                    {/* Product Management Buttons - Only for authorized users */}
-                    {isAuthorized && (
-                        <div className="flex justify-center gap-4 mb-8">
-                            <button
-                                onClick={() => {
-                                    setOpenAddForm(true);
-                                }}
-                                className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-blue-500/25"
-                            >
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
-                                Manage Products
-                            </button>
+            {/* Hero Section */}
+            <div className="relative py-20 md:py-32 overflow-hidden">
+                {/* Animated background */}
+                <div className="absolute inset-0 bg-gradient-to-br from-nyx-black via-brand-purple/5 to-nyx-black"></div>
+                <div className="absolute inset-0 opacity-30">
+                    <div className="absolute top-0 left-1/4 w-96 h-96 bg-brand-purple/20 rounded-full blur-3xl animate-pulse"></div>
+                    <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-nyx-blue/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
                 </div>
-                    )}
+                
+                <div className="container mx-auto px-4 relative z-10">
+                    <div className="max-w-4xl mx-auto text-center">
+                        <div className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-brand-purple/20 to-brand-pink/20 border border-brand-purple/30 mb-6">
+                            <span className="w-2 h-2 bg-nyx-blue rounded-full mr-2 animate-pulse"></span>
+                            <span className="text-sm font-medium text-gray-300">{displayedProducts.length} Products Available</span>
+                        </div>
+                        <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6">
+                            Our Smart
+                            <span className="block bg-gradient-to-r from-brand-purple via-brand-pink to-nyx-blue text-transparent bg-clip-text">
+                                Products
+                            </span>
+                        </h1>
+                        <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
+                            Explore our complete range of smart home devices, designed to work together seamlessly
+                        </p>
+                        
+                        {/* Product Management Button - Only for authorized users */}
+                        {isAuthorized && (
+                            <div className="flex justify-center gap-4 mb-8">
+                                <button
+                                    onClick={() => setOpenAddForm(true)}
+                                    className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-blue-500/25"
+                                >
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                    Manage Products
+                                </button>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
+
+            {/* Filter and Sort Bar */}
+            <section className="relative py-8 border-b border-gray-800">
+                <div className="container mx-auto px-4">
+                    <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                        {/* Results count */}
+                        <div className="text-gray-400">
+                            Showing <span className="text-white font-semibold">{displayedProducts.length}</span> products
+                        </div>
+                        
+                        {/* Sort and View Controls */}
+                        <div className="flex items-center gap-4">
+                            {/* Sort Dropdown */}
+                            <div className="flex items-center gap-2">
+                                <label className="text-sm text-gray-400">Sort by:</label>
+                                <select
+                                    value={sortBy}
+                                    onChange={(e) => setSortBy(e.target.value as any)}
+                                    className="bg-nyx-gray border border-gray-700 text-white rounded-lg px-4 py-2 focus:border-nyx-blue focus:outline-none transition-colors cursor-pointer"
+                                >
+                                    <option value="newest">Newest First</option>
+                                    <option value="price-low">Price: Low to High</option>
+                                    <option value="price-high">Price: High to Low</option>
+                                    <option value="name">Name: A-Z</option>
+                                </select>
+                            </div>
+                            
+                            {/* View Mode Toggle */}
+                            <div className="flex items-center gap-1 bg-nyx-gray rounded-lg p-1">
+                                <button
+                                    onClick={() => setViewMode('grid')}
+                                    className={`p-2 rounded transition-colors ${
+                                        viewMode === 'grid' 
+                                            ? 'bg-nyx-blue text-nyx-black' 
+                                            : 'text-gray-400 hover:text-white'
+                                    }`}
+                                    title="Grid View"
+                                >
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                                    </svg>
+                                </button>
+                                <button
+                                    onClick={() => setViewMode('list')}
+                                    className={`p-2 rounded transition-colors ${
+                                        viewMode === 'list' 
+                                            ? 'bg-nyx-blue text-nyx-black' 
+                                            : 'text-gray-400 hover:text-white'
+                                    }`}
+                                    title="List View"
+                                >
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
             {/* Products Grid */}
             <section className="relative py-16 md:py-24 overflow-hidden">
@@ -1370,11 +1457,19 @@ const ProductsPage = ({ navigateTo, setOpenAddForm }: { navigateTo: (page: strin
                             </div>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                    {displayedProducts.map(product => (
-                        <ProductCard key={product.id} product={product} navigateTo={navigateTo} />
-                    ))}
-                </div>
+                        <div className={
+                            viewMode === 'grid'
+                                ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8'
+                                : 'flex flex-col gap-6'
+                        }>
+                            {displayedProducts.map(product => (
+                                viewMode === 'grid' ? (
+                                    <ProductCard key={product.id} product={product} navigateTo={navigateTo} />
+                                ) : (
+                                    <ProductListItem key={product.id} product={product} navigateTo={navigateTo} />
+                                )
+                            ))}
+                        </div>
                     )}
             </div>
             </section>
