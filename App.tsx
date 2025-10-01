@@ -25,6 +25,11 @@ import { CouponManagement } from './components/CouponManagement';
 const ProductDetailPage = ({ navigateTo, product }: { navigateTo: (page: string, params?: any) => void, product?: Product }) => {
   const { addToCart } = useCart();
   
+  // Scroll to top when component mounts
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+  
   if (!product) {
     return (
       <div className="min-h-screen bg-dark text-white flex items-center justify-center">
@@ -2165,6 +2170,8 @@ const App = () => {
     const navigateTo = (page: string, params?: any) => {
         setCurrentPage(page);
         setPageParams(params);
+        // Scroll to top when navigating
+        window.scrollTo(0, 0);
     };
 
         const renderPage = () => {
