@@ -1228,6 +1228,11 @@ const ProductsPage = ({ navigateTo, setOpenAddForm }: { navigateTo: (page: strin
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
      const isAuthorized = user && (user.roles.includes('seller') || user.roles.includes('admin') || user.roles.includes('super-admin'));
     
+    // Scroll to top when component mounts
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
+    
     // Fetch products from database - INSTANT LOADING
     useEffect(() => {
         const fetchProducts = async () => {
