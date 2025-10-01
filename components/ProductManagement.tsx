@@ -10,7 +10,7 @@ interface ProductManagementProps {
 export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, openAddForm = false }) => {
   const { user } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
 
@@ -54,7 +54,7 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
 
   const fetchProducts = async () => {
     try {
-      setLoading(true);
+      console.log('🔄 Fetching products...');
       const { data, error } = await supabase
         .from('products')
         .select('*')
@@ -62,10 +62,9 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
       
       if (error) throw error;
       setProducts(data || []);
+      console.log('✅ Products fetched successfully!');
     } catch (error) {
       console.error('Error fetching products:', error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -165,11 +164,20 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
       }
 
       console.log('✅ Product saved successfully!');
+      
+      // Reset form and close modal immediately
       setEditingProduct(null);
       setShowAddForm(false);
       resetForm();
-      await fetchProducts();
-      onClose(); // Close the ProductManagement modal
+      
+      // Close modal first, then fetch products
+      onClose();
+      
+      // Fetch products in background
+      setTimeout(async () => {
+        await fetchProducts();
+      }, 100);
+      
     } catch (error) {
       console.error('Error saving product:', error);
     } finally {
