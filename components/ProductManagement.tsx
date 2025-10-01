@@ -54,6 +54,7 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
 
   const fetchProducts = async () => {
     try {
+      setLoading(true);
       const { data, error } = await supabase
         .from('products')
         .select('*')
@@ -163,11 +164,12 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
         if (error) throw error;
       }
 
+      console.log('✅ Product saved successfully!');
       setEditingProduct(null);
       setShowAddForm(false);
       resetForm();
-      fetchProducts();
-      console.log('✅ Product saved successfully!');
+      await fetchProducts();
+      onClose(); // Close the ProductManagement modal
     } catch (error) {
       console.error('Error saving product:', error);
     } finally {
