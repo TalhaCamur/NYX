@@ -3,10 +3,10 @@ import { BlogPost } from '../types';
 import { supabase, useAuth } from '../contexts/AuthContext';
 
 interface BlogManagementProps {
-  onClose: () => void;
+  onUpdate?: () => void;
 }
 
-export const BlogManagement: React.FC<BlogManagementProps> = ({ onClose }) => {
+export const BlogManagement: React.FC<BlogManagementProps> = ({ onUpdate }) => {
   const { user } = useAuth();
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
@@ -52,9 +52,16 @@ export const BlogManagement: React.FC<BlogManagementProps> = ({ onClose }) => {
     e.preventDefault();
     try {
       const postData = {
-        ...formData,
+        title: formData.title,
+        excerpt: formData.excerpt,
+        content: formData.content,
+        featured_image: formData.featuredImage,
+        status: formData.status,
         slug: formData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
         tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
+        seo_title: formData.seoTitle,
+        seo_description: formData.seoDescription,
+        is_featured: formData.isFeatured,
         published_at: formData.status === 'published' ? new Date().toISOString() : null
       };
 
@@ -96,18 +103,18 @@ export const BlogManagement: React.FC<BlogManagementProps> = ({ onClose }) => {
     });
   };
 
-  const handleEdit = (post: BlogPost) => {
+  const handleEdit = (post: any) => {
     setEditingPost(post);
     setFormData({
       title: post.title,
       excerpt: post.excerpt || '',
       content: post.content,
-      featuredImage: post.imageUrl || '',
+      featuredImage: post.featured_image || post.imageUrl || '',
       status: post.status || 'draft',
       tags: post.tags?.join(', ') || '',
-      seoTitle: post.seoTitle || '',
-      seoDescription: post.seoDescription || '',
-      isFeatured: post.isFeatured || false
+      seoTitle: post.seo_title || post.seoTitle || '',
+      seoDescription: post.seo_description || post.seoDescription || '',
+      isFeatured: post.is_featured || post.isFeatured || false
     });
     setShowAddForm(true);
   };
@@ -151,63 +158,44 @@ export const BlogManagement: React.FC<BlogManagementProps> = ({ onClose }) => {
   // Access control check
   if (!isAuthorized) {
     return (
-      <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-        <div className="bg-nyx-black rounded-2xl border border-nyx-gray/50 p-8 text-center">
-          <div className="w-20 h-20 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg className="w-10 h-10 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-            </svg>
-          </div>
-          <h2 className="text-2xl font-bold text-white mb-4">Access Denied</h2>
-          <p className="text-gray-400 mb-6">You don't have permission to manage blog posts.</p>
-          <p className="text-sm text-gray-500 mb-6">Required roles: Content Writer, Admin, or Super Admin</p>
-          <button
-            onClick={onClose}
-            className="bg-nyx-gray text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors"
-          >
-            Close
-          </button>
+      <div className="bg-nyx-black rounded-2xl border border-nyx-gray/50 p-8 text-center">
+        <div className="w-20 h-20 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+          <svg className="w-10 h-10 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+          </svg>
         </div>
+        <h2 className="text-2xl font-bold text-white mb-4">Access Denied</h2>
+        <p className="text-gray-400 mb-6">You don't have permission to manage blog posts.</p>
+        <p className="text-sm text-gray-500 mb-6">Required roles: Content Writer, Admin, or Super Admin</p>
       </div>
     );
   }
 
   if (loading) {
     return (
-      <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center">
-        <div className="bg-nyx-black p-8 rounded-2xl">
-          <div className="text-white">Loading blog posts...</div>
-        </div>
+      <div className="bg-nyx-black p-8 rounded-2xl">
+        <div className="text-white">Loading blog posts...</div>
       </div>
     );
   }
 
   return (
-    <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-      <div className="bg-nyx-black rounded-2xl border border-nyx-gray/50 w-full max-w-6xl max-h-[90vh] overflow-hidden">
-        <div className="p-6 border-b border-nyx-gray/50 flex justify-between items-center">
-          <h2 className="text-2xl font-bold text-white">Blog Management</h2>
-          <div className="flex gap-3">
-            <button
-              onClick={() => {
-                setShowAddForm(true);
-                setEditingPost(null);
-                resetForm();
-              }}
-              className="bg-nyx-blue text-nyx-black px-4 py-2 rounded-lg font-semibold hover:bg-white transition-colors"
-            >
-              Add Post
-            </button>
-            <button
-              onClick={onClose}
-              className="bg-nyx-gray text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors"
-            >
-              Close
-            </button>
-          </div>
-        </div>
+    <div className="bg-nyx-black rounded-2xl border border-nyx-gray/50 w-full">
+      <div className="p-6 border-b border-nyx-gray/50 flex justify-between items-center">
+        <h2 className="text-2xl font-bold text-white">Blog Management</h2>
+        <button
+          onClick={() => {
+            setShowAddForm(true);
+            setEditingPost(null);
+            resetForm();
+          }}
+          className="bg-nyx-blue text-nyx-black px-4 py-2 rounded-lg font-semibold hover:bg-white transition-colors"
+        >
+          Add Post
+        </button>
+      </div>
 
-        <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+      <div className="p-6">
           {showAddForm ? (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
@@ -346,13 +334,13 @@ export const BlogManagement: React.FC<BlogManagementProps> = ({ onClose }) => {
                         }`}>
                           {post.status}
                         </span>
-                        {post.isFeatured && <span className="px-2 py-1 bg-yellow-600 text-white rounded text-xs font-semibold">Featured</span>}
+                        {(post.is_featured || post.isFeatured) && <span className="px-2 py-1 bg-yellow-600 text-white rounded text-xs font-semibold">Featured</span>}
                       </div>
                       <p className="text-gray-300 mb-2">{post.excerpt}</p>
                       <div className="flex gap-4 text-sm text-gray-400">
-                        <span>Author: {post.author}</span>
-                        <span>Created: {new Date(post.date).toLocaleDateString()}</span>
-                        <span>Views: {post.viewCount || 0}</span>
+                        <span>Author: {post.author_name || post.author || 'NYX Team'}</span>
+                        <span>Created: {new Date(post.created_at || post.date).toLocaleDateString()}</span>
+                        <span>Views: {post.view_count || post.viewCount || 0}</span>
                         {post.tags && post.tags.length > 0 && (
                           <span>Tags: {post.tags.join(', ')}</span>
                         )}
@@ -387,7 +375,6 @@ export const BlogManagement: React.FC<BlogManagementProps> = ({ onClose }) => {
               ))}
             </div>
           )}
-        </div>
       </div>
     </div>
   );
