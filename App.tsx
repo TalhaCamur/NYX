@@ -1172,6 +1172,7 @@ const BlogPage = ({ navigateTo }: { navigateTo: (page: string, params?: any) => 
     const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
     const [loading, setLoading] = useState(false); // INSTANT LOADING
     const [forceUpdate, setForceUpdate] = useState(0); // Added for force re-render
+    const [showBlogManagement, setShowBlogManagement] = useState(false);
     const isAuthorized = user && (user.roles.includes('admin') || user.roles.includes('super-admin'));
     
     // Scroll to top when component mounts
@@ -1222,6 +1223,29 @@ const BlogPage = ({ navigateTo }: { navigateTo: (page: string, params?: any) => 
         fetchBlogPosts();
     }, [forceUpdate]); // Depend on forceUpdate to trigger re-fetch
     
+    // Show BlogManagement if user is authorized and clicked "New Post"
+    if (showBlogManagement && isAuthorized) {
+        return (
+            <div className="min-h-screen bg-dark text-white">
+                <div className="container mx-auto px-4 py-8">
+                    <button
+                        onClick={() => setShowBlogManagement(false)}
+                        className="mb-6 inline-flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition-colors"
+                    >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                        Back to Blog
+                    </button>
+                    <BlogManagement onUpdate={() => {
+                        setShowBlogManagement(false);
+                        setForceUpdate(prev => prev + 1);
+                    }} />
+                </div>
+            </div>
+        );
+    }
+    
     return (
         <div className="min-h-screen bg-dark text-white">
             {/* Elegant Blog Header */}
@@ -1257,7 +1281,7 @@ const BlogPage = ({ navigateTo }: { navigateTo: (page: string, params?: any) => 
                             </div>
                             {isAuthorized && (
                                 <button
-                                    onClick={() => {}}
+                                    onClick={() => setShowBlogManagement(true)}
                                     className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/5 text-white rounded-lg hover:bg-white/10 font-medium text-xs border border-white/10"
                                 >
                                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1293,7 +1317,7 @@ const BlogPage = ({ navigateTo }: { navigateTo: (page: string, params?: any) => 
                                 <p className="text-gray-400 mb-6">There are no blog posts available at the moment.</p>
                                 {isAuthorized && (
                                     <button
-                                        onClick={() => {}}
+                                        onClick={() => setShowBlogManagement(true)}
                                         className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold rounded-xl transition-all duration-300"
                                     >
                                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
