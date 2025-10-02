@@ -256,7 +256,7 @@ export const BlogManagement: React.FC<BlogManagementProps> = ({ onClose }) => {
                   <select
                     value={formData.status}
                     onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                    className="w-full bg-nyx-gray border border-gray-700 rounded-lg py-2 px-3 text-white"
+                    className="w-full bg-transparent text-white px-3 py-2 rounded text-sm appearance-none border-0"
                   >
                     <option value="draft">Draft</option>
                     <option value="published">Published</option>
