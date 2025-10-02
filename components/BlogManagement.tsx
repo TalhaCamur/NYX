@@ -96,9 +96,15 @@ export const BlogManagement: React.FC<BlogManagementProps> = ({ onUpdate }) => {
         console.log('🔄 Calling onUpdate callback');
         onUpdate();
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ Error saving blog post:', error);
-      alert('Failed to save blog post. Check console for details.');
+      console.error('Error details:', {
+        message: error?.message,
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint
+      });
+      alert(`Failed to save blog post: ${error?.message || 'Unknown error'}\n\nCheck console for details.`);
     }
   };
 

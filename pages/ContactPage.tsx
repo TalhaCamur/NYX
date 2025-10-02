@@ -264,29 +264,6 @@ const ContactPage: React.FC<ContactPageProps> = ({ navigateTo }) => {
           </div>
         </div>
       </section>
-
-      {/* FAQ Section */}
-      <section className="py-12 border-t border-gray-800/50">
-        <div className="container mx-auto px-4">
-          <div className="max-w-5xl mx-auto">
-            <h2 className="text-2xl font-bold mb-8 text-center">Frequently Asked Questions</h2>
-            
-            <div className="grid md:grid-cols-2 gap-6">
-              {[
-                { q: 'What are your response times?', a: 'We typically respond within 24 hours on business days.' },
-                { q: 'Do you offer technical support?', a: 'Yes! Our team provides full technical support for all products.' },
-                { q: 'Can I schedule a demo?', a: 'Absolutely! Contact us to schedule a personalized demo.' },
-                { q: 'Where are you located?', a: "We're based in San Francisco, CA with remote team members worldwide." }
-              ].map((item, index) => (
-                <div key={index} className="p-5 rounded-lg bg-white/5 border border-white/10">
-                  <h3 className="font-semibold mb-2 text-white text-sm">{item.q}</h3>
-                  <p className="text-sm text-gray-400 leading-relaxed">{item.a}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
     </div>
   );
 };
