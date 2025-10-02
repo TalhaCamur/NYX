@@ -433,45 +433,52 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
               )}
             </div>
           ) : (
-            <div className="space-y-4">
-              {/* Form Header with Back Button */}
-              <div className="flex items-center gap-4 mb-6">
-                <button
-                  type="button"
-                  onClick={() => setShowAddForm(false)}
-                  className="bg-nyx-gray text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors flex items-center gap-2"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                  Back to Products
-                </button>
-                <h3 className="text-xl font-bold text-white">
-                  {editingProduct ? 'Edit Product' : 'Add New Product'}
-                </h3>
-              </div>
+            <div>
+              {/* Premium Form Container */}
+              <div className="bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-xl rounded-2xl border border-white/10 p-8 shadow-2xl">
+                {/* Form Header */}
+                <div className="flex items-center justify-between mb-8 pb-6 border-b border-white/5">
+                  <div>
+                    <h2 className="text-2xl font-bold text-white mb-2">
+                      {editingProduct ? 'Edit Product' : 'Create New Product'}
+                    </h2>
+                    <p className="text-gray-400 text-sm">
+                      {editingProduct ? 'Update your product details' : 'Add a new product to your inventory'}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowAddForm(false)}
+                    className="px-4 py-2 bg-white/5 border border-white/10 text-gray-300 rounded-xl hover:bg-white/10 transition-all flex items-center gap-2"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                    Back
+                  </button>
+                </div>
               
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Product Name and Tagline */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-white mb-2 font-medium">Product Name *</label>
+                    <label className="block text-sm font-semibold text-gray-300 mb-3 tracking-wide">PRODUCT NAME *</label>
                     <input
                       type="text"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full bg-nyx-gray border border-gray-700 rounded-lg py-2 px-3 text-white focus:border-nyx-blue focus:outline-none transition-colors"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl py-3.5 px-4 text-white placeholder-gray-500 focus:border-nyx-blue focus:ring-2 focus:ring-nyx-blue/20 focus:outline-none transition-all"
                       placeholder="Enter product name"
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-white mb-2 font-medium">Tagline</label>
+                    <label className="block text-sm font-semibold text-gray-300 mb-3 tracking-wide">Tagline</label>
                     <input
                       type="text"
                       value={formData.tag_line}
                       onChange={(e) => setFormData({ ...formData, tag_line: e.target.value })}
-                      className="w-full bg-nyx-gray border border-gray-700 rounded-lg py-2 px-3 text-white focus:border-nyx-blue focus:outline-none transition-colors"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl py-3.5 px-4 text-white placeholder-gray-500 focus:border-nyx-blue focus:ring-2 focus:ring-nyx-blue/20 focus:outline-none transition-all"
                       placeholder="Short product tagline"
                     />
                   </div>
@@ -479,11 +486,11 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
 
                 {/* Description */}
                 <div>
-                  <label className="block text-white mb-2 font-medium">Description *</label>
+                  <label className="block text-sm font-semibold text-gray-300 mb-3 tracking-wide">Description *</label>
                   <textarea
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    className="w-full bg-nyx-gray border border-gray-700 rounded-lg py-2 px-3 text-white focus:border-nyx-blue focus:outline-none transition-colors h-24 resize-none"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl py-3.5 px-4 text-white placeholder-gray-500 focus:border-nyx-blue focus:ring-2 focus:ring-nyx-blue/20 focus:outline-none transition-all h-24 resize-none"
                     placeholder="Describe your product..."
                     required
                   />
@@ -493,14 +500,14 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-white mb-2 font-medium">Price (€) *</label>
+                      <label className="block text-sm font-semibold text-gray-300 mb-3 tracking-wide">Price (€) *</label>
                       <input
                         type="number"
                         step="0.01"
                         min="0"
                         value={formData.price}
                         onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                        className="w-full bg-nyx-gray border border-gray-700 rounded-lg py-2 px-3 text-white focus:border-nyx-blue focus:outline-none transition-colors"
+                        className="w-full bg-white/5 border border-white/10 rounded-xl py-3.5 px-4 text-white placeholder-gray-500 focus:border-nyx-blue focus:ring-2 focus:ring-nyx-blue/20 focus:outline-none transition-all"
                         placeholder="0.00"
                         required
                       />
@@ -539,14 +546,14 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
                   {/* Discounted Price - Shows only when Apply Discount is ON */}
                   {applyDiscount && (
                     <div className="bg-nyx-blue/10 border border-nyx-blue/30 rounded-lg p-4">
-                      <label className="block text-white mb-2 font-medium">Discounted Price (€) *</label>
+                      <label className="block text-sm font-semibold text-gray-300 mb-3 tracking-wide">Discounted Price (€) *</label>
                       <input
                         type="number"
                         step="0.01"
                         min="0"
                         value={formData.original_price}
                         onChange={(e) => setFormData({ ...formData, original_price: e.target.value })}
-                        className="w-full bg-nyx-gray border border-gray-700 rounded-lg py-2 px-3 text-white focus:border-nyx-blue focus:outline-none transition-colors"
+                        className="w-full bg-white/5 border border-white/10 rounded-xl py-3.5 px-4 text-white placeholder-gray-500 focus:border-nyx-blue focus:ring-2 focus:ring-nyx-blue/20 focus:outline-none transition-all"
                         placeholder="0.00"
                         required={applyDiscount}
                       />
@@ -565,23 +572,23 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
                 {/* Stock and SKU */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-white mb-2 font-medium">Stock</label>
+                    <label className="block text-sm font-semibold text-gray-300 mb-3 tracking-wide">Stock</label>
                     <input
                       type="number"
                       min="0"
                       value={formData.stock}
                       onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
-                      className="w-full bg-nyx-gray border border-gray-700 rounded-lg py-2 px-3 text-white focus:border-nyx-blue focus:outline-none transition-colors"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl py-3.5 px-4 text-white placeholder-gray-500 focus:border-nyx-blue focus:ring-2 focus:ring-nyx-blue/20 focus:outline-none transition-all"
                       placeholder="0"
                     />
                   </div>
                   <div>
-                    <label className="block text-white mb-2 font-medium">SKU</label>
+                    <label className="block text-sm font-semibold text-gray-300 mb-3 tracking-wide">SKU</label>
                     <input
                       type="text"
                       value={formData.sku}
                       onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
-                      className="w-full bg-nyx-gray border border-gray-700 rounded-lg py-2 px-3 text-white focus:border-nyx-blue focus:outline-none transition-colors"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl py-3.5 px-4 text-white placeholder-gray-500 focus:border-nyx-blue focus:ring-2 focus:ring-nyx-blue/20 focus:outline-none transition-all"
                       placeholder="Product SKU"
                     />
                   </div>
@@ -590,7 +597,7 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
                 {/* Image Upload Section */}
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-white mb-2 font-medium">Product Images</label>
+                    <label className="block text-sm font-semibold text-gray-300 mb-3 tracking-wide">Product Images</label>
                     
                     {/* Upload Button */}
                     <div className="flex gap-4">
@@ -642,7 +649,7 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
 
                   {/* Or use Image URLs */}
                   <div>
-                    <label className="block text-white mb-2 font-medium">Or paste Image URLs</label>
+                    <label className="block text-sm font-semibold text-gray-300 mb-3 tracking-wide">Or paste Image URLs</label>
                     <input
                       type="text"
                       value={formData.images}
@@ -652,7 +659,7 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
                         const urls = e.target.value.split(',').map(url => url.trim()).filter(url => url);
                         setUploadedImages(urls);
                       }}
-                      className="w-full bg-nyx-gray border border-gray-700 rounded-lg py-2 px-3 text-white focus:border-nyx-blue focus:outline-none transition-colors"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl py-3.5 px-4 text-white placeholder-gray-500 focus:border-nyx-blue focus:ring-2 focus:ring-nyx-blue/20 focus:outline-none transition-all"
                       placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
                     />
                     <p className="text-sm text-gray-400 mt-1">Separate multiple URLs with commas</p>
@@ -661,12 +668,12 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
 
                 {/* Features */}
                 <div>
-                  <label className="block text-white mb-2 font-medium">Features</label>
+                  <label className="block text-sm font-semibold text-gray-300 mb-3 tracking-wide">Features</label>
                   <input
                     type="text"
                     value={formData.features}
                     onChange={(e) => setFormData({ ...formData, features: e.target.value })}
-                    className="w-full bg-nyx-gray border border-gray-700 rounded-lg py-2 px-3 text-white focus:border-nyx-blue focus:outline-none transition-colors"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl py-3.5 px-4 text-white placeholder-gray-500 focus:border-nyx-blue focus:ring-2 focus:ring-nyx-blue/20 focus:outline-none transition-all"
                     placeholder="WiFi, Bluetooth, Voice Control"
                   />
                   <p className="text-sm text-gray-400 mt-1">Separate features with commas</p>
@@ -674,7 +681,7 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
 
                 {/* Specifications */}
                 <div>
-                  <label className="block text-white mb-2 font-medium">Specifications</label>
+                  <label className="block text-sm font-semibold text-gray-300 mb-3 tracking-wide">Specifications</label>
                   <div className="space-y-3">
                     {specs.map((spec, index) => (
                       <div key={index} className="grid grid-cols-2 gap-3">
@@ -686,7 +693,7 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
                             newSpecs[index].name = e.target.value;
                             setSpecs(newSpecs);
                           }}
-                          className="bg-nyx-gray border border-gray-700 rounded-lg py-2 px-3 text-white focus:border-nyx-blue focus:outline-none transition-colors"
+                          className="bg-white/5 border border-white/10 rounded-xl py-3.5 px-4 text-white placeholder-gray-500 focus:border-nyx-blue focus:ring-2 focus:ring-nyx-blue/20 focus:outline-none transition-all"
                           placeholder="Spec name (e.g., Weight)"
                         />
                         <div className="flex gap-2">
@@ -698,7 +705,7 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
                               newSpecs[index].value = e.target.value;
                               setSpecs(newSpecs);
                             }}
-                            className="flex-1 bg-nyx-gray border border-gray-700 rounded-lg py-2 px-3 text-white focus:border-nyx-blue focus:outline-none transition-colors"
+                            className="flex-1 bg-white/5 border border-white/10 rounded-xl py-3.5 px-4 text-white placeholder-gray-500 focus:border-nyx-blue focus:ring-2 focus:ring-nyx-blue/20 focus:outline-none transition-all"
                             placeholder="Value (e.g., 1.2kg)"
                           />
                           {specs.length > 1 && (
@@ -783,26 +790,35 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
                   <button
                     type="submit"
                     disabled={loading}
-                    className="bg-nyx-blue text-nyx-black px-6 py-2 rounded-lg hover:bg-white transition-colors disabled:opacity-50 flex items-center gap-2"
+                    className="flex-1 group relative px-6 py-4 bg-gradient-to-r from-nyx-blue to-brand-purple text-white font-semibold rounded-xl overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-nyx-blue/50 disabled:opacity-50"
                   >
-                    {loading ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-nyx-black"></div>
-                        {editingProduct ? 'Updating...' : 'Creating...'}
-                      </>
-                    ) : (
-                      editingProduct ? 'Update Product' : 'Create Product'
-                    )}
+                    <div className="absolute inset-0 bg-gradient-to-r from-brand-purple to-nyx-blue opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div className="relative flex items-center justify-center gap-2">
+                      {loading ? (
+                        <>
+                          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                          <span>{editingProduct ? 'Updating...' : 'Creating...'}</span>
+                        </>
+                      ) : (
+                        <>
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                          <span>{editingProduct ? 'Update Product' : 'Create Product'}</span>
+                        </>
+                      )}
+                    </div>
                   </button>
                   <button
                     type="button"
                     onClick={() => setShowAddForm(false)}
-                    className="bg-nyx-gray text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors"
+                    className="px-6 py-4 bg-white/5 border border-white/10 text-gray-300 font-semibold rounded-xl hover:bg-white/10 transition-all"
                   >
                     Cancel
                   </button>
                 </div>
               </form>
+              </div>
             </div>
           )}
         </div>
