@@ -276,37 +276,65 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
   }
 
   return (
-    <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-      <div className="bg-nyx-black rounded-2xl border border-nyx-gray/50 w-full max-w-6xl max-h-[90vh] overflow-hidden">
-        <div className="p-6 border-b border-nyx-gray/50 flex justify-between items-center">
-          <h2 className="text-2xl font-bold text-white">Product Management</h2>
-          <div className="flex gap-3">
-            <button
-              onClick={onClose}
-              className="bg-nyx-gray text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors flex items-center gap-2"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-              Close
-            </button>
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-gradient-to-br from-nyx-black/95 to-nyx-gray/95 backdrop-blur-xl rounded-2xl border border-white/10 w-full max-w-7xl max-h-[95vh] overflow-hidden shadow-2xl">
+        {/* Premium Header with Gradient Background */}
+        <div className="relative overflow-hidden bg-gradient-to-br from-nyx-blue/10 via-brand-purple/5 to-transparent border-b border-white/5">
+          {/* Animated Background Elements */}
+          <div className="absolute inset-0 overflow-hidden">
+            <div className="absolute -top-16 -right-16 w-64 h-64 bg-nyx-blue/10 rounded-full blur-3xl"></div>
+            <div className="absolute -bottom-16 -left-16 w-64 h-64 bg-brand-purple/10 rounded-full blur-3xl"></div>
+          </div>
+          
+          <div className="relative px-8 py-8">
+            <div className="flex items-center justify-between">
+              <div>
+                {/* Premium Badge */}
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-nyx-blue/20 to-brand-purple/20 border border-nyx-blue/30 mb-3">
+                  <div className="w-2 h-2 bg-nyx-blue rounded-full animate-pulse"></div>
+                  <span className="text-xs font-semibold text-gray-300 tracking-wider">PRODUCT STUDIO</span>
+                </div>
+                
+                {/* Title */}
+                <h1 className="text-3xl font-bold">
+                  <span className="text-white">Product</span>{' '}
+                  <span className="bg-gradient-to-r from-nyx-blue via-brand-purple to-brand-pink text-transparent bg-clip-text">Management</span>
+                </h1>
+              </div>
+              
+              {/* Close Button */}
+              <button
+                onClick={onClose}
+                className="group p-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-xl transition-all"
+              >
+                <svg className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
 
-        <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+        <div className="p-8 overflow-y-auto max-h-[calc(95vh-140px)]">
           {!showAddForm ? (
             <div className="space-y-6">
               {/* Header */}
-              <div className="flex justify-between items-center">
-                <h3 className="text-xl font-bold text-white">Manage Products</h3>
+              <div className="flex justify-between items-center mb-2">
+                <div>
+                  <p className="text-sm text-gray-400 mb-1">Your Inventory</p>
+                  <h3 className="text-xl font-bold text-white">{products.length} Products</h3>
+                </div>
                 <button
                   onClick={() => setShowAddForm(true)}
-                  className="bg-nyx-blue text-nyx-black px-4 py-2 rounded-lg hover:bg-white transition-colors flex items-center gap-2"
+                  className="group relative px-6 py-3 bg-gradient-to-r from-nyx-blue to-brand-purple text-white font-semibold rounded-xl overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-nyx-blue/50 hover:scale-105"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
-                  Add New Product
+                  <div className="absolute inset-0 bg-gradient-to-r from-brand-purple to-nyx-blue opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <div className="relative flex items-center gap-2">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                    <span>New Product</span>
+                  </div>
                 </button>
               </div>
 
@@ -317,46 +345,86 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({ onClose, o
                   <p className="text-gray-400 mt-2">Loading products...</p>
                 </div>
               ) : products.length === 0 ? (
-                <div className="text-center py-8">
-                  <p className="text-gray-400">No products found. Add your first product!</p>
+                <div className="text-center py-20">
+                  <div className="w-20 h-20 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                    <svg className="w-10 h-10 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-semibold text-white mb-2">No products yet</h3>
+                  <p className="text-gray-400 mb-6">Create your first product to get started</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                   {products.map((product) => (
-                    <div key={product.id} className="bg-nyx-gray/30 backdrop-blur-sm rounded-xl p-4 border border-white/10">
-                      <div className="aspect-square overflow-hidden rounded-lg mb-3">
+                    <div key={product.id} className="group relative bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-xl rounded-xl border border-white/10 overflow-hidden hover:border-nyx-blue/30 transition-all duration-300 hover:shadow-lg hover:shadow-nyx-blue/10">
+                      {/* Product Image */}
+                      <div className="aspect-square overflow-hidden relative">
                         <img 
                           src={product.images?.[0] || product.imageUrl || 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=400&fit=crop&crop=center'} 
                           alt={product.name}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
                         />
-                      </div>
-                      <div className="space-y-2">
-                        <h4 className="text-white font-semibold truncate">{product.name}</h4>
-                        <p className="text-gray-400 text-sm line-clamp-2">{product.description}</p>
-                        <div className="flex items-center justify-between">
-                          <span className="text-nyx-blue font-bold">€{product.price}</span>
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => handleEdit(product)}
-                              className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition-colors"
-                            >
-                              Edit
-                            </button>
-                            <button
-                              onClick={() => handleDelete(product.id)}
-                              className="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 transition-colors"
-                            >
-                              Delete
-                            </button>
-                          </div>
-                        </div>
-                        <div className="flex gap-4 text-xs text-gray-400">
-                          <span>Stock: {product.stock}</span>
-                          <span className={product.is_visible ? 'text-green-400' : 'text-red-400'}>
-                            {product.is_visible ? 'Visible' : 'Hidden'}
+                        {/* Badges Overlay */}
+                        <div className="absolute top-3 right-3 flex flex-col gap-2">
+                          {product.is_featured && (
+                            <span className="px-2 py-1 rounded-lg text-xs font-semibold bg-yellow-500/90 text-yellow-950 backdrop-blur-sm">
+                              ⭐ Featured
+                            </span>
+                          )}
+                          <span className={`px-2 py-1 rounded-lg text-xs font-semibold backdrop-blur-sm ${
+                            product.is_visible 
+                              ? 'bg-green-500/90 text-green-950' 
+                              : 'bg-red-500/90 text-red-950'
+                          }`}>
+                            {product.is_visible ? '👁 Visible' : '🔒 Hidden'}
                           </span>
-                          {product.is_featured && <span className="text-yellow-400">Featured</span>}
+                        </div>
+                        {/* Stock Badge */}
+                        <div className="absolute bottom-3 left-3">
+                          <span className="px-3 py-1 rounded-lg text-xs font-semibold bg-black/70 text-white backdrop-blur-sm">
+                            📦 {product.stock} in stock
+                          </span>
+                        </div>
+                      </div>
+                      
+                      {/* Product Info */}
+                      <div className="p-4">
+                        <h4 className="text-white font-bold text-lg mb-2 truncate">{product.name}</h4>
+                        {product.tag_line && (
+                          <p className="text-gray-400 text-xs mb-2 line-clamp-1">{product.tag_line}</p>
+                        )}
+                        <p className="text-gray-500 text-sm mb-3 line-clamp-2">{product.description}</p>
+                        
+                        {/* Price */}
+                        <div className="mb-4">
+                          {product.original_price && product.original_price > product.price ? (
+                            <div className="flex items-center gap-2">
+                              <span className="text-nyx-blue font-bold text-xl">€{product.price}</span>
+                              <span className="text-gray-500 text-sm line-through">€{product.original_price}</span>
+                              <span className="px-2 py-0.5 bg-red-500/20 text-red-400 text-xs font-semibold rounded">
+                                -{Math.round(((product.original_price - product.price) / product.original_price) * 100)}%
+                              </span>
+                            </div>
+                          ) : (
+                            <span className="text-nyx-blue font-bold text-xl">€{product.price}</span>
+                          )}
+                        </div>
+                        
+                        {/* Action Buttons */}
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleEdit(product)}
+                            className="flex-1 px-4 py-2.5 rounded-lg text-sm font-semibold bg-nyx-blue/20 text-nyx-blue border border-nyx-blue/30 hover:bg-nyx-blue/30 transition-all"
+                          >
+                            ✎ Edit
+                          </button>
+                          <button
+                            onClick={() => handleDelete(product.id)}
+                            className="flex-1 px-4 py-2.5 rounded-lg text-sm font-semibold bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30 transition-all"
+                          >
+                            🗑 Delete
+                          </button>
                         </div>
                       </div>
                     </div>
