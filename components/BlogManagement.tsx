@@ -50,6 +50,7 @@ export const BlogManagement: React.FC<BlogManagementProps> = ({ onUpdate }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log('📝 Submitting blog post...', formData);
+    console.log('👤 Current user:', user);
     
     try {
       const postData: any = {
@@ -58,7 +59,9 @@ export const BlogManagement: React.FC<BlogManagementProps> = ({ onUpdate }) => {
         content: formData.content,
         status: formData.status,
         slug: formData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-        published_at: formData.status === 'published' ? new Date().toISOString() : null
+        published_at: formData.status === 'published' ? new Date().toISOString() : null,
+        author_id: user?.id || null,
+        author_name: user?.email?.split('@')[0] || 'NYX Team'
       };
 
       // Add optional fields only if they have values
