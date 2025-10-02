@@ -253,17 +253,17 @@ export const BlogManagement: React.FC<BlogManagementProps> = ({ onClose }) => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-white mb-2">Status</label>
-                  <div className="flex items-center gap-2">
+                  <div className="relative inline-block">
                     <select
                       value={formData.status}
                       onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                      className="bg-transparent text-white px-2 py-2 text-sm appearance-none border-0 outline-none"
+                      className="bg-transparent text-white pl-2 pr-8 py-2 text-sm appearance-none border-0 outline-none cursor-pointer"
                     >
                       <option value="draft">Draft</option>
                       <option value="published">Published</option>
                       <option value="archived">Archived</option>
                     </select>
-                    <svg className="w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 text-gray-400 pointer-events-none absolute right-2 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
                   </div>
