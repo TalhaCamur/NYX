@@ -61,7 +61,7 @@ export const BlogManagement: React.FC<BlogManagementProps> = ({ onUpdate }) => {
         slug: formData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
         published_at: formData.status === 'published' ? new Date().toISOString() : null,
         author_id: user?.id || null,
-        author_name: user?.email?.split('@')[0] || 'NYX Team'
+        author_name: user?.nickname || user?.email?.split('@')[0] || 'NYX Team'
       };
 
       // Add optional fields only if they have values
