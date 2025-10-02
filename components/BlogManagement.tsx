@@ -49,6 +49,8 @@ export const BlogManagement: React.FC<BlogManagementProps> = ({ onUpdate }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('📝 Submitting blog post...', formData);
+    
     try {
       const postData: any = {
         title: formData.title,
@@ -65,6 +67,8 @@ export const BlogManagement: React.FC<BlogManagementProps> = ({ onUpdate }) => {
       if (formData.seoTitle) postData.seo_title = formData.seoTitle;
       if (formData.seoDescription) postData.seo_description = formData.seoDescription;
 
+      console.log('📤 Sending to database:', postData);
+
       if (editingPost) {
         const { error } = await supabase
           .from('blog_posts')
@@ -72,20 +76,29 @@ export const BlogManagement: React.FC<BlogManagementProps> = ({ onUpdate }) => {
           .eq('id', editingPost.id);
         
         if (error) throw error;
+        console.log('✅ Blog post updated successfully');
       } else {
         const { error } = await supabase
           .from('blog_posts')
           .insert([postData]);
         
         if (error) throw error;
+        console.log('✅ Blog post created successfully');
       }
 
       setEditingPost(null);
       setShowAddForm(false);
       resetForm();
       fetchBlogPosts();
+      
+      // Call onUpdate callback if provided
+      if (onUpdate) {
+        console.log('🔄 Calling onUpdate callback');
+        onUpdate();
+      }
     } catch (error) {
-      console.error('Error saving blog post:', error);
+      console.error('❌ Error saving blog post:', error);
+      alert('Failed to save blog post. Check console for details.');
     }
   };
 
@@ -181,16 +194,18 @@ export const BlogManagement: React.FC<BlogManagementProps> = ({ onUpdate }) => {
     <div className="bg-nyx-black rounded-2xl border border-nyx-gray/50 w-full">
       <div className="p-6 border-b border-nyx-gray/50 flex justify-between items-center">
         <h2 className="text-2xl font-bold text-white">Blog Management</h2>
-        <button
-          onClick={() => {
-            setShowAddForm(true);
-            setEditingPost(null);
-            resetForm();
-          }}
-          className="bg-nyx-blue text-nyx-black px-4 py-2 rounded-lg font-semibold hover:bg-white transition-colors"
-        >
-          Add Post
-        </button>
+        {!showAddForm && (
+          <button
+            onClick={() => {
+              setShowAddForm(true);
+              setEditingPost(null);
+              resetForm();
+            }}
+            className="bg-nyx-blue text-nyx-black px-4 py-2 rounded-lg font-semibold hover:bg-white transition-colors"
+          >
+            Add Post
+          </button>
+        )}
       </div>
 
       <div className="p-6">
