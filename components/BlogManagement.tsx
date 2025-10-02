@@ -24,8 +24,7 @@ export const BlogManagement: React.FC<BlogManagementProps> = ({ onUpdate }) => {
     status: 'draft',
     tags: '',
     seoTitle: '',
-    seoDescription: '',
-    isFeatured: false
+    seoDescription: ''
   });
 
   useEffect(() => {
@@ -51,19 +50,20 @@ export const BlogManagement: React.FC<BlogManagementProps> = ({ onUpdate }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const postData = {
+      const postData: any = {
         title: formData.title,
         excerpt: formData.excerpt,
         content: formData.content,
-        featured_image: formData.featuredImage,
         status: formData.status,
         slug: formData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-        tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
-        seo_title: formData.seoTitle,
-        seo_description: formData.seoDescription,
-        is_featured: formData.isFeatured,
         published_at: formData.status === 'published' ? new Date().toISOString() : null
       };
+
+      // Add optional fields only if they have values
+      if (formData.featuredImage) postData.featured_image = formData.featuredImage;
+      if (formData.tags) postData.tags = formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag);
+      if (formData.seoTitle) postData.seo_title = formData.seoTitle;
+      if (formData.seoDescription) postData.seo_description = formData.seoDescription;
 
       if (editingPost) {
         const { error } = await supabase
@@ -98,8 +98,7 @@ export const BlogManagement: React.FC<BlogManagementProps> = ({ onUpdate }) => {
       status: 'draft',
       tags: '',
       seoTitle: '',
-      seoDescription: '',
-      isFeatured: false
+      seoDescription: ''
     });
   };
 
@@ -113,8 +112,7 @@ export const BlogManagement: React.FC<BlogManagementProps> = ({ onUpdate }) => {
       status: post.status || 'draft',
       tags: post.tags?.join(', ') || '',
       seoTitle: post.seo_title || post.seoTitle || '',
-      seoDescription: post.seo_description || post.seoDescription || '',
-      isFeatured: post.is_featured || post.isFeatured || false
+      seoDescription: post.seo_description || post.seoDescription || ''
     });
     setShowAddForm(true);
   };
@@ -287,18 +285,6 @@ export const BlogManagement: React.FC<BlogManagementProps> = ({ onUpdate }) => {
                 />
               </div>
 
-              <div className="flex gap-4">
-                <label className="flex items-center text-white">
-                  <input
-                    type="checkbox"
-                    checked={formData.isFeatured}
-                    onChange={(e) => setFormData({ ...formData, isFeatured: e.target.checked })}
-                    className="mr-2"
-                  />
-                  Featured Post
-                </label>
-              </div>
-
               <div className="flex gap-3 pt-4">
                 <button
                   type="submit"
@@ -334,7 +320,6 @@ export const BlogManagement: React.FC<BlogManagementProps> = ({ onUpdate }) => {
                         }`}>
                           {post.status}
                         </span>
-                        {(post.is_featured || post.isFeatured) && <span className="px-2 py-1 bg-yellow-600 text-white rounded text-xs font-semibold">Featured</span>}
                       </div>
                       <p className="text-gray-300 mb-2">{post.excerpt}</p>
                       <div className="flex gap-4 text-sm text-gray-400">
