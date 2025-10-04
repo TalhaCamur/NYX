@@ -772,17 +772,21 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo }) => {
                                 </div>
                             </div>
 
-                            {/* Personal Information */}
-                            <div className={`mb-8 transition-all duration-300 ${isEditing ? 'ring-2 ring-blue-500/30 rounded-2xl p-6 bg-blue-500/5' : ''}`}>
-                                <h3 className="text-xl font-semibold text-white mb-3 flex items-center gap-2">
-                                    {isEditing && (
-                                        <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
-                                    )}
-                                    Personal Information
-                                    {isEditing && (
-                                        <span className="text-sm text-blue-300 font-normal">(Click to edit)</span>
-                                    )}
-                                </h3>
+                            {/* Personal Information Card */}
+                            <div className="bg-gradient-to-br from-white/[0.06] to-white/[0.02] backdrop-blur-xl rounded-2xl border border-white/10 p-8 shadow-xl">
+                                <div className="flex items-center gap-3 mb-6">
+                                    <div className="p-3 bg-gradient-to-br from-nyx-blue/20 to-brand-purple/20 rounded-xl border border-nyx-blue/30">
+                                        <svg className="w-6 h-6 text-nyx-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h3 className="text-2xl font-bold text-white">Personal Information</h3>
+                                        {isEditing && (
+                                            <span className="text-sm text-nyx-blue font-semibold">✏️ Edit mode active</span>
+                                        )}
+                                    </div>
+                                </div>
                                 <div className="grid md:grid-cols-2 gap-6">
                                     <div>
                                         <label className="block text-sm font-semibold text-gray-300 mb-3 tracking-wide">First Name</label>
@@ -829,41 +833,49 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo }) => {
                                 </div>
                             </div>
 
-                            {/* Bio */}
-                            <div className={`mb-8 transition-all duration-300 ${isEditing ? 'ring-2 ring-blue-500/30 rounded-2xl p-6 bg-blue-500/5' : ''}`}>
-                                <h3 className="text-xl font-semibold text-white mb-3 flex items-center gap-2">
-                                    {isEditing && (
-                                        <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
-                                    )}
-                                    About
-                                    {isEditing && (
-                                        <span className="text-sm text-blue-300 font-normal">(Click to edit)</span>
-                                    )}
-                                </h3>
+                            {/* Bio Card */}
+                            <div className="bg-gradient-to-br from-white/[0.06] to-white/[0.02] backdrop-blur-xl rounded-2xl border border-white/10 p-8 shadow-xl">
+                                <div className="flex items-center gap-3 mb-6">
+                                    <div className="p-3 bg-gradient-to-br from-brand-purple/20 to-brand-pink/20 rounded-xl border border-brand-purple/30">
+                                        <svg className="w-6 h-6 text-brand-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h3 className="text-2xl font-bold text-white">About Me</h3>
+                                        {isEditing && (
+                                            <span className="text-sm text-brand-purple font-semibold">✏️ Edit mode active</span>
+                                        )}
+                                    </div>
+                                </div>
                                 {isEditing ? (
                                     <textarea
                                         value={editData.bio || ''}
                                         onChange={(e) => handleInputChange('bio', e.target.value)}
-                                        className="w-full p-4 bg-white/10 border-2 border-blue-500/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-300 shadow-lg resize-none"
-                                        rows={3}
+                                        className="w-full p-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:border-nyx-blue focus:ring-2 focus:ring-nyx-blue/20 focus:outline-none transition-all resize-none"
+                                        rows={4}
                                         placeholder="Tell us about yourself..."
                                     />
                                 ) : (
-                                    <p className="text-gray-300 leading-relaxed">{profileData.bio || 'No bio available.'}</p>
+                                    <p className="text-gray-300 leading-relaxed text-lg">{profileData.bio || 'No bio available yet. Click edit to add one!'}</p>
                                 )}
                             </div>
 
-                            {/* Contact Information */}
-                            <div className={`mb-8 transition-all duration-300 ${isEditing ? 'ring-2 ring-blue-500/30 rounded-2xl p-6 bg-blue-500/5' : ''}`}>
-                                <h3 className="text-xl font-semibold text-white mb-3 flex items-center gap-2">
-                                    {isEditing && (
-                                        <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
-                                    )}
-                                    Contact Information
-                                    {isEditing && (
-                                        <span className="text-sm text-blue-300 font-normal">(Click to edit)</span>
-                                    )}
-                                </h3>
+                            {/* Contact Information Card */}
+                            <div className="bg-gradient-to-br from-white/[0.06] to-white/[0.02] backdrop-blur-xl rounded-2xl border border-white/10 p-8 shadow-xl">
+                                <div className="flex items-center gap-3 mb-6">
+                                    <div className="p-3 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-xl border border-green-500/30">
+                                        <svg className="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h3 className="text-2xl font-bold text-white">Contact Information</h3>
+                                        {isEditing && (
+                                            <span className="text-sm text-green-400 font-semibold">✏️ Edit mode active</span>
+                                        )}
+                                    </div>
+                                </div>
                                 <div className="space-y-4">
                                     <div>
                                         <label className="block text-sm font-semibold text-gray-300 mb-3 tracking-wide">Phone Number</label>
