@@ -724,13 +724,13 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo }) => {
                                 </h3>
                                 <div className="grid md:grid-cols-2 gap-6">
                                     <div>
-                                        <label className="block text-sm text-gray-400 mb-2">First Name</label>
+                                        <label className="block text-sm font-semibold text-gray-300 mb-3 tracking-wide">First Name</label>
                                         {isEditing ? (
                                             <input
                                                 type="text"
                                                 value={editData.first_name || ''}
                                                 onChange={(e) => handleInputChange('first_name', e.target.value)}
-                                                className="w-full p-3 bg-white/10 border-2 border-blue-500/50 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-300 shadow-lg"
+                                                className="w-full p-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:border-nyx-blue focus:ring-2 focus:ring-nyx-blue/20 focus:outline-none transition-all"
                                                 placeholder="Enter first name"
                                             />
                                         ) : (
@@ -738,13 +738,13 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo }) => {
                                         )}
                                     </div>
                                     <div>
-                                        <label className="block text-sm text-gray-400 mb-2">Last Name</label>
+                                        <label className="block text-sm font-semibold text-gray-300 mb-3 tracking-wide">Last Name</label>
                                         {isEditing ? (
                                             <input
                                                 type="text"
                                                 value={editData.last_name || ''}
                                                 onChange={(e) => handleInputChange('last_name', e.target.value)}
-                                                className="w-full p-3 bg-white/10 border-2 border-blue-500/50 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-300 shadow-lg"
+                                                className="w-full p-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:border-nyx-blue focus:ring-2 focus:ring-nyx-blue/20 focus:outline-none transition-all"
                                                 placeholder="Enter last name"
                                             />
                                         ) : (
@@ -752,13 +752,13 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo }) => {
                                         )}
                                     </div>
                                     <div className="md:col-span-2">
-                                        <label className="block text-sm text-gray-400 mb-2">Nickname</label>
+                                        <label className="block text-sm font-semibold text-gray-300 mb-3 tracking-wide">Nickname</label>
                                         {isEditing ? (
                                             <input
                                                 type="text"
                                                 value={editData.nickname || ''}
                                                 onChange={(e) => handleInputChange('nickname', e.target.value)}
-                                                className="w-full p-3 bg-white/10 border-2 border-blue-500/50 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-300 shadow-lg"
+                                                className="w-full p-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:border-nyx-blue focus:ring-2 focus:ring-nyx-blue/20 focus:outline-none transition-all"
                                                 placeholder="Enter nickname"
                                             />
                                         ) : (
@@ -805,7 +805,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo }) => {
                                 </h3>
                                 <div className="space-y-4">
                                     <div>
-                                        <label className="block text-sm text-gray-400 mb-2">Phone Number</label>
+                                        <label className="block text-sm font-semibold text-gray-300 mb-3 tracking-wide">Phone Number</label>
                                         {isEditing ? (
                                             <div className="flex gap-2">
                                                 <select
@@ -862,24 +862,25 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo }) => {
 
                             {/* Action Buttons */}
                             {isEditing && (
-                                <div className="flex gap-4 mt-8 pt-6 border-t border-white/10 bg-gradient-to-r from-green-500/5 to-blue-500/5 rounded-2xl p-6">
+                                <div className="mt-8 pt-6 border-t border-white/10">
                                     <div className="flex items-center gap-2 text-green-300 mb-4">
                                         <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                                        <span className="text-sm font-medium">Ready to save your changes?</span>
+                                        <span className="text-sm font-semibold">Ready to save your changes?</span>
                                     </div>
-                                    <div className="flex gap-4 w-full">
+                                    <div className="flex gap-3">
                                         <button
                                             onClick={handleSave}
-                                            className="flex-1 px-6 py-3 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition-colors duration-200 flex items-center justify-center gap-2"
+                                            className="flex-1 group relative px-6 py-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold rounded-xl overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-green-500/50 flex items-center justify-center gap-2"
                                         >
-                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-green-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                            <svg className="w-5 h-5 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                             </svg>
-                                            Save Changes
+                                            <span className="relative z-10">Save Changes</span>
                                         </button>
                                         <button
                                             onClick={handleCancel}
-                                            className="px-6 py-3 bg-white/10 text-white rounded-xl font-medium hover:bg-white/20 transition-all duration-300 flex items-center gap-2"
+                                            className="px-6 py-4 bg-white/5 border border-white/10 text-gray-300 font-semibold rounded-xl hover:bg-white/10 transition-all flex items-center gap-2"
                                         >
                                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -1025,32 +1026,32 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo }) => {
                                     
                                     <div className="space-y-4">
                                         <div>
-                                            <label className="block text-sm text-gray-400 mb-2">Current Password</label>
+                                            <label className="block text-sm font-semibold text-gray-300 mb-3 tracking-wide">Current Password</label>
                                             <input
                                                 type="password"
                                                 value={passwordData.currentPassword}
                                                 onChange={(e) => setPasswordData(prev => ({ ...prev, currentPassword: e.target.value }))}
-                                                className="w-full p-3 bg-white/10 border-2 border-blue-500/50 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-300 shadow-lg"
+                                                className="w-full p-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:border-nyx-blue focus:ring-2 focus:ring-nyx-blue/20 focus:outline-none transition-all"
                                                 placeholder="Enter current password"
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-sm text-gray-400 mb-2">New Password</label>
+                                            <label className="block text-sm font-semibold text-gray-300 mb-3 tracking-wide">New Password</label>
                                             <input
                                                 type="password"
                                                 value={passwordData.newPassword}
                                                 onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
-                                                className="w-full p-3 bg-white/10 border-2 border-blue-500/50 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-300 shadow-lg"
+                                                className="w-full p-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:border-nyx-blue focus:ring-2 focus:ring-nyx-blue/20 focus:outline-none transition-all"
                                                 placeholder="Enter new password"
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-sm text-gray-400 mb-2">Confirm New Password</label>
+                                            <label className="block text-sm font-semibold text-gray-300 mb-3 tracking-wide">Confirm New Password</label>
                                             <input
                                                 type="password"
                                                 value={passwordData.confirmPassword}
                                                 onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                                                className="w-full p-3 bg-white/10 border-2 border-blue-500/50 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-300 shadow-lg"
+                                                className="w-full p-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:border-nyx-blue focus:ring-2 focus:ring-nyx-blue/20 focus:outline-none transition-all"
                                                 placeholder="Confirm new password"
                                             />
                                         </div>
@@ -1081,32 +1082,32 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo }) => {
                                 
                                 <div className="space-y-4">
                                     <div>
-                                        <label className="block text-sm text-gray-400 mb-2">Current Email Address</label>
+                                        <label className="block text-sm font-semibold text-gray-300 mb-3 tracking-wide">Current Email Address</label>
                                         <input
                                             type="email"
                                             value={emailData.currentEmail}
                                             onChange={(e) => setEmailData(prev => ({ ...prev, currentEmail: e.target.value }))}
-                                            className="w-full p-3 bg-white/10 border-2 border-blue-500/50 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-300 shadow-lg"
+                                            className="w-full p-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:border-nyx-blue focus:ring-2 focus:ring-nyx-blue/20 focus:outline-none transition-all"
                                             placeholder="Enter your current email address"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm text-gray-400 mb-2">New Email Address</label>
+                                        <label className="block text-sm font-semibold text-gray-300 mb-3 tracking-wide">New Email Address</label>
                                         <input
                                             type="email"
                                             value={emailData.newEmail}
                                             onChange={(e) => setEmailData(prev => ({ ...prev, newEmail: e.target.value }))}
-                                            className="w-full p-3 bg-white/10 border-2 border-blue-500/50 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-300 shadow-lg"
+                                            className="w-full p-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:border-nyx-blue focus:ring-2 focus:ring-nyx-blue/20 focus:outline-none transition-all"
                                             placeholder="Enter new email address"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm text-gray-400 mb-2">Current Password (Required)</label>
+                                        <label className="block text-sm font-semibold text-gray-300 mb-3 tracking-wide">Current Password (Required)</label>
                                         <input
                                             type="password"
                                             value={passwordData.currentPassword}
                                             onChange={(e) => setPasswordData(prev => ({ ...prev, currentPassword: e.target.value }))}
-                                            className="w-full p-3 bg-white/10 border-2 border-blue-500/50 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-300 shadow-lg"
+                                            className="w-full p-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:border-nyx-blue focus:ring-2 focus:ring-nyx-blue/20 focus:outline-none transition-all"
                                             placeholder="Enter your current password"
                                         />
                                     </div>
