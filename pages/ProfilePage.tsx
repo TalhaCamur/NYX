@@ -338,15 +338,24 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo }) => {
 
         setEmailLoading(true);
         setEmailMessage(null);
+        
+        console.log("📧 Starting email change process...");
+        console.log("📧 Current email:", emailData.currentEmail);
+        console.log("📧 New email:", emailData.newEmail);
 
         try {
-            // Update email directly (Supabase handles verification)
-            const { error } = await supabase.auth.updateUser({
-                email: emailData.newEmail
-            });
+            // Update email with redirect URL (Supabase handles verification)
+            const { data, error } = await supabase.auth.updateUser(
+                { email: emailData.newEmail },
+                { 
+                    emailRedirectTo: 'https://talhacamur.github.io/NYX/'
+                }
+            );
+
+            console.log("📧 Update response:", { data, error });
 
             if (error) {
-                console.error("Email update error:", error);
+                console.error("❌ Email update error:", error);
                 if (error.message.includes('Email rate limit exceeded')) {
                     setEmailMessage({ type: 'error', text: 'Too many email change requests. Please wait before trying again.' });
                 } else if (error.message.includes('Invalid email')) {
@@ -361,18 +370,20 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo }) => {
             }
 
             console.log("✅ Email update request sent successfully");
-            setEmailMessage({ type: 'success', text: '✅ Verification email sent to your new email address. Please check your inbox and click the verification link to complete the email change.' });
+            setEmailMessage({ 
+                type: 'success', 
+                text: '✅ Verification email sent! Please check BOTH your current and new email addresses. Click the verification link in the new email to complete the change.' 
+            });
             setEmailData({ currentEmail: '', newEmail: '' });
             setEmailLoading(false);
             
-            // Auto refresh after 3 seconds to sync auth state
+            // Clear message after 8 seconds
             setTimeout(() => {
-                console.log("🔄 Refreshing page to sync auth state...");
-                window.location.reload();
-            }, 3000);
-        } catch (error) {
-            console.error("Email update catch error:", error);
-            setEmailMessage({ type: 'error', text: 'Failed to update email' });
+                setEmailMessage(null);
+            }, 8000);
+        } catch (error: any) {
+            console.error("❌ Email update catch error:", error);
+            setEmailMessage({ type: 'error', text: error.message || 'Failed to update email. Please try again.' });
             setEmailLoading(false);
         }
     };
