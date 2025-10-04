@@ -569,55 +569,54 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const deleteUserAccount = useCallback(async () => {
         if(!user) throw new Error("Not logged in.");
         
+        console.log("🗑️ Starting complete account deletion for user:", user.id);
         
         try {
             // First delete all related data
+            console.log("🗑️ Deleting orders...");
             const { error: ordersError } = await supabase
                 .from('orders')
                 .delete()
                 .eq('user_id', user.id);
             if (ordersError) console.warn("⚠️ Orders deletion warning:", ordersError);
 
+            console.log("🗑️ Deleting favorites...");
             const { error: favoritesError } = await supabase
                 .from('user_favorites')
                 .delete()
                 .eq('user_id', user.id);
             if (favoritesError) console.warn("⚠️ Favorites deletion warning:", favoritesError);
 
+            console.log("🗑️ Deleting cart items...");
             const { error: cartError } = await supabase
                 .from('cart_items')
                 .delete()
                 .eq('user_id', user.id);
             if (cartError) console.warn("⚠️ Cart deletion warning:", cartError);
 
-            // Mark profile as deleted and deactivate
-            const deletedTimestamp = Date.now();
+            // Delete profile completely from database
+            console.log("🗑️ Deleting profile from database...");
             const { error: profileError } = await supabase
                 .from('profiles')
-                .update({
-                    is_active: false,
-                    email: `deleted_${deletedTimestamp}@deleted.com`,
-                    first_name: 'Deleted',
-                    last_name: 'User',
-                    nickname: `deleted_${deletedTimestamp}`,
-                    updated_at: new Date().toISOString()
-                })
+                .delete()
                 .eq('id', user.id);
                 
             if (profileError) {
-                console.error("❌ Profile update error:", profileError);
-                throw profileError;
+                console.error("❌ Profile deletion error:", profileError);
+                throw new Error("Failed to delete profile: " + profileError.message);
             }
             
+            console.log("✅ Profile deleted successfully");
             
-            // Finally sign out the user
+            // Sign out the user first
+            console.log("🚪 Signing out user...");
             const { error: signOutError } = await supabase.auth.signOut();
             if (signOutError) {
-                console.error("❌ Sign out error:", signOutError);
-                // Don't throw here as profile is already marked as deleted
+                console.warn("⚠️ Sign out warning:", signOutError);
             }
             
             setUser(null);
+            console.log("✅ Account deletion completed successfully");
         } catch (error) {
             console.error("💥 Account deletion failed:", error);
             throw error;
