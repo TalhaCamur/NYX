@@ -370,11 +370,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 
                 if (authError) {
                     console.error("❌ Auth signup error:", authError);
+                    console.error("❌ Full error details:", JSON.stringify(authError, null, 2));
+                    
                     if (authError.message.includes('User already registered')) {
                         throw new Error('This email is already registered. Please try logging in or resetting your password.');
                     }
                     if (authError.message.includes('Database error')) {
-                        throw new Error('Database error. Please try again in a few moments.');
+                        // Try to create profile manually if database trigger failed
+                        console.log("⚠️ Database trigger failed, attempting manual profile creation...");
+                        throw new Error('Account creation failed. Please contact support or try again later.');
                     }
                     throw new Error(authError.message || 'Signup failed. Please try again.');
                 }
