@@ -349,6 +349,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                     email: trimmedEmail, 
                     password,
                     options: {
+                        emailRedirectTo: 'https://talhacamur.github.io/NYX/',
                         data: {
                             first_name: trimmedFirstName,
                             last_name: trimmedLastName,
@@ -499,7 +500,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const { error } = await supabase.auth.signInWithOAuth({
             provider,
             options: {
-                redirectTo: window.location.origin,
+                redirectTo: 'https://talhacamur.github.io/NYX/',
             },
         });
         if (error) throw error;
@@ -507,7 +508,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     
     const sendPasswordResetEmail = useCallback(async (email: string) => {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
-            redirectTo: window.location.origin,
+            redirectTo: 'https://talhacamur.github.io/NYX/',
         });
         if (error) throw error;
     }, []);
