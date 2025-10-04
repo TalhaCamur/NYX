@@ -353,6 +353,8 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo }) => {
             );
 
             console.log("📧 Update response:", { data, error });
+            console.log("📧 Full response data:", JSON.stringify(data, null, 2));
+            console.log("📧 Full error:", JSON.stringify(error, null, 2));
 
             if (error) {
                 console.error("❌ Email update error:", error);
