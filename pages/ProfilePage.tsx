@@ -619,96 +619,157 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo }) => {
 
                     {/* Profile Tab */}
                     {activeTab === 'profile' && (
-                        <div className="bg-gradient-to-br from-white/[0.07] to-white/[0.02] backdrop-blur-xl rounded-2xl border border-white/10 p-8 mb-8 shadow-2xl">
-                            {/* Profile Header */}
-                            <div className="flex flex-col md:flex-row items-center md:items-start gap-6 mb-8">
-                                {/* Avatar */}
-                                <div className="relative group">
-                                    {profileData.avatar_url ? (
-                                        <img 
-                                            src={profileData.avatar_url} 
-                                            alt="Profile" 
-                                            className="w-24 h-24 rounded-2xl object-cover shadow-lg"
-                                        />
-                                    ) : (
-                                        <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center text-2xl font-bold text-white shadow-lg">
-                                            {(profileData.first_name?.[0] || 'U')}{(profileData.last_name?.[0] || '')}
-                                        </div>
-                                    )}
-                                    <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-green-500 rounded-full border-4 border-white/20 flex items-center justify-center">
-                                        <div className="w-3 h-3 bg-white rounded-full"></div>
-                                    </div>
-                                    
-                                    {/* Upload Overlay */}
-                                    <div className="absolute inset-0 bg-black/50 rounded-2xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                        <label className="cursor-pointer">
-                                            <input
-                                                type="file"
-                                                accept="image/*"
-                                                onChange={handleAvatarUpload}
-                                                className="hidden"
-                                                disabled={uploading}
-                                            />
-                                            <div className="bg-white/20 backdrop-blur-sm rounded-lg p-2">
-                                                {uploading ? (
-                                                    <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                                ) : (
-                                                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                                    </svg>
-                                                )}
+                        <div className="space-y-6">
+                            {/* Premium Profile Card */}
+                            <div className="relative overflow-hidden bg-gradient-to-br from-white/[0.08] to-white/[0.02] backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl">
+                                {/* Animated Background Orbs */}
+                                <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-nyx-blue/10 to-transparent rounded-full blur-3xl animate-pulse"></div>
+                                <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-brand-purple/10 to-transparent rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+                                
+                                <div className="relative p-8">
+                                    {/* Profile Header */}
+                                    <div className="flex flex-col items-center text-center mb-8">
+                                        {/* Premium Avatar with Animated Rings */}
+                                        <div className="relative mb-6">
+                                            {/* Animated Rings */}
+                                            <div className="absolute inset-0 -m-4">
+                                                <div className="absolute inset-0 rounded-full border-2 border-nyx-blue/30 animate-ping" style={{ animationDuration: '3s' }}></div>
+                                                <div className="absolute inset-0 rounded-full border-2 border-brand-purple/30 animate-ping" style={{ animationDuration: '3s', animationDelay: '1s' }}></div>
                                             </div>
-                                        </label>
+                                            
+                                            {/* Avatar Container */}
+                                            <div className="relative group">
+                                                {profileData.avatar_url ? (
+                                                    <img 
+                                                        src={profileData.avatar_url} 
+                                                        alt="Profile" 
+                                                        className="w-32 h-32 rounded-3xl object-cover shadow-2xl ring-4 ring-white/10 group-hover:ring-nyx-blue/50 transition-all duration-300"
+                                                    />
+                                                ) : (
+                                                    <div className="w-32 h-32 bg-gradient-to-br from-nyx-blue via-brand-purple to-brand-pink rounded-3xl flex items-center justify-center text-4xl font-bold text-white shadow-2xl ring-4 ring-white/10 group-hover:ring-nyx-blue/50 transition-all duration-300">
+                                                        {(profileData.first_name?.[0] || 'U')}{(profileData.last_name?.[0] || '')}
+                                                    </div>
+                                                )}
+                                                
+                                                {/* Online Status Badge */}
+                                                <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full border-4 border-nyx-black shadow-lg flex items-center justify-center">
+                                                    <div className="w-4 h-4 bg-white rounded-full animate-pulse"></div>
+                                                </div>
+                                                
+                                                {/* Upload Overlay */}
+                                                <div className="absolute inset-0 bg-gradient-to-br from-nyx-blue/90 to-brand-purple/90 backdrop-blur-sm rounded-3xl flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+                                                    <label className="cursor-pointer flex flex-col items-center gap-2">
+                                                        <input
+                                                            type="file"
+                                                            accept="image/*"
+                                                            onChange={handleAvatarUpload}
+                                                            className="hidden"
+                                                            disabled={uploading}
+                                                        />
+                                                        {uploading ? (
+                                                            <>
+                                                                <div className="w-8 h-8 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
+                                                                <span className="text-white text-sm font-semibold">Uploading...</span>
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                                </svg>
+                                                                <span className="text-white text-sm font-semibold">Change Photo</span>
+                                                            </>
+                                                        )}
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        {/* User Info - Centered */}
+                                        <div className="space-y-3">
+                                            <h2 className="text-4xl font-bold text-white">
+                                                {profileData.first_name || 'User'} {profileData.last_name || ''}
+                                            </h2>
+                                            
+                                            <div className="flex items-center justify-center gap-2 text-gray-300">
+                                                <svg className="w-5 h-5 text-nyx-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                                </svg>
+                                                <span className="text-lg">{profileData.email}</span>
+                                            </div>
+                                            
+                                            <div className="flex items-center justify-center gap-2 text-gray-400">
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                </svg>
+                                                <span className="text-sm">Member since {new Date(profileData.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</span>
+                                            </div>
+                                            
+                                            {/* Role Badges */}
+                                            <div className="flex items-center justify-center gap-2 flex-wrap mt-4">
+                                                {(user?.roles || ['user']).map((role, index) => (
+                                                    <span 
+                                                        key={index}
+                                                        className={`px-4 py-2 rounded-xl text-xs font-bold tracking-wider shadow-lg ${
+                                                            role === 'super-admin' ? 'bg-gradient-to-r from-red-500 to-red-600 text-white' :
+                                                            role === 'admin' ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white' :
+                                                            role === 'seller' ? 'bg-gradient-to-r from-green-500 to-green-600 text-white' :
+                                                            role === 'content_writer' ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white' :
+                                                            role === 'Web Developer' ? 'bg-gradient-to-r from-cyan-500 to-cyan-600 text-white' :
+                                                            role === 'UI/UX Designer' ? 'bg-gradient-to-r from-pink-500 to-pink-600 text-white' :
+                                                            'bg-gradient-to-r from-nyx-blue to-brand-purple text-white'
+                                                        }`}
+                                                    >
+                                                        {role.toUpperCase()}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                        
+                                        {/* Quick Stats */}
+                                        <div className="grid grid-cols-2 gap-4 mt-8 max-w-md mx-auto">
+                                            <div className="bg-gradient-to-br from-nyx-blue/20 to-brand-purple/10 backdrop-blur-sm rounded-2xl p-4 border border-nyx-blue/30">
+                                                <div className="text-3xl font-bold text-white mb-1">{stats.orders}</div>
+                                                <div className="text-sm text-gray-300 flex items-center gap-1">
+                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                                                    </svg>
+                                                    Total Orders
+                                                </div>
+                                            </div>
+                                            <div className="bg-gradient-to-br from-brand-pink/20 to-red-500/10 backdrop-blur-sm rounded-2xl p-4 border border-brand-pink/30">
+                                                <div className="text-3xl font-bold text-white mb-1">{stats.favorites}</div>
+                                                <div className="text-sm text-gray-300 flex items-center gap-1">
+                                                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
+                                                    </svg>
+                                                    Favorites
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                        
+                                        {/* Edit Button - Centered */}
+                                        <div className="mt-6">
+                                            {!isEditing ? (
+                                                <button
+                                                    onClick={handleEdit}
+                                                    className="group relative px-8 py-4 bg-gradient-to-r from-nyx-blue to-brand-purple text-white font-bold rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-nyx-blue/50 hover:scale-105 flex items-center gap-2"
+                                                >
+                                                    <div className="absolute inset-0 bg-gradient-to-r from-brand-purple to-nyx-blue opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                                    <svg className="w-6 h-6 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                    </svg>
+                                                    <span className="relative z-10">Edit Profile</span>
+                                                </button>
+                                            ) : (
+                                                <div className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-500/20 to-red-500/20 border-2 border-orange-500/50 rounded-2xl shadow-lg">
+                                                    <div className="w-3 h-3 bg-orange-400 rounded-full animate-pulse"></div>
+                                                    <span className="text-orange-300 font-bold text-lg">✏️ Editing Mode</span>
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
-                                
-                                {/* User Info */}
-                                <div className="flex-1 text-center md:text-left">
-                                    <h2 className="text-3xl font-bold text-white mb-2">
-                                        {profileData.first_name || 'User'} {profileData.last_name || ''}
-                                    </h2>
-                                    <p className="text-gray-300 text-lg mb-1">{profileData.email}</p>
-                                    <div className="flex items-center gap-2 mb-1">
-                                        <span className="text-gray-400">Member since {new Date(profileData.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</span>
-                                    </div>
-                                    <div className="flex items-center gap-2 flex-wrap">
-                                        {(user?.roles || ['user']).map((role, index) => (
-                                            <span 
-                                                key={index}
-                                                className={`px-3 py-1 rounded-full text-sm font-medium ${
-                                                    role === 'super-admin' ? 'bg-gradient-to-r from-red-500/20 to-red-600/20 border border-red-500/30 text-red-300' :
-                                                    role === 'admin' ? 'bg-gradient-to-r from-purple-500/20 to-purple-600/20 border border-purple-500/30 text-purple-300' :
-                                                    role === 'seller' ? 'bg-gradient-to-r from-green-500/20 to-green-600/20 border border-green-500/30 text-green-300' :
-                                                    role === 'content_writer' ? 'bg-gradient-to-r from-orange-500/20 to-orange-600/20 border border-orange-500/30 text-orange-300' :
-                                                    role === 'Web Developer' ? 'bg-gradient-to-r from-cyan-500/20 to-cyan-600/20 border border-cyan-500/30 text-cyan-300' :
-                                                    role === 'UI/UX Designer' ? 'bg-gradient-to-r from-pink-500/20 to-pink-600/20 border border-pink-500/30 text-pink-300' :
-                                                    'bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 text-blue-300'
-                                                }`}
-                                            >
-                                                {role.toUpperCase()}
-                                            </span>
-                                        ))}
-                                    </div>
-                                </div>
-                                
-                                {/* Edit Button */}
-                                {!isEditing ? (
-                                    <button
-                                        onClick={handleEdit}
-                                        className="group relative px-6 py-3 bg-gradient-to-r from-nyx-blue to-brand-purple text-white font-semibold rounded-xl overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-nyx-blue/50 flex items-center gap-2"
-                                    >
-                                        <div className="absolute inset-0 bg-gradient-to-r from-brand-purple to-nyx-blue opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                                        <svg className="w-5 h-5 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                        </svg>
-                                        <span className="relative z-10">Edit Profile</span>
-                                    </button>
-                                ) : (
-                                    <div className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/30 rounded-xl">
-                                        <div className="w-2 h-2 bg-orange-400 rounded-full animate-pulse"></div>
-                                        <span className="text-orange-300 font-semibold">✏️ Editing Mode</span>
-                                    </div>
-                                )}
                             </div>
 
                             {/* Personal Information */}
