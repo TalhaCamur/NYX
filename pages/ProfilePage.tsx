@@ -519,17 +519,25 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo }) => {
                 {/* Grid Pattern */}
                 <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px]"></div>
                 
-                <div className="relative z-10 container mx-auto px-6 py-24">
-                    <div className="max-w-4xl mx-auto">
-                        {/* Header */}
+                <div className="relative z-10 container mx-auto px-6 py-20">
+                    <div className="max-w-6xl mx-auto">
+                        {/* Premium Header */}
                         <div className="text-center mb-12">
-                            <h1 className="text-5xl md:text-6xl font-bold mb-6">
-                                <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent">
-                                    Profile
-                                </span>
+                            {/* Badge */}
+                            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-nyx-blue/20 to-brand-purple/20 border border-nyx-blue/30 mb-6">
+                                <div className="w-2 h-2 bg-nyx-blue rounded-full animate-pulse"></div>
+                                <span className="text-xs font-semibold text-gray-300 tracking-wider">MY ACCOUNT</span>
+                            </div>
+                            
+                            {/* Title */}
+                            <h1 className="text-5xl md:text-6xl font-bold mb-4">
+                                <span className="text-white">Your</span>{' '}
+                                <span className="bg-gradient-to-r from-nyx-blue via-brand-purple to-brand-pink text-transparent bg-clip-text">Profile</span>
                             </h1>
-                            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-                                Manage your account settings and preferences
+                            
+                            {/* Subtitle */}
+                            <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+                                Manage your personal information, security settings, and preferences
                             </p>
                         </div>
                     </div>
@@ -537,8 +545,8 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo }) => {
             </div>
 
             {/* Profile Content */}
-            <div className="relative z-10 container mx-auto px-6 py-16">
-                <div className="max-w-4xl mx-auto">
+            <div className="relative z-10 container mx-auto px-6 py-8">
+                <div className="max-w-6xl mx-auto">
                     {/* Message Display */}
                     {message && (
                         <div className={`mb-6 p-4 rounded-xl animate-slide-down flex items-center gap-3 ${
@@ -563,53 +571,55 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo }) => {
                         </div>
                     )}
 
-                    {/* Tab Navigation */}
-                    <div className="flex flex-wrap gap-2 mb-8">
-                        <button
-                            onClick={() => setActiveTab('profile')}
-                            className={`px-6 py-3 rounded-xl font-medium transition-all duration-300 ${
-                                activeTab === 'profile'
-                                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg'
-                                    : 'bg-white/5 text-gray-300 hover:bg-white/10'
-                            }`}
-                        >
-                            Profile
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('security')}
-                            className={`px-6 py-3 rounded-xl font-medium transition-all duration-300 ${
-                                activeTab === 'security'
-                                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg'
-                                    : 'bg-white/5 text-gray-300 hover:bg-white/10'
-                            }`}
-                        >
-                            Security
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('orders')}
-                            className={`px-6 py-3 rounded-xl font-medium transition-all duration-300 ${
-                                activeTab === 'orders'
-                                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg'
-                                    : 'bg-white/5 text-gray-300 hover:bg-white/10'
-                            }`}
-                        >
-                            Orders
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('settings')}
-                            className={`px-6 py-3 rounded-xl font-medium transition-all duration-300 ${
-                                activeTab === 'settings'
-                                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg'
-                                    : 'bg-white/5 text-gray-300 hover:bg-white/10'
-                            }`}
-                        >
-                            Settings
-                        </button>
+                    {/* Premium Tab Navigation */}
+                    <div className="bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-xl rounded-2xl border border-white/10 p-2 mb-8 shadow-xl">
+                        <div className="flex flex-wrap gap-2">
+                            <button
+                                onClick={() => setActiveTab('profile')}
+                                className={`flex-1 min-w-[120px] px-6 py-3.5 rounded-xl font-semibold transition-all duration-300 ${
+                                    activeTab === 'profile'
+                                        ? 'bg-gradient-to-r from-nyx-blue to-brand-purple text-white shadow-lg shadow-nyx-blue/30'
+                                        : 'text-gray-400 hover:text-white hover:bg-white/5'
+                                }`}
+                            >
+                                👤 Profile
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('security')}
+                                className={`flex-1 min-w-[120px] px-6 py-3.5 rounded-xl font-semibold transition-all duration-300 ${
+                                    activeTab === 'security'
+                                        ? 'bg-gradient-to-r from-nyx-blue to-brand-purple text-white shadow-lg shadow-nyx-blue/30'
+                                        : 'text-gray-400 hover:text-white hover:bg-white/5'
+                                }`}
+                            >
+                                🔒 Security
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('orders')}
+                                className={`flex-1 min-w-[120px] px-6 py-3.5 rounded-xl font-semibold transition-all duration-300 ${
+                                    activeTab === 'orders'
+                                        ? 'bg-gradient-to-r from-nyx-blue to-brand-purple text-white shadow-lg shadow-nyx-blue/30'
+                                        : 'text-gray-400 hover:text-white hover:bg-white/5'
+                                }`}
+                            >
+                                📦 Orders
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('settings')}
+                                className={`flex-1 min-w-[120px] px-6 py-3.5 rounded-xl font-semibold transition-all duration-300 ${
+                                    activeTab === 'settings'
+                                        ? 'bg-gradient-to-r from-nyx-blue to-brand-purple text-white shadow-lg shadow-nyx-blue/30'
+                                        : 'text-gray-400 hover:text-white hover:bg-white/5'
+                                }`}
+                            >
+                                ⚙️ Settings
+                            </button>
+                        </div>
                     </div>
 
                     {/* Profile Tab */}
                     {activeTab === 'profile' && (
-                        <div className="bg-white/5 backdrop-blur-xl rounded-3xl border border-white/10 p-8 mb-8 shadow-2xl">
+                        <div className="bg-gradient-to-br from-white/[0.07] to-white/[0.02] backdrop-blur-xl rounded-2xl border border-white/10 p-8 mb-8 shadow-2xl">
                             {/* Profile Header */}
                             <div className="flex flex-col md:flex-row items-center md:items-start gap-6 mb-8">
                                 {/* Avatar */}
@@ -685,17 +695,18 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo }) => {
                                 {!isEditing ? (
                                     <button
                                         onClick={handleEdit}
-                                        className="px-6 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors duration-200 flex items-center gap-2"
+                                        className="group relative px-6 py-3 bg-gradient-to-r from-nyx-blue to-brand-purple text-white font-semibold rounded-xl overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-nyx-blue/50 flex items-center gap-2"
                                     >
-                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <div className="absolute inset-0 bg-gradient-to-r from-brand-purple to-nyx-blue opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                        <svg className="w-5 h-5 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                         </svg>
-                                        Edit Profile
+                                        <span className="relative z-10">Edit Profile</span>
                                     </button>
                                 ) : (
-                                    <div className="flex items-center gap-2 px-4 py-2 bg-orange-500/20 border border-orange-500/30 rounded-xl">
+                                    <div className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/30 rounded-xl">
                                         <div className="w-2 h-2 bg-orange-400 rounded-full animate-pulse"></div>
-                                        <span className="text-orange-300 font-medium">Editing Mode</span>
+                                        <span className="text-orange-300 font-semibold">✏️ Editing Mode</span>
                                     </div>
                                 )}
                             </div>
