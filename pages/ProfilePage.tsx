@@ -746,7 +746,6 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo }) => {
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
                                         
                                         {/* Edit Button - Centered */}
                                         <div className="mt-6">
