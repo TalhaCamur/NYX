@@ -504,45 +504,46 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo }) => {
 
     return (
         <div className="min-h-screen bg-dark text-white">
-            {/* Hero Section */}
-            <div className="relative overflow-hidden">
-                {/* Animated Background */}
-                <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-blue-900/20 to-indigo-900/20"></div>
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(120,119,198,0.3),transparent_50%)]"></div>
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(120,119,198,0.2),transparent_50%)]"></div>
+            {/* Elegant Profile Header - Like Products Page */}
+            <section className="relative py-16 border-b border-gray-800/50">
+                {/* Subtle background gradient */}
+                <div className="absolute inset-0 bg-gradient-to-b from-nyx-blue/5 via-transparent to-transparent"></div>
                 
-                {/* Floating Orbs */}
-                <div className="absolute top-20 left-10 w-32 h-32 bg-gradient-to-r from-purple-500/20 to-blue-500/20 rounded-full blur-xl animate-float"></div>
-                <div className="absolute top-40 right-20 w-24 h-24 bg-gradient-to-r from-blue-500/20 to-indigo-500/20 rounded-full blur-xl animate-float" style={{ animationDelay: '2s' }}></div>
-                <div className="absolute bottom-20 left-1/3 w-20 h-20 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-full blur-xl animate-float" style={{ animationDelay: '4s' }}></div>
-                
-                {/* Grid Pattern */}
-                <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px]"></div>
-                
-                <div className="relative z-10 container mx-auto px-6 py-20">
-                    <div className="max-w-6xl mx-auto">
-                        {/* Premium Header */}
-                        <div className="text-center mb-12">
-                            {/* Badge */}
-                            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-nyx-blue/20 to-brand-purple/20 border border-nyx-blue/30 mb-6">
-                                <div className="w-2 h-2 bg-nyx-blue rounded-full animate-pulse"></div>
-                                <span className="text-xs font-semibold text-gray-300 tracking-wider">MY ACCOUNT</span>
+                <div className="container mx-auto px-4 relative z-10">
+                    <div className="max-w-3xl mx-auto text-center">
+                        {/* Small badge */}
+                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-nyx-blue/10 to-brand-purple/10 border border-nyx-blue/20 mb-6">
+                            <div className="w-1.5 h-1.5 bg-nyx-blue rounded-full animate-pulse"></div>
+                            <span className="text-xs font-medium text-gray-300 tracking-wide">MY ACCOUNT</span>
+                        </div>
+                        
+                        {/* Title */}
+                        <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+                            Your <span className="bg-gradient-to-r from-nyx-blue via-brand-purple to-brand-pink text-transparent bg-clip-text">Profile</span>
+                        </h1>
+                        
+                        {/* Subtitle */}
+                        <p className="text-gray-400 text-lg mb-6">
+                            Manage your personal information and account settings
+                        </p>
+                        
+                        {/* Quick Stats Row */}
+                        <div className="flex items-center justify-center gap-6 text-sm">
+                            <div className="flex items-center gap-2 text-gray-500">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                                <span>Member since {new Date(profileData?.created_at || Date.now()).getFullYear()}</span>
                             </div>
-                            
-                            {/* Title */}
-                            <h1 className="text-5xl md:text-6xl font-bold mb-4">
-                                <span className="text-white">Your</span>{' '}
-                                <span className="bg-gradient-to-r from-nyx-blue via-brand-purple to-brand-pink text-transparent bg-clip-text">Profile</span>
-                            </h1>
-                            
-                            {/* Subtitle */}
-                            <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-                                Manage your personal information, security settings, and preferences
-                            </p>
+                            <div className="w-1 h-1 bg-gray-600 rounded-full"></div>
+                            <div className="flex items-center gap-2 text-gray-500">
+                                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                                <span>Active</span>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </section>
 
             {/* Profile Content */}
             <div className="relative z-10 container mx-auto px-6 py-8">
