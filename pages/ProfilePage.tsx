@@ -572,118 +572,102 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo }) => {
                         </div>
                     )}
 
-                    {/* Premium Tab Navigation */}
-                    <div className="bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-xl rounded-2xl border border-white/10 p-2 mb-8 shadow-xl">
-                        <div className="flex flex-wrap gap-2">
-                            <button
-                                onClick={() => setActiveTab('profile')}
-                                className={`flex-1 min-w-[120px] px-6 py-3.5 rounded-xl font-semibold transition-all duration-300 ${
-                                    activeTab === 'profile'
-                                        ? 'bg-gradient-to-r from-nyx-blue to-brand-purple text-white shadow-lg shadow-nyx-blue/30'
-                                        : 'text-gray-400 hover:text-white hover:bg-white/5'
-                                }`}
-                            >
-                                👤 Profile
-                            </button>
-                            <button
-                                onClick={() => setActiveTab('security')}
-                                className={`flex-1 min-w-[120px] px-6 py-3.5 rounded-xl font-semibold transition-all duration-300 ${
-                                    activeTab === 'security'
-                                        ? 'bg-gradient-to-r from-nyx-blue to-brand-purple text-white shadow-lg shadow-nyx-blue/30'
-                                        : 'text-gray-400 hover:text-white hover:bg-white/5'
-                                }`}
-                            >
-                                🔒 Security
-                            </button>
-                            <button
-                                onClick={() => setActiveTab('orders')}
-                                className={`flex-1 min-w-[120px] px-6 py-3.5 rounded-xl font-semibold transition-all duration-300 ${
-                                    activeTab === 'orders'
-                                        ? 'bg-gradient-to-r from-nyx-blue to-brand-purple text-white shadow-lg shadow-nyx-blue/30'
-                                        : 'text-gray-400 hover:text-white hover:bg-white/5'
-                                }`}
-                            >
-                                📦 Orders
-                            </button>
-                            <button
-                                onClick={() => setActiveTab('settings')}
-                                className={`flex-1 min-w-[120px] px-6 py-3.5 rounded-xl font-semibold transition-all duration-300 ${
-                                    activeTab === 'settings'
-                                        ? 'bg-gradient-to-r from-nyx-blue to-brand-purple text-white shadow-lg shadow-nyx-blue/30'
-                                        : 'text-gray-400 hover:text-white hover:bg-white/5'
-                                }`}
-                            >
-                                ⚙️ Settings
-                            </button>
-                        </div>
+                    {/* Elegant Tab Navigation */}
+                    <div className="flex items-center gap-2 mb-8 overflow-x-auto pb-2">
+                        <button
+                            onClick={() => setActiveTab('profile')}
+                            className={`px-5 py-2.5 rounded-lg font-medium transition-all duration-200 whitespace-nowrap ${
+                                activeTab === 'profile'
+                                    ? 'bg-white/10 text-white border border-white/20'
+                                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                            }`}
+                        >
+                            Profile
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('security')}
+                            className={`px-5 py-2.5 rounded-lg font-medium transition-all duration-200 whitespace-nowrap ${
+                                activeTab === 'security'
+                                    ? 'bg-white/10 text-white border border-white/20'
+                                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                            }`}
+                        >
+                            Security
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('orders')}
+                            className={`px-5 py-2.5 rounded-lg font-medium transition-all duration-200 whitespace-nowrap ${
+                                activeTab === 'orders'
+                                    ? 'bg-white/10 text-white border border-white/20'
+                                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                            }`}
+                        >
+                            Orders
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('settings')}
+                            className={`px-5 py-2.5 rounded-lg font-medium transition-all duration-200 whitespace-nowrap ${
+                                activeTab === 'settings'
+                                    ? 'bg-white/10 text-white border border-white/20'
+                                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                            }`}
+                        >
+                            Settings
+                        </button>
                     </div>
 
                     {/* Profile Tab */}
                     {activeTab === 'profile' && (
                         <div className="space-y-6">
-                            {/* Premium Profile Card */}
-                            <div className="relative overflow-hidden bg-gradient-to-br from-white/[0.08] to-white/[0.02] backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl">
-                                {/* Animated Background Orbs */}
-                                <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-nyx-blue/10 to-transparent rounded-full blur-3xl animate-pulse"></div>
-                                <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-brand-purple/10 to-transparent rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-                                
-                                <div className="relative p-8">
-                                    {/* Profile Header */}
-                                    <div className="flex flex-col items-center text-center mb-8">
-                                        {/* Premium Avatar with Animated Rings */}
-                                        <div className="relative mb-6">
-                                            {/* Animated Rings */}
-                                            <div className="absolute inset-0 -m-4">
-                                                <div className="absolute inset-0 rounded-full border-2 border-nyx-blue/30 animate-ping" style={{ animationDuration: '3s' }}></div>
-                                                <div className="absolute inset-0 rounded-full border-2 border-brand-purple/30 animate-ping" style={{ animationDuration: '3s', animationDelay: '1s' }}></div>
+                            {/* Clean Profile Card */}
+                            <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-8">
+                                {/* Profile Header */}
+                                <div className="flex flex-col md:flex-row items-center md:items-start gap-8 mb-8">
+                                    {/* Avatar */}
+                                    <div className="relative group">
+                                        {profileData.avatar_url ? (
+                                            <img 
+                                                src={profileData.avatar_url} 
+                                                alt="Profile" 
+                                                className="w-32 h-32 rounded-2xl object-cover border border-white/10"
+                                            />
+                                        ) : (
+                                            <div className="w-32 h-32 bg-gradient-to-br from-nyx-blue to-brand-purple rounded-2xl flex items-center justify-center text-4xl font-bold text-white border border-white/10">
+                                                {(profileData.first_name?.[0] || 'U')}{(profileData.last_name?.[0] || '')}
                                             </div>
-                                            
-                                            {/* Avatar Container */}
-                                            <div className="relative group">
-                                                {profileData.avatar_url ? (
-                                                    <img 
-                                                        src={profileData.avatar_url} 
-                                                        alt="Profile" 
-                                                        className="w-32 h-32 rounded-3xl object-cover shadow-2xl ring-4 ring-white/10 group-hover:ring-nyx-blue/50 transition-all duration-300"
-                                                    />
-                                                ) : (
-                                                    <div className="w-32 h-32 bg-gradient-to-br from-nyx-blue via-brand-purple to-brand-pink rounded-3xl flex items-center justify-center text-4xl font-bold text-white shadow-2xl ring-4 ring-white/10 group-hover:ring-nyx-blue/50 transition-all duration-300">
-                                                        {(profileData.first_name?.[0] || 'U')}{(profileData.last_name?.[0] || '')}
-                                                    </div>
-                                                )}
-                                                
-                                                {/* Online Status Badge */}
-                                                <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full border-4 border-nyx-black shadow-lg flex items-center justify-center">
-                                                    <div className="w-4 h-4 bg-white rounded-full animate-pulse"></div>
-                                                </div>
-                                                
-                                                {/* Upload Overlay */}
-                                                <div className="absolute inset-0 bg-gradient-to-br from-nyx-blue/90 to-brand-purple/90 backdrop-blur-sm rounded-3xl flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-                                                    <label className="cursor-pointer flex flex-col items-center gap-2">
-                                                        <input
-                                                            type="file"
-                                                            accept="image/*"
-                                                            onChange={handleAvatarUpload}
-                                                            className="hidden"
-                                                            disabled={uploading}
-                                                        />
-                                                        {uploading ? (
-                                                            <>
-                                                                <div className="w-8 h-8 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
-                                                                <span className="text-white text-sm font-semibold">Uploading...</span>
-                                                            </>
-                                                        ) : (
-                                                            <>
-                                                                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                                                </svg>
-                                                                <span className="text-white text-sm font-semibold">Change Photo</span>
-                                                            </>
-                                                        )}
-                                                    </label>
-                                                </div>
-                                            </div>
+                                        )}
+                                        
+                                        {/* Online Status Badge */}
+                                        <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-green-500 rounded-full border-4 border-nyx-black flex items-center justify-center">
+                                            <div className="w-3 h-3 bg-white rounded-full"></div>
                                         </div>
+                                        
+                                        {/* Upload Overlay */}
+                                        <div className="absolute inset-0 bg-black/80 backdrop-blur-sm rounded-2xl flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+                                            <label className="cursor-pointer flex flex-col items-center gap-2">
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    onChange={handleAvatarUpload}
+                                                    className="hidden"
+                                                    disabled={uploading}
+                                                />
+                                                {uploading ? (
+                                                    <>
+                                                        <div className="w-8 h-8 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
+                                                        <span className="text-white text-sm font-semibold">Uploading...</span>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                        </svg>
+                                                        <span className="text-white text-sm font-semibold">Change Photo</span>
+                                                    </>
+                                                )}
+                                            </label>
+                                        </div>
+                                    </div>
                                         
                                         {/* User Info - Centered */}
                                         <div className="space-y-3">
@@ -831,34 +815,6 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo }) => {
                                         )}
                                     </div>
                                 </div>
-                            </div>
-
-                            {/* Bio Card */}
-                            <div className="bg-gradient-to-br from-white/[0.06] to-white/[0.02] backdrop-blur-xl rounded-2xl border border-white/10 p-8 shadow-xl">
-                                <div className="flex items-center gap-3 mb-6">
-                                    <div className="p-3 bg-gradient-to-br from-brand-purple/20 to-brand-pink/20 rounded-xl border border-brand-purple/30">
-                                        <svg className="w-6 h-6 text-brand-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <h3 className="text-2xl font-bold text-white">About Me</h3>
-                                        {isEditing && (
-                                            <span className="text-sm text-brand-purple font-semibold">✏️ Edit mode active</span>
-                                        )}
-                                    </div>
-                                </div>
-                                {isEditing ? (
-                                    <textarea
-                                        value={editData.bio || ''}
-                                        onChange={(e) => handleInputChange('bio', e.target.value)}
-                                        className="w-full p-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:border-nyx-blue focus:ring-2 focus:ring-nyx-blue/20 focus:outline-none transition-all resize-none"
-                                        rows={4}
-                                        placeholder="Tell us about yourself..."
-                                    />
-                                ) : (
-                                    <p className="text-gray-300 leading-relaxed text-lg">{profileData.bio || 'No bio available yet. Click edit to add one!'}</p>
-                                )}
                             </div>
 
                             {/* Contact Information Card */}
