@@ -668,9 +668,9 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo }) => {
                                             </label>
                                         </div>
                                     </div>
-                                        
-                                        {/* User Info - Centered */}
-                                        <div className="space-y-3">
+                                    
+                                    {/* User Info - Centered */}
+                                    <div className="space-y-3">
                                             <h2 className="text-4xl font-bold text-white">
                                                 {profileData.first_name || 'User'} {profileData.last_name || ''}
                                             </h2>
@@ -755,7 +755,12 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo }) => {
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                    )}
 
+                    {/* Profile Tab - Forms Section */}
+                    {activeTab === 'profile' && (
+                        <div className="space-y-6">
                             {/* Personal Information Card */}
                             <div className="bg-gradient-to-br from-white/[0.06] to-white/[0.02] backdrop-blur-xl rounded-2xl border border-white/10 p-8 shadow-xl">
                                 <div className="flex items-center gap-3 mb-6">
