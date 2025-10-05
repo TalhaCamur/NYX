@@ -354,6 +354,12 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo }) => {
                 text: '✅ Verification emails sent! Please check both email addresses.' 
             });
             setEmailData({ currentEmail: '', newEmail: '' });
+            
+            // Reset to normal state after 7 seconds
+            setTimeout(() => {
+                setEmailSent(false);
+                setEmailMessage(null);
+            }, 7000);
         }, 5000);
 
         try {
@@ -396,6 +402,12 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo }) => {
             });
             setEmailData({ currentEmail: '', newEmail: '' });
             
+            // Reset to normal state after 7 seconds
+            setTimeout(() => {
+                setEmailSent(false);
+                setEmailMessage(null);
+            }, 7000);
+            
         } catch (error: any) {
             // Clear timeout
             clearTimeout(timeoutId);
@@ -409,6 +421,12 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo }) => {
                 text: '✅ Verification emails sent! Please check both email addresses.' 
             });
             setEmailData({ currentEmail: '', newEmail: '' });
+            
+            // Reset to normal state after 7 seconds
+            setTimeout(() => {
+                setEmailSent(false);
+                setEmailMessage(null);
+            }, 7000);
         }
     };
 
