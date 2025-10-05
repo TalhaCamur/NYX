@@ -885,57 +885,46 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo }) => {
                         </div>
                     )}
 
-                    {/* Orders Tab */}
+                    {/* Orders Tab - Minimalist */}
                     {activeTab === 'orders' && (
-                        <div className="space-y-8">
-                            {/* Stats Cards */}
-                            <div className="grid md:grid-cols-2 gap-6">
-                                <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 text-center">
-                                    <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center mx-auto mb-4">
-                                        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                                        </svg>
-                                    </div>
-                                    <h3 className="text-2xl font-bold text-white mb-2">{stats.orders}</h3>
-                                    <p className="text-gray-400">Orders Placed</p>
+                        <div className="space-y-6">
+                            {/* Clean Stats */}
+                            <div className="grid md:grid-cols-2 gap-4">
+                                <div className="bg-white/[0.03] backdrop-blur-xl rounded-2xl border border-white/10 p-6 text-center hover:border-white/20 transition-all">
+                                    <div className="text-3xl font-bold text-white mb-1">{stats.orders}</div>
+                                    <p className="text-sm text-gray-400">Orders Placed</p>
                                 </div>
-                                
-                                <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 text-center">
-                                    <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl flex items-center justify-center mx-auto mb-4">
-                                        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                                        </svg>
-                                    </div>
-                                    <h3 className="text-2xl font-bold text-white mb-2">{stats.favorites}</h3>
-                                    <p className="text-gray-400">Favorites</p>
+                                <div className="bg-white/[0.03] backdrop-blur-xl rounded-2xl border border-white/10 p-6 text-center hover:border-white/20 transition-all">
+                                    <div className="text-3xl font-bold text-white mb-1">{stats.favorites}</div>
+                                    <p className="text-sm text-gray-400">Favorites</p>
                                 </div>
                             </div>
 
-                            {/* Recent Activity */}
-                            <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-8">
-                                <h3 className="text-2xl font-bold text-white mb-6">Recent Activity</h3>
-                                <div className="space-y-4">
+                            {/* Clean Recent Activity */}
+                            <div className="bg-white/[0.03] backdrop-blur-xl rounded-2xl border border-white/10 p-8 hover:border-white/20 transition-all">
+                                <h3 className="text-xl font-bold text-white mb-6">Recent Activity</h3>
+                                <div className="space-y-3">
                                     {recentActivity.length > 0 ? (
                                         recentActivity.map((activity, index) => (
-                                            <div key={index} className="flex items-center gap-4 p-4 bg-white/5 rounded-xl">
-                                                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                                                    activity.type === 'order' ? 'bg-gradient-to-r from-blue-500 to-purple-600' :
-                                                    activity.type === 'profile' ? 'bg-gradient-to-r from-green-500 to-emerald-600' :
-                                                    activity.type === 'account' ? 'bg-gradient-to-r from-orange-500 to-red-600' :
-                                                    'bg-gradient-to-r from-gray-500 to-gray-600'
+                                            <div key={index} className="flex items-center gap-4 p-4 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-all">
+                                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                                                    activity.type === 'order' ? 'bg-blue-500/20 text-blue-400' :
+                                                    activity.type === 'profile' ? 'bg-green-500/20 text-green-400' :
+                                                    activity.type === 'account' ? 'bg-orange-500/20 text-orange-400' :
+                                                    'bg-gray-500/20 text-gray-400'
                                                 }`}>
                                                     {activity.icon === 'shopping-bag' && (
-                                                        <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                                                         </svg>
                                                     )}
                                                     {activity.icon === 'user' && (
-                                                        <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                                         </svg>
                                                     )}
                                                     {activity.icon === 'user-plus' && (
-                                                        <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                                                         </svg>
                                                     )}
@@ -977,18 +966,12 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo }) => {
                                 </div>
                             </div>
 
-                            {/* Order Tracking Section */}
-                            <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-8">
-                                <h3 className="text-2xl font-bold text-white mb-6">Order Tracking</h3>
-                                <div className="text-center py-12">
-                                    <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                                        <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                    </div>
-                                    <h4 className="text-xl font-semibold text-white mb-2">Track Your Orders</h4>
-                                    <p className="text-gray-400 mb-6">Monitor your order status and delivery progress</p>
-                                    <button className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl font-medium hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl">
+                            {/* Clean Order Tracking */}
+                            <div className="bg-white/[0.03] backdrop-blur-xl rounded-2xl border border-white/10 p-8 hover:border-white/20 transition-all">
+                                <h3 className="text-xl font-bold text-white mb-4">Order Tracking</h3>
+                                <div className="text-center py-8">
+                                    <p className="text-gray-400 mb-4">Monitor your order status and delivery progress</p>
+                                    <button className="px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white rounded-xl transition-all">
                                         View All Orders
                                     </button>
                                 </div>
@@ -996,14 +979,12 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo }) => {
                         </div>
                     )}
 
-                    {/* Security Tab */}
+                    {/* Security Tab - Minimalist */}
                     {activeTab === 'security' && (
-                        <div className="bg-white/5 backdrop-blur-xl rounded-3xl border border-white/10 p-8 mb-8 shadow-2xl">
-                            <h3 className="text-2xl font-bold text-white mb-6">Security Settings</h3>
-                            
-                                {/* Password Change */}
-                                <div className="mb-8">
-                                    <h4 className="text-lg font-semibold text-white mb-4">Change Password</h4>
+                        <div className="space-y-6">
+                            {/* Password Change Card */}
+                            <div className="bg-white/[0.03] backdrop-blur-xl rounded-2xl border border-white/10 p-8 hover:border-white/20 transition-all">
+                                <h3 className="text-xl font-bold text-white mb-6">Change Password</h3>
                                     
                                     {/* Password Message */}
                                     {passwordMessage && (
@@ -1016,50 +997,50 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo }) => {
                                         </div>
                                     )}
                                     
-                                    <div className="space-y-4">
-                                        <div>
-                                            <label className="block text-sm font-semibold text-gray-300 mb-3 tracking-wide">Current Password</label>
-                                            <input
-                                                type="password"
-                                                value={passwordData.currentPassword}
-                                                onChange={(e) => setPasswordData(prev => ({ ...prev, currentPassword: e.target.value }))}
-                                                className="w-full p-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:border-nyx-blue focus:ring-2 focus:ring-nyx-blue/20 focus:outline-none transition-all"
-                                                placeholder="Enter current password"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-semibold text-gray-300 mb-3 tracking-wide">New Password</label>
-                                            <input
-                                                type="password"
-                                                value={passwordData.newPassword}
-                                                onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
-                                                className="w-full p-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:border-nyx-blue focus:ring-2 focus:ring-nyx-blue/20 focus:outline-none transition-all"
-                                                placeholder="Enter new password"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-semibold text-gray-300 mb-3 tracking-wide">Confirm New Password</label>
-                                            <input
-                                                type="password"
-                                                value={passwordData.confirmPassword}
-                                                onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                                                className="w-full p-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:border-nyx-blue focus:ring-2 focus:ring-nyx-blue/20 focus:outline-none transition-all"
-                                                placeholder="Confirm new password"
-                                            />
-                                        </div>
-                                        <button
-                                            onClick={handlePasswordChange}
-                                            disabled={passwordLoading}
-                                            className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-medium hover:from-green-600 hover:to-emerald-700 transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
-                                        >
-                                            {passwordLoading ? 'Updating...' : 'Update Password'}
-                                        </button>
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="block text-xs font-medium text-gray-400 mb-2">Current Password</label>
+                                        <input
+                                            type="password"
+                                            value={passwordData.currentPassword}
+                                            onChange={(e) => setPasswordData(prev => ({ ...prev, currentPassword: e.target.value }))}
+                                            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:border-white/30 focus:outline-none transition-all"
+                                            placeholder="Enter current password"
+                                        />
                                     </div>
+                                    <div>
+                                        <label className="block text-xs font-medium text-gray-400 mb-2">New Password</label>
+                                        <input
+                                            type="password"
+                                            value={passwordData.newPassword}
+                                            onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
+                                            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:border-white/30 focus:outline-none transition-all"
+                                            placeholder="Enter new password"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-medium text-gray-400 mb-2">Confirm New Password</label>
+                                        <input
+                                            type="password"
+                                            value={passwordData.confirmPassword}
+                                            onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                                            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:border-white/30 focus:outline-none transition-all"
+                                            placeholder="Confirm new password"
+                                        />
+                                    </div>
+                                    <button
+                                        onClick={handlePasswordChange}
+                                        disabled={passwordLoading}
+                                        className="px-6 py-3 bg-white text-nyx-black font-semibold rounded-xl hover:bg-gray-100 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        {passwordLoading ? 'Updating...' : 'Update Password'}
+                                    </button>
                                 </div>
+                            </div>
 
-                            {/* Email Change */}
-                            <div className="mb-8">
-                                <h4 className="text-lg font-semibold text-white mb-4">Change Email</h4>
+                            {/* Email Change Card */}
+                            <div className="bg-white/[0.03] backdrop-blur-xl rounded-2xl border border-white/10 p-8 hover:border-white/20 transition-all">
+                                <h3 className="text-xl font-bold text-white mb-6">Change Email</h3>
                                 
                                 {/* Email Message */}
                                 {emailMessage && (
@@ -1074,161 +1055,124 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo }) => {
                                 
                                 <div className="space-y-4">
                                     <div>
-                                        <label className="block text-sm font-semibold text-gray-300 mb-3 tracking-wide">Current Email Address</label>
+                                        <label className="block text-xs font-medium text-gray-400 mb-2">Current Email</label>
                                         <input
                                             type="email"
                                             value={emailData.currentEmail}
                                             onChange={(e) => setEmailData(prev => ({ ...prev, currentEmail: e.target.value }))}
-                                            className="w-full p-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:border-nyx-blue focus:ring-2 focus:ring-nyx-blue/20 focus:outline-none transition-all"
-                                            placeholder="Enter your current email address"
+                                            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:border-white/30 focus:outline-none transition-all"
+                                            placeholder="Current email"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-semibold text-gray-300 mb-3 tracking-wide">New Email Address</label>
+                                        <label className="block text-xs font-medium text-gray-400 mb-2">New Email</label>
                                         <input
                                             type="email"
                                             value={emailData.newEmail}
                                             onChange={(e) => setEmailData(prev => ({ ...prev, newEmail: e.target.value }))}
-                                            className="w-full p-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:border-nyx-blue focus:ring-2 focus:ring-nyx-blue/20 focus:outline-none transition-all"
-                                            placeholder="Enter new email address"
+                                            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:border-white/30 focus:outline-none transition-all"
+                                            placeholder="New email"
                                         />
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-semibold text-gray-300 mb-3 tracking-wide">Current Password (Required)</label>
-                                        <input
-                                            type="password"
-                                            value={passwordData.currentPassword}
-                                            onChange={(e) => setPasswordData(prev => ({ ...prev, currentPassword: e.target.value }))}
-                                            className="w-full p-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:border-nyx-blue focus:ring-2 focus:ring-nyx-blue/20 focus:outline-none transition-all"
-                                            placeholder="Enter your current password"
-                                        />
-                                    </div>
-                                    <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-                                        <p className="text-blue-300 text-sm">
-                                            📧 You will receive a verification link at your new email address. 
-                                            Please check your inbox and click the link to complete the email change.
-                                        </p>
-                                    </div>
+                                    <p className="text-xs text-gray-500">
+                                        A verification link will be sent to your new email address
+                                    </p>
                                     <button
-                                        onClick={() => {
-                                            handleEmailChange();
-                                            // Fallback: reset loading state after 5 seconds
-                                            setTimeout(() => {
-                                                if (emailLoading) {
-                                                    console.log("🔄 Fallback: Resetting email loading state");
-                                                    setEmailLoading(false);
-                                                }
-                                            }, 5000);
-                                        }}
+                                        onClick={handleEmailChange}
                                         disabled={emailLoading}
-                                        className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl font-medium hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="px-6 py-3 bg-white text-nyx-black font-semibold rounded-xl hover:bg-gray-100 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
-                                        {emailLoading ? 'Sending...' : 'Send Verification Email'}
+                                        {emailLoading ? 'Sending...' : 'Send Verification'}
                                     </button>
                                 </div>
                             </div>
 
-                            {/* Delete Account */}
-                            <div className="mt-8 p-6 bg-red-500/10 border border-red-500/20 rounded-xl">
-                                <h4 className="text-lg font-semibold text-red-400 mb-2">🗑️ Delete Account</h4>
-                                <div className="space-y-4">
-                                    <div className="p-4 bg-red-500/20 border border-red-500/30 rounded-lg">
-                                        <p className="text-red-300 text-sm font-medium mb-2">⚠️ WARNING: This action is irreversible!</p>
-                                        <p className="text-gray-300 text-sm">
-                                            Deleting your account will permanently remove:
-                                        </p>
-                                        <ul className="text-gray-400 text-sm mt-2 ml-4 list-disc">
-                                            <li>Your profile and personal information</li>
-                                            <li>All orders and purchase history</li>
-                                            <li>Favorites and wishlists</li>
-                                            <li>Security settings and preferences</li>
-                                            <li>All associated data from our database</li>
-                                        </ul>
-                                    </div>
-                                    <p className="text-gray-300 text-sm">
-                                        This action cannot be undone. Please be absolutely certain before proceeding.
-                                    </p>
-                                    <button
-                                        onClick={handleDeleteAccount}
-                                        className="px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl font-medium hover:from-red-600 hover:to-red-700 transition-all duration-300 shadow-lg hover:shadow-xl"
-                                    >
-                                        🗑️ Delete Account Permanently
-                                    </button>
-                                </div>
+                            {/* Delete Account Card */}
+                            <div className="bg-red-500/5 border border-red-500/20 rounded-2xl p-8">
+                                <h3 className="text-xl font-bold text-red-400 mb-4">Delete Account</h3>
+                                <p className="text-sm text-gray-400 mb-4">
+                                    Permanently delete your account and all associated data. This action cannot be undone.
+                                </p>
+                                <button
+                                    onClick={handleDeleteAccount}
+                                    className="px-6 py-3 bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 hover:border-red-500/50 text-red-300 font-semibold rounded-xl transition-all"
+                                >
+                                    Delete Account
+                                </button>
                             </div>
                         </div>
                     )}
 
-                        {/* Settings Tab */}
+                        {/* Settings Tab - Minimalist */}
                         {activeTab === 'settings' && (
-                            <div className="bg-white/5 backdrop-blur-xl rounded-3xl border border-white/10 p-8 mb-8 shadow-2xl">
-                                <h3 className="text-2xl font-bold text-white mb-6">Account Settings</h3>
+                            <div className="bg-white/[0.03] backdrop-blur-xl rounded-2xl border border-white/10 p-8 hover:border-white/20 transition-all">
+                                <h3 className="text-xl font-bold text-white mb-6">Account Settings</h3>
                                 
-                                <div className="space-y-6">
-                                    <div className="flex items-center justify-between p-4 bg-white/5 rounded-xl">
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between p-4 bg-white/5 border border-white/10 rounded-xl">
                                         <div>
-                                            <h4 className="text-white font-medium">Email Notifications</h4>
-                                            <p className="text-gray-400 text-sm">Receive email updates about your orders and account</p>
+                                            <h4 className="text-white font-medium text-sm">Email Notifications</h4>
+                                            <p className="text-gray-500 text-xs">Receive email updates</p>
                                         </div>
                                         <button
                                             onClick={() => setEmailNotifications(!emailNotifications)}
-                                            className={`w-12 h-6 rounded-full relative cursor-pointer transition-colors duration-300 ${
-                                                emailNotifications ? 'bg-blue-500' : 'bg-gray-600'
+                                            className={`w-11 h-6 rounded-full relative cursor-pointer transition-colors ${
+                                                emailNotifications ? 'bg-white' : 'bg-white/20'
                                             }`}
                                         >
-                                            <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform duration-300 ${
-                                                emailNotifications ? 'right-1' : 'left-1'
+                                            <div className={`absolute top-1 w-4 h-4 rounded-full transition-transform ${
+                                                emailNotifications ? 'right-1 bg-nyx-black' : 'left-1 bg-white'
                                             }`}></div>
                                         </button>
                                     </div>
                                     
-                                    <div className="flex items-center justify-between p-4 bg-white/5 rounded-xl">
+                                    <div className="flex items-center justify-between p-4 bg-white/5 border border-white/10 rounded-xl">
                                         <div>
-                                            <h4 className="text-white font-medium">SMS Notifications</h4>
-                                            <p className="text-gray-400 text-sm">Receive SMS updates for important account changes</p>
+                                            <h4 className="text-white font-medium text-sm">SMS Notifications</h4>
+                                            <p className="text-gray-500 text-xs">Receive SMS updates</p>
                                         </div>
                                         <button
                                             onClick={() => setSmsNotifications(!smsNotifications)}
-                                            className={`w-12 h-6 rounded-full relative cursor-pointer transition-colors duration-300 ${
-                                                smsNotifications ? 'bg-blue-500' : 'bg-gray-600'
+                                            className={`w-11 h-6 rounded-full relative cursor-pointer transition-colors ${
+                                                smsNotifications ? 'bg-white' : 'bg-white/20'
                                             }`}
                                         >
-                                            <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform duration-300 ${
-                                                smsNotifications ? 'right-1' : 'left-1'
+                                            <div className={`absolute top-1 w-4 h-4 rounded-full transition-transform ${
+                                                smsNotifications ? 'right-1 bg-nyx-black' : 'left-1 bg-white'
                                             }`}></div>
                                         </button>
                                     </div>
                                     
-                                    <div className="flex items-center justify-between p-4 bg-white/5 rounded-xl">
+                                    <div className="flex items-center justify-between p-4 bg-white/5 border border-white/10 rounded-xl">
                                         <div>
-                                            <h4 className="text-white font-medium">Two-Factor Authentication</h4>
-                                            <p className="text-gray-400 text-sm">Add an extra layer of security to your account</p>
+                                            <h4 className="text-white font-medium text-sm">Two-Factor Authentication</h4>
+                                            <p className="text-gray-500 text-xs">Extra security layer</p>
                                         </div>
                                         <button
                                             onClick={() => setTwoFactorAuth(!twoFactorAuth)}
-                                            className={`w-12 h-6 rounded-full relative cursor-pointer transition-colors duration-300 ${
-                                                twoFactorAuth ? 'bg-blue-500' : 'bg-gray-600'
+                                            className={`w-11 h-6 rounded-full relative cursor-pointer transition-colors ${
+                                                twoFactorAuth ? 'bg-white' : 'bg-white/20'
                                             }`}
                                         >
-                                            <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform duration-300 ${
-                                                twoFactorAuth ? 'right-1' : 'left-1'
+                                            <div className={`absolute top-1 w-4 h-4 rounded-full transition-transform ${
+                                                twoFactorAuth ? 'right-1 bg-nyx-black' : 'left-1 bg-white'
                                             }`}></div>
                                         </button>
                                     </div>
                                     
-                                    <div className="flex items-center justify-between p-4 bg-white/5 rounded-xl">
+                                    <div className="flex items-center justify-between p-4 bg-white/5 border border-white/10 rounded-xl">
                                         <div>
-                                            <h4 className="text-white font-medium">Dark Mode</h4>
-                                            <p className="text-gray-400 text-sm">Use dark theme for better experience</p>
+                                            <h4 className="text-white font-medium text-sm">Dark Mode</h4>
+                                            <p className="text-gray-500 text-xs">Dark theme enabled</p>
                                         </div>
                                         <button
                                             onClick={() => setDarkMode(!darkMode)}
-                                            className={`w-12 h-6 rounded-full relative cursor-pointer transition-colors duration-300 ${
-                                                darkMode ? 'bg-blue-500' : 'bg-gray-600'
+                                            className={`w-11 h-6 rounded-full relative cursor-pointer transition-colors ${
+                                                darkMode ? 'bg-white' : 'bg-white/20'
                                             }`}
                                         >
-                                            <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform duration-300 ${
-                                                darkMode ? 'right-1' : 'left-1'
+                                            <div className={`absolute top-1 w-4 h-4 rounded-full transition-transform ${
+                                                darkMode ? 'right-1 bg-nyx-black' : 'left-1 bg-white'
                                             }`}></div>
                                         </button>
                                     </div>
