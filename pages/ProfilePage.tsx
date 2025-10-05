@@ -1076,13 +1076,29 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo }) => {
                                         </div>
                                         <button
                                             onClick={handleEmailChange}
-                                            disabled={emailLoading}
-                                            className="w-full px-6 py-3 bg-white text-nyx-black font-semibold rounded-xl hover:bg-gray-100 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                            disabled={emailLoading || emailSent}
+                                            className={`w-full px-6 py-3 font-semibold rounded-xl transition-all flex items-center justify-center gap-2 ${
+                                                emailSent 
+                                                    ? 'bg-green-500 text-white cursor-not-allowed' 
+                                                    : 'bg-white text-nyx-black hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed'
+                                            }`}
                                         >
                                             {emailLoading ? (
                                                 <>
                                                     <div className="w-4 h-4 border-2 border-nyx-black border-t-transparent rounded-full animate-spin"></div>
                                                     Sending...
+                                                </>
+                                            ) : emailSent ? (
+                                                <>
+                                                    <svg 
+                                                        className="w-5 h-5 animate-scale-in" 
+                                                        fill="none" 
+                                                        stroke="currentColor" 
+                                                        viewBox="0 0 24 24"
+                                                    >
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                    <span className="animate-fade-in">Sent Successfully</span>
                                                 </>
                                             ) : (
                                                 'Send Verification'
