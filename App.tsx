@@ -1194,7 +1194,10 @@ const BlogPage = ({ navigateTo }: { navigateTo: (page: string, params?: any) => 
                     .order('created_at', { ascending: false });
                 
                 if (error) {
-                    console.error("❌ BlogPage: Supabase error:", error);
+                    // Silently handle error if it's just a connection issue on refresh
+                    if (error.message && !error.message.includes('Could not fetch')) {
+                        console.error("❌ BlogPage: Supabase error:", error);
+                    }
                     setBlogPosts([]);
                     setLoading(false);
                     return;
@@ -1213,17 +1216,16 @@ const BlogPage = ({ navigateTo }: { navigateTo: (page: string, params?: any) => 
                 
                 setBlogPosts(formattedPosts);
                 setLoading(false);
-                setForceUpdate(prev => prev + 1); // Trigger re-render
                 
             } catch (error) {
-                console.error('Error fetching blog posts:', error);
+                // Silently handle catch errors on refresh
                 setBlogPosts([]);
                 setLoading(false);
             }
         };
         
         fetchBlogPosts();
-    }, [forceUpdate]); // Depend on forceUpdate to trigger re-fetch
+    }, []); // Only fetch once on mount
     
     // Show BlogManagement if user is authorized and clicked "New Post"
     if (showBlogManagement && isAuthorized) {
