@@ -1058,159 +1058,88 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo }) => {
                             <div className="bg-white/[0.03] backdrop-blur-xl rounded-2xl border border-white/10 p-8 hover:border-white/20 transition-all">
                                 <h3 className="text-xl font-bold text-white mb-6">Change Email</h3>
                                 
-                                {/* Email Message */}
-                                {emailMessage && (
-                                    <div className={`mb-4 p-4 rounded-xl ${
-                                        emailMessage.type === 'success' 
-                                            ? 'bg-green-500/20 border border-green-500/30 text-green-300' 
-                                            : 'bg-red-500/20 border border-red-500/30 text-red-300'
-                                    }`}>
-                                        {emailMessage.text}
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="block text-xs font-medium text-gray-400 mb-2">Current Email</label>
+                                        <input
+                                            type="email"
+                                            value={emailData.currentEmail}
+                                            onChange={(e) => setEmailData(prev => ({ ...prev, currentEmail: e.target.value }))}
+                                            disabled={emailSent}
+                                            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:border-white/30 focus:outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                            placeholder="Current email"
+                                        />
                                     </div>
-                                )}
-                                
-                                {!emailSent ? (
-                                    <div className="space-y-4">
-                                        <div>
-                                            <label className="block text-xs font-medium text-gray-400 mb-2">Current Email</label>
-                                            <input
-                                                type="email"
-                                                value={emailData.currentEmail}
-                                                onChange={(e) => setEmailData(prev => ({ ...prev, currentEmail: e.target.value }))}
-                                                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:border-white/30 focus:outline-none transition-all"
-                                                placeholder="Current email"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-xs font-medium text-gray-400 mb-2">New Email</label>
-                                            <input
-                                                type="email"
-                                                value={emailData.newEmail}
-                                                onChange={(e) => setEmailData(prev => ({ ...prev, newEmail: e.target.value }))}
-                                                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:border-white/30 focus:outline-none transition-all"
-                                                placeholder="New email"
-                                            />
-                                        </div>
-                                        <button
-                                            onClick={handleEmailChange}
-                                            disabled={emailLoading || emailSent}
-                                            className={`w-full px-6 py-3 font-semibold rounded-xl transition-all flex items-center justify-center gap-2 ${
-                                                emailSent 
-                                                    ? 'bg-green-500 text-white cursor-not-allowed' 
-                                                    : 'bg-white text-nyx-black hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed'
-                                            }`}
-                                        >
-                                            {emailLoading ? (
-                                                <>
-                                                    <div className="w-4 h-4 border-2 border-nyx-black border-t-transparent rounded-full animate-spin"></div>
-                                                    Sending...
-                                                </>
-                                            ) : emailSent ? (
-                                                <>
-                                                    <svg 
-                                                        className="w-5 h-5 animate-scale-in" 
-                                                        fill="none" 
-                                                        stroke="currentColor" 
-                                                        viewBox="0 0 24 24"
-                                                    >
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                                                    </svg>
-                                                    <span className="animate-fade-in">Sent Successfully</span>
-                                                </>
-                                            ) : (
-                                                'Send Verification'
-                                            )}
-                                        </button>
+                                    <div>
+                                        <label className="block text-xs font-medium text-gray-400 mb-2">New Email</label>
+                                        <input
+                                            type="email"
+                                            value={emailData.newEmail}
+                                            onChange={(e) => setEmailData(prev => ({ ...prev, newEmail: e.target.value }))}
+                                            disabled={emailSent}
+                                            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:border-white/30 focus:outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                            placeholder="New email"
+                                        />
                                     </div>
-                                ) : (
-                                    <div className="space-y-6">
-                                        {/* Success State with Instructions */}
-                                        <div className="flex items-center gap-3 p-4 bg-green-500/10 border border-green-500/30 rounded-xl">
-                                            <div className="flex-shrink-0 w-10 h-10 bg-green-500/20 rounded-full flex items-center justify-center">
-                                                <svg className="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                    
+                                    {/* Stripe-style Button */}
+                                    <button
+                                        onClick={handleEmailChange}
+                                        disabled={emailLoading || emailSent}
+                                        className={`w-full px-6 py-3.5 font-semibold rounded-xl transition-all duration-300 flex items-center justify-center gap-2.5 ${
+                                            emailSent 
+                                                ? 'bg-green-500 text-white cursor-default shadow-lg shadow-green-500/20' 
+                                                : 'bg-white text-nyx-black hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed'
+                                        }`}
+                                    >
+                                        {emailLoading ? (
+                                            <>
+                                                <div className="w-4 h-4 border-2 border-nyx-black border-t-transparent rounded-full animate-spin"></div>
+                                                <span>Sending...</span>
+                                            </>
+                                        ) : emailSent ? (
+                                            <>
+                                                <svg 
+                                                    className="w-5 h-5 animate-scale-in" 
+                                                    fill="none" 
+                                                    stroke="currentColor" 
+                                                    viewBox="0 0 24 24"
+                                                >
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                                                 </svg>
-                                            </div>
-                                            <div className="flex-1">
-                                                <h4 className="text-green-300 font-semibold mb-1">Emails Sent Successfully!</h4>
-                                                <p className="text-green-400/80 text-xs">Follow the steps below to complete the process</p>
-                                            </div>
+                                                <span className="animate-fade-in">Sent</span>
+                                            </>
+                                        ) : (
+                                            'Send Verification'
+                                        )}
+                                    </button>
+
+                                    {/* Minimal Success Message */}
+                                    {emailSent && (
+                                        <div className="animate-slide-up">
+                                            <p className="text-sm text-gray-400 text-center">
+                                                Check your <span className="text-white font-medium">current</span> and <span className="text-white font-medium">new</span> email addresses for verification links.
+                                            </p>
+                                            <button
+                                                onClick={() => {
+                                                    setEmailSent(false);
+                                                    setEmailMessage(null);
+                                                    setEmailData({ currentEmail: '', newEmail: '' });
+                                                }}
+                                                className="mt-4 w-full text-sm text-gray-500 hover:text-white transition-colors"
+                                            >
+                                                Send another email
+                                            </button>
                                         </div>
+                                    )}
 
-                                        {/* Step-by-Step Instructions */}
-                                        <div className="space-y-4">
-                                            <h4 className="text-sm font-semibold text-white">How to Complete Email Change:</h4>
-                                            
-                                            {/* Step 1 */}
-                                            <div className="flex gap-4">
-                                                <div className="flex-shrink-0 w-8 h-8 bg-nyx-blue/20 border border-nyx-blue/30 rounded-full flex items-center justify-center">
-                                                    <span className="text-nyx-blue font-bold text-sm">1</span>
-                                                </div>
-                                                <div className="flex-1 pt-1">
-                                                    <h5 className="text-white font-medium text-sm mb-1">Check Your Current Email</h5>
-                                                    <p className="text-gray-400 text-xs leading-relaxed">
-                                                        Open your <span className="text-white font-medium">current email inbox</span> and look for a confirmation email from Supabase. 
-                                                        Click the <span className="text-nyx-blue font-medium">"Confirm Email Change"</span> link in that email.
-                                                    </p>
-                                                </div>
-                                            </div>
-
-                                            {/* Step 2 */}
-                                            <div className="flex gap-4">
-                                                <div className="flex-shrink-0 w-8 h-8 bg-brand-purple/20 border border-brand-purple/30 rounded-full flex items-center justify-center">
-                                                    <span className="text-brand-purple font-bold text-sm">2</span>
-                                                </div>
-                                                <div className="flex-1 pt-1">
-                                                    <h5 className="text-white font-medium text-sm mb-1">Check Your New Email</h5>
-                                                    <p className="text-gray-400 text-xs leading-relaxed">
-                                                        After confirming in your current email, check your <span className="text-white font-medium">new email inbox</span>. 
-                                                        You'll receive another verification email. Click the <span className="text-brand-purple font-medium">"Verify New Email"</span> link.
-                                                    </p>
-                                                </div>
-                                            </div>
-
-                                            {/* Step 3 */}
-                                            <div className="flex gap-4">
-                                                <div className="flex-shrink-0 w-8 h-8 bg-green-500/20 border border-green-500/30 rounded-full flex items-center justify-center">
-                                                    <span className="text-green-400 font-bold text-sm">3</span>
-                                                </div>
-                                                <div className="flex-1 pt-1">
-                                                    <h5 className="text-white font-medium text-sm mb-1">Email Changed Successfully</h5>
-                                                    <p className="text-gray-400 text-xs leading-relaxed">
-                                                        Once both links are clicked, your email will be updated. 
-                                                        You can now log in with your <span className="text-green-400 font-medium">new email address</span>.
-                                                    </p>
-                                                </div>
-                                            </div>
+                                    {/* Error Message */}
+                                    {emailMessage && emailMessage.type === 'error' && (
+                                        <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl">
+                                            <p className="text-red-300 text-sm">{emailMessage.text}</p>
                                         </div>
-
-                                        {/* Important Note */}
-                                        <div className="p-4 bg-orange-500/10 border border-orange-500/20 rounded-xl">
-                                            <div className="flex gap-2">
-                                                <svg className="w-5 h-5 text-orange-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                                </svg>
-                                                <div>
-                                                    <h5 className="text-orange-300 font-medium text-xs mb-1">Important</h5>
-                                                    <p className="text-orange-400/80 text-xs">
-                                                        Both verification links must be clicked in order. If you don't see the emails, check your spam folder.
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {/* Reset Button */}
-                                        <button
-                                            onClick={() => {
-                                                setEmailSent(false);
-                                                setEmailMessage(null);
-                                            }}
-                                            className="w-full px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white font-medium rounded-xl transition-all text-sm"
-                                        >
-                                            Send Another Email
-                                        </button>
-                                    </div>
-                                )}
+                                    )}
+                                </div>
                             </div>
 
                             {/* Delete Account Card */}
