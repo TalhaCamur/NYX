@@ -64,6 +64,54 @@ const mapProfileToUser = (profile: any, authUser: SupabaseUser | null): User => 
     newsletterSubscribed: profile.newsletter_subscribed ?? false,
 });
 
+// Common weak passwords
+const commonPasswords = [
+    'password', '123456', '12345678', 'qwerty', 'abc123', 'monkey', '1234567', 
+    'letmein', 'trustno1', 'dragon', 'baseball', 'iloveyou', 'master', 'sunshine',
+    'ashley', 'bailey', 'passw0rd', 'shadow', '123123', '654321', 'superman',
+    'qazwsx', 'michael', 'football', 'admin', 'welcome', 'login'
+];
+
+// Password validation function
+const validatePassword = (password: string, email?: string): { isValid: boolean; error?: string } => {
+    // Length check
+    if (password.length < 8) {
+        return { isValid: false, error: 'Password must be at least 8 characters long' };
+    }
+
+    // Uppercase check
+    if (!/[A-Z]/.test(password)) {
+        return { isValid: false, error: 'Password must contain at least one uppercase letter (A-Z)' };
+    }
+
+    // Lowercase check
+    if (!/[a-z]/.test(password)) {
+        return { isValid: false, error: 'Password must contain at least one lowercase letter (a-z)' };
+    }
+
+    // Number check
+    if (!/[0-9]/.test(password)) {
+        return { isValid: false, error: 'Password must contain at least one number (0-9)' };
+    }
+
+    // Common password check
+    if (commonPasswords.includes(password.toLowerCase())) {
+        return { isValid: false, error: 'This password is too common. Please choose a more unique password' };
+    }
+
+    // Email similarity check
+    if (email && password.toLowerCase().includes(email.split('@')[0].toLowerCase())) {
+        return { isValid: false, error: 'Password should not contain your email address' };
+    }
+
+    // Sequential characters check
+    if (/(.)\1{2,}/.test(password)) {
+        return { isValid: false, error: 'Password should not contain repeating characters (e.g., "aaa", "111")' };
+    }
+
+    return { isValid: true };
+};
+
 interface AuthContextType {
     user: User | null;
     loading: boolean;
@@ -329,6 +377,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         if (!trimmedNickname || !trimmedEmail || !trimmedFirstName || !trimmedLastName) {
             throw new Error("All fields must be filled out.");
+        }
+
+        // Validate password strength
+        const passwordValidation = validatePassword(password, trimmedEmail);
+        if (!passwordValidation.isValid) {
+            throw new Error(passwordValidation.error || 'Password does not meet requirements');
         }
 
         try {
