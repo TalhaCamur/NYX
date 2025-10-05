@@ -1887,10 +1887,28 @@ const AdminDashboardPage = () => {
 
 // Main App Component
 const App = () => {
-    const [currentPage, setCurrentPage] = useState('home');
+    // Initialize from URL hash
+    const getInitialPage = () => {
+        const hash = window.location.hash.slice(1); // Remove '#'
+        return hash || 'home';
+    };
+    
+    const [currentPage, setCurrentPage] = useState(getInitialPage());
     const [pageParams, setPageParams] = useState<any>(null);
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
     const [openAddForm, setOpenAddForm] = useState(false);
+    
+    // Listen to hash changes (browser back/forward)
+    React.useEffect(() => {
+        const handleHashChange = () => {
+            const hash = window.location.hash.slice(1) || 'home';
+            setCurrentPage(hash);
+            setPageParams(null);
+        };
+        
+        window.addEventListener('hashchange', handleHashChange);
+        return () => window.removeEventListener('hashchange', handleHashChange);
+    }, []);
     
     // Debug state changes
     React.useEffect(() => {
@@ -1954,6 +1972,8 @@ const App = () => {
     }, []);
 
     const navigateTo = (page: string, params?: any) => {
+        // Update URL hash for browser history
+        window.location.hash = page;
         setCurrentPage(page);
         setPageParams(params);
         // Scroll to top when navigating
