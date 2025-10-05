@@ -755,12 +755,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo }) => {
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    )}
 
-                    {/* Profile Tab - Forms Section */}
-                    {activeTab === 'profile' && (
-                        <div className="space-y-6">
                             {/* Personal Information Card */}
                             <div className="bg-gradient-to-br from-white/[0.06] to-white/[0.02] backdrop-blur-xl rounded-2xl border border-white/10 p-8 shadow-xl">
                                 <div className="flex items-center gap-3 mb-6">
