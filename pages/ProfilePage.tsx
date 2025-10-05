@@ -808,63 +808,94 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo }) => {
                                 </div>
                             </div>
 
-                            {/* Personal Information Card */}
-                            <div className="bg-gradient-to-br from-white/[0.06] to-white/[0.02] backdrop-blur-xl rounded-2xl border border-white/10 p-8 shadow-xl">
-                                <div className="flex items-center gap-3 mb-6">
-                                    <div className="p-3 bg-gradient-to-br from-nyx-blue/20 to-brand-purple/20 rounded-xl border border-nyx-blue/30">
-                                        <svg className="w-6 h-6 text-nyx-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                        </svg>
+                            {/* Premium Personal Information Card */}
+                            <div className="relative bg-gradient-to-br from-white/[0.08] to-white/[0.02] backdrop-blur-2xl rounded-3xl border border-white/20 p-10 shadow-2xl overflow-hidden group">
+                                {/* Animated gradient orb */}
+                                <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-br from-nyx-blue/20 to-transparent rounded-full blur-3xl"></div>
+                                
+                                <div className="relative z-10">
+                                    <div className="flex items-center justify-between mb-8">
+                                        <div className="flex items-center gap-4">
+                                            <div className="relative">
+                                                <div className="absolute inset-0 bg-gradient-to-br from-nyx-blue to-brand-purple rounded-2xl blur-lg opacity-50"></div>
+                                                <div className="relative w-16 h-16 bg-gradient-to-br from-nyx-blue/30 to-brand-purple/30 rounded-2xl flex items-center justify-center border border-nyx-blue/30">
+                                                    <svg className="w-8 h-8 text-nyx-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h3 className="text-3xl font-black text-white tracking-tight">Personal Information</h3>
+                                                {isEditing && (
+                                                    <div className="flex items-center gap-2 mt-1">
+                                                        <div className="w-2 h-2 bg-nyx-blue rounded-full animate-pulse"></div>
+                                                        <span className="text-sm text-nyx-blue font-bold tracking-wide">EDIT MODE ACTIVE</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <div className="px-4 py-2 bg-nyx-blue/10 border border-nyx-blue/30 rounded-xl">
+                                            <span className="text-xs font-bold text-nyx-blue tracking-widest">IDENTITY</span>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <h3 className="text-2xl font-bold text-white">Personal Information</h3>
-                                        {isEditing && (
-                                            <span className="text-sm text-nyx-blue font-semibold">✏️ Edit mode active</span>
-                                        )}
-                                    </div>
-                                </div>
-                                <div className="grid md:grid-cols-2 gap-6">
-                                    <div>
-                                        <label className="block text-sm font-semibold text-gray-300 mb-3 tracking-wide">First Name</label>
-                                        {isEditing ? (
-                                            <input
-                                                type="text"
-                                                value={editData.first_name || ''}
-                                                onChange={(e) => handleInputChange('first_name', e.target.value)}
-                                                className="w-full p-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:border-nyx-blue focus:ring-2 focus:ring-nyx-blue/20 focus:outline-none transition-all"
-                                                placeholder="Enter first name"
-                                            />
-                                        ) : (
-                                            <p className="text-gray-300 p-3 bg-white/5 rounded-lg">{profileData.first_name || 'No first name'}</p>
-                                        )}
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-semibold text-gray-300 mb-3 tracking-wide">Last Name</label>
-                                        {isEditing ? (
-                                            <input
-                                                type="text"
-                                                value={editData.last_name || ''}
-                                                onChange={(e) => handleInputChange('last_name', e.target.value)}
-                                                className="w-full p-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:border-nyx-blue focus:ring-2 focus:ring-nyx-blue/20 focus:outline-none transition-all"
-                                                placeholder="Enter last name"
-                                            />
-                                        ) : (
-                                            <p className="text-gray-300 p-3 bg-white/5 rounded-lg">{profileData.last_name || 'No last name'}</p>
-                                        )}
-                                    </div>
-                                    <div className="md:col-span-2">
-                                        <label className="block text-sm font-semibold text-gray-300 mb-3 tracking-wide">Nickname</label>
-                                        {isEditing ? (
-                                            <input
-                                                type="text"
-                                                value={editData.nickname || ''}
-                                                onChange={(e) => handleInputChange('nickname', e.target.value)}
-                                                className="w-full p-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:border-nyx-blue focus:ring-2 focus:ring-nyx-blue/20 focus:outline-none transition-all"
-                                                placeholder="Enter nickname"
-                                            />
-                                        ) : (
-                                            <p className="text-gray-300 p-3 bg-white/5 rounded-lg">{profileData.nickname || 'No nickname'}</p>
-                                        )}
+                                    <div className="grid md:grid-cols-2 gap-6">
+                                        <div className="group/input">
+                                            <label className="block text-xs font-black text-gray-400 mb-3 tracking-widest uppercase">First Name</label>
+                                            {isEditing ? (
+                                                <div className="relative">
+                                                    <input
+                                                        type="text"
+                                                        value={editData.first_name || ''}
+                                                        onChange={(e) => handleInputChange('first_name', e.target.value)}
+                                                        className="w-full px-5 py-4 bg-white/5 border-2 border-white/10 rounded-2xl text-white placeholder-gray-500 focus:border-nyx-blue focus:bg-white/10 focus:outline-none transition-all duration-300 font-medium"
+                                                        placeholder="Enter first name"
+                                                    />
+                                                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-nyx-blue/20 to-brand-purple/20 opacity-0 group-hover/input:opacity-100 transition-opacity pointer-events-none"></div>
+                                                </div>
+                                            ) : (
+                                                <div className="px-5 py-4 bg-gradient-to-br from-white/10 to-white/5 border border-white/10 rounded-2xl">
+                                                    <p className="text-white font-semibold">{profileData.first_name || 'No first name'}</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="group/input">
+                                            <label className="block text-xs font-black text-gray-400 mb-3 tracking-widest uppercase">Last Name</label>
+                                            {isEditing ? (
+                                                <div className="relative">
+                                                    <input
+                                                        type="text"
+                                                        value={editData.last_name || ''}
+                                                        onChange={(e) => handleInputChange('last_name', e.target.value)}
+                                                        className="w-full px-5 py-4 bg-white/5 border-2 border-white/10 rounded-2xl text-white placeholder-gray-500 focus:border-nyx-blue focus:bg-white/10 focus:outline-none transition-all duration-300 font-medium"
+                                                        placeholder="Enter last name"
+                                                    />
+                                                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-nyx-blue/20 to-brand-purple/20 opacity-0 group-hover/input:opacity-100 transition-opacity pointer-events-none"></div>
+                                                </div>
+                                            ) : (
+                                                <div className="px-5 py-4 bg-gradient-to-br from-white/10 to-white/5 border border-white/10 rounded-2xl">
+                                                    <p className="text-white font-semibold">{profileData.last_name || 'No last name'}</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="md:col-span-2 group/input">
+                                            <label className="block text-xs font-black text-gray-400 mb-3 tracking-widest uppercase">Nickname</label>
+                                            {isEditing ? (
+                                                <div className="relative">
+                                                    <input
+                                                        type="text"
+                                                        value={editData.nickname || ''}
+                                                        onChange={(e) => handleInputChange('nickname', e.target.value)}
+                                                        className="w-full px-5 py-4 bg-white/5 border-2 border-white/10 rounded-2xl text-white placeholder-gray-500 focus:border-nyx-blue focus:bg-white/10 focus:outline-none transition-all duration-300 font-medium"
+                                                        placeholder="Enter nickname"
+                                                    />
+                                                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-nyx-blue/20 to-brand-purple/20 opacity-0 group-hover/input:opacity-100 transition-opacity pointer-events-none"></div>
+                                                </div>
+                                            ) : (
+                                                <div className="px-5 py-4 bg-gradient-to-br from-white/10 to-white/5 border border-white/10 rounded-2xl">
+                                                    <p className="text-white font-semibold">{profileData.nickname || 'No nickname'}</p>
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
