@@ -619,32 +619,38 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo }) => {
                     {/* Profile Tab */}
                     {activeTab === 'profile' && (
                         <div className="space-y-6">
-                            {/* Clean Profile Card */}
-                            <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-8">
+                            {/* Premium Profile Card with Animated Background */}
+                            <div className="relative bg-gradient-to-br from-white/[0.08] to-white/[0.02] backdrop-blur-2xl rounded-3xl border border-white/20 p-10 shadow-2xl overflow-hidden group">
+                                {/* Animated gradient orbs */}
+                                <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-nyx-blue/20 to-transparent rounded-full blur-3xl animate-pulse"></div>
+                                <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-brand-purple/20 to-transparent rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+                                
+                                <div className="relative z-10">
                                 {/* Profile Header */}
                                 <div className="flex flex-col md:flex-row items-center md:items-start gap-8 mb-8">
-                                    {/* Avatar */}
+                                    {/* Premium Avatar with Glow Effect */}
                                     <div className="relative group">
+                                        <div className="absolute inset-0 bg-gradient-to-r from-nyx-blue via-brand-purple to-brand-pink rounded-3xl blur-xl opacity-50 group-hover:opacity-75 transition-opacity duration-500"></div>
                                         {profileData.avatar_url ? (
                                             <img 
                                                 src={profileData.avatar_url} 
                                                 alt="Profile" 
-                                                className="w-32 h-32 rounded-2xl object-cover border border-white/10"
+                                                className="relative w-40 h-40 rounded-3xl object-cover border-2 border-white/30 shadow-2xl transform group-hover:scale-105 transition-all duration-500"
                                             />
                                         ) : (
-                                            <div className="w-32 h-32 bg-gradient-to-br from-nyx-blue to-brand-purple rounded-2xl flex items-center justify-center text-4xl font-bold text-white border border-white/10">
+                                            <div className="relative w-40 h-40 bg-gradient-to-br from-nyx-blue via-brand-purple to-brand-pink rounded-3xl flex items-center justify-center text-5xl font-black text-white border-2 border-white/30 shadow-2xl transform group-hover:scale-105 transition-all duration-500">
                                                 {(profileData.first_name?.[0] || 'U')}{(profileData.last_name?.[0] || '')}
                                             </div>
                                         )}
                                         
-                                        {/* Online Status Badge */}
-                                        <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-green-500 rounded-full border-4 border-nyx-black flex items-center justify-center">
-                                            <div className="w-3 h-3 bg-white rounded-full"></div>
+                                        {/* Premium Online Status Badge */}
+                                        <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full border-4 border-nyx-black flex items-center justify-center shadow-lg shadow-green-500/50 animate-pulse">
+                                            <div className="w-4 h-4 bg-white rounded-full"></div>
                                         </div>
                                         
-                                        {/* Upload Overlay */}
-                                        <div className="absolute inset-0 bg-black/80 backdrop-blur-sm rounded-2xl flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-                                            <label className="cursor-pointer flex flex-col items-center gap-2">
+                                        {/* Premium Upload Overlay */}
+                                        <div className="absolute inset-0 bg-gradient-to-br from-nyx-blue/90 via-brand-purple/90 to-brand-pink/90 backdrop-blur-md rounded-3xl flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500">
+                                            <label className="cursor-pointer flex flex-col items-center gap-3">
                                                 <input
                                                     type="file"
                                                     accept="image/*"
@@ -654,47 +660,68 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo }) => {
                                                 />
                                                 {uploading ? (
                                                     <>
-                                                        <div className="w-8 h-8 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
-                                                        <span className="text-white text-sm font-semibold">Uploading...</span>
+                                                        <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+                                                        <span className="text-white text-sm font-bold tracking-wide">Uploading...</span>
                                                     </>
                                                 ) : (
                                                     <>
-                                                        <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                                        </svg>
-                                                        <span className="text-white text-sm font-semibold">Change Photo</span>
+                                                        <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+                                                            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                            </svg>
+                                                        </div>
+                                                        <span className="text-white text-sm font-bold tracking-wide">Change Photo</span>
                                                     </>
                                                 )}
                                             </label>
                                         </div>
                                     </div>
                                     
-                                    {/* User Info - Left Aligned */}
-                                    <div className="flex-1 space-y-3">
-                                        <h2 className="text-4xl font-bold text-white">
-                                            {profileData.first_name || 'User'} {profileData.last_name || ''}
-                                        </h2>
-                                        
-                                        <div className="flex items-center gap-2 text-gray-300">
-                                            <svg className="w-5 h-5 text-nyx-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                            </svg>
-                                            <span className="text-lg">{profileData.email}</span>
+                                    {/* Premium User Info */}
+                                    <div className="flex-1 space-y-4">
+                                        <div>
+                                            <h2 className="text-5xl font-black bg-gradient-to-r from-white via-gray-100 to-white text-transparent bg-clip-text mb-2">
+                                                {profileData.first_name || 'User'} {profileData.last_name || ''}
+                                            </h2>
+                                            <div className="h-1 w-24 bg-gradient-to-r from-nyx-blue via-brand-purple to-brand-pink rounded-full"></div>
                                         </div>
                                         
-                                        <div className="flex items-center gap-2 text-gray-400">
-                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                            </svg>
-                                            <span className="text-sm">Member since {new Date(profileData.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</span>
+                                        <div className="flex items-center gap-3 text-gray-200 bg-white/5 rounded-2xl px-4 py-3 border border-white/10">
+                                            <div className="w-10 h-10 bg-gradient-to-br from-nyx-blue/30 to-brand-purple/30 rounded-xl flex items-center justify-center">
+                                                <svg className="w-5 h-5 text-nyx-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                                </svg>
+                                            </div>
+                                            <span className="text-base font-medium">{profileData.email}</span>
                                         </div>
                                         
-                                        {/* Role Badges */}
-                                        <div className="flex items-center gap-2 flex-wrap mt-4">
+                                        <div className="flex items-center gap-3 text-gray-300 bg-white/5 rounded-2xl px-4 py-3 border border-white/10">
+                                            <div className="w-10 h-10 bg-gradient-to-br from-green-500/30 to-emerald-500/30 rounded-xl flex items-center justify-center">
+                                                <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                </svg>
+                                            </div>
+                                            <span className="text-sm font-medium">Member since {new Date(profileData.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</span>
+                                        </div>
+                                        
+                                        {/* Premium Role Badges */}
+                                        <div className="flex items-center gap-3 flex-wrap pt-2">
                                             {(user?.roles || ['user']).map((role, index) => (
-                                                <span 
+                                                <div 
                                                     key={index}
-                                                    className={`px-4 py-2 rounded-xl text-xs font-bold tracking-wider shadow-lg ${
+                                                    className="relative group/badge"
+                                                >
+                                                    <div className={`absolute inset-0 rounded-2xl blur-md opacity-50 group-hover/badge:opacity-75 transition-opacity ${
+                                                        role === 'super-admin' ? 'bg-gradient-to-r from-red-500 to-red-600' :
+                                                        role === 'admin' ? 'bg-gradient-to-r from-purple-500 to-purple-600' :
+                                                        role === 'seller' ? 'bg-gradient-to-r from-green-500 to-green-600' :
+                                                        role === 'content_writer' ? 'bg-gradient-to-r from-orange-500 to-orange-600' :
+                                                        role === 'Web Developer' ? 'bg-gradient-to-r from-cyan-500 to-cyan-600' :
+                                                        role === 'UI/UX Designer' ? 'bg-gradient-to-r from-pink-500 to-pink-600' :
+                                                        'bg-gradient-to-r from-nyx-blue to-brand-purple'
+                                                    }`}></div>
+                                                    <span className={`relative px-5 py-2.5 rounded-2xl text-xs font-black tracking-widest shadow-xl border-2 border-white/20 flex items-center gap-2 ${
                                                         role === 'super-admin' ? 'bg-gradient-to-r from-red-500 to-red-600 text-white' :
                                                         role === 'admin' ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white' :
                                                         role === 'seller' ? 'bg-gradient-to-r from-green-500 to-green-600 text-white' :
@@ -702,56 +729,82 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo }) => {
                                                         role === 'Web Developer' ? 'bg-gradient-to-r from-cyan-500 to-cyan-600 text-white' :
                                                         role === 'UI/UX Designer' ? 'bg-gradient-to-r from-pink-500 to-pink-600 text-white' :
                                                         'bg-gradient-to-r from-nyx-blue to-brand-purple text-white'
-                                                    }`}
-                                                >
-                                                    {role.toUpperCase()}
-                                                </span>
+                                                    }`}>
+                                                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                                        </svg>
+                                                        {role.toUpperCase()}
+                                                    </span>
+                                                </div>
                                             ))}
                                         </div>
                                         
-                                        {/* Edit Button - Inline */}
-                                        <div className="mt-6">
+                                        {/* Premium Edit Button */}
+                                        <div className="pt-4">
                                             {!isEditing ? (
                                                 <button
                                                     onClick={handleEdit}
-                                                    className="group relative px-8 py-4 bg-gradient-to-r from-nyx-blue to-brand-purple text-white font-bold rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-nyx-blue/50 hover:scale-105 flex items-center gap-2"
+                                                    className="group relative px-10 py-5 bg-gradient-to-r from-nyx-blue via-brand-purple to-brand-pink text-white font-black rounded-2xl overflow-hidden transition-all duration-500 hover:shadow-2xl hover:shadow-nyx-blue/50 hover:scale-105 flex items-center gap-3"
                                                 >
-                                                    <div className="absolute inset-0 bg-gradient-to-r from-brand-purple to-nyx-blue opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                                    <div className="absolute inset-0 bg-gradient-to-r from-brand-pink via-brand-purple to-nyx-blue opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                                                     <svg className="w-6 h-6 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                                     </svg>
-                                                    <span className="relative z-10">Edit Profile</span>
+                                                    <span className="relative z-10 text-lg tracking-wide">Edit Profile</span>
+                                                    <svg className="w-5 h-5 relative z-10 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                                    </svg>
                                                 </button>
                                             ) : (
-                                                <div className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-500/20 to-red-500/20 border-2 border-orange-500/50 rounded-2xl shadow-lg">
-                                                    <div className="w-3 h-3 bg-orange-400 rounded-full animate-pulse"></div>
-                                                    <span className="text-orange-300 font-bold text-lg">✏️ Editing Mode</span>
+                                                <div className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-orange-500/30 to-red-500/30 border-2 border-orange-400/50 rounded-2xl shadow-2xl backdrop-blur-sm">
+                                                    <div className="relative">
+                                                        <div className="w-4 h-4 bg-orange-400 rounded-full animate-pulse"></div>
+                                                        <div className="absolute inset-0 w-4 h-4 bg-orange-400 rounded-full animate-ping"></div>
+                                                    </div>
+                                                    <span className="text-orange-200 font-black text-lg tracking-wide">✏️ EDITING MODE</span>
                                                 </div>
                                             )}
                                         </div>
                                     </div>
                                 </div>
                                 
-                                {/* Quick Stats */}
-                                <div className="grid grid-cols-2 gap-4 mt-8 max-w-md">
-                                    <div className="bg-gradient-to-br from-nyx-blue/20 to-brand-purple/10 backdrop-blur-sm rounded-2xl p-4 border border-nyx-blue/30">
-                                        <div className="text-3xl font-bold text-white mb-1">{stats.orders}</div>
-                                        <div className="text-sm text-gray-300 flex items-center gap-1">
-                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                                            </svg>
-                                            Total Orders
+                                {/* Premium Quick Stats */}
+                                <div className="grid grid-cols-2 gap-6 mt-12">
+                                    <div className="relative group/stat">
+                                        <div className="absolute inset-0 bg-gradient-to-br from-nyx-blue to-brand-purple rounded-3xl blur-xl opacity-30 group-hover/stat:opacity-50 transition-opacity"></div>
+                                        <div className="relative bg-gradient-to-br from-nyx-blue/20 to-brand-purple/10 backdrop-blur-xl rounded-3xl p-6 border border-nyx-blue/30 shadow-xl transform group-hover/stat:scale-105 transition-all duration-300">
+                                            <div className="flex items-center justify-between mb-4">
+                                                <div className="w-14 h-14 bg-gradient-to-br from-nyx-blue to-brand-purple rounded-2xl flex items-center justify-center shadow-lg">
+                                                    <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                                                    </svg>
+                                                </div>
+                                                <div className="px-3 py-1 bg-nyx-blue/20 rounded-full">
+                                                    <span className="text-xs font-bold text-nyx-blue">TOTAL</span>
+                                                </div>
+                                            </div>
+                                            <div className="text-4xl font-black text-white mb-2">{stats.orders}</div>
+                                            <div className="text-sm font-semibold text-gray-300 tracking-wide">Orders Placed</div>
                                         </div>
                                     </div>
-                                    <div className="bg-gradient-to-br from-brand-pink/20 to-red-500/10 backdrop-blur-sm rounded-2xl p-4 border border-brand-pink/30">
-                                        <div className="text-3xl font-bold text-white mb-1">{stats.favorites}</div>
-                                        <div className="text-sm text-gray-300 flex items-center gap-1">
-                                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
-                                            </svg>
-                                            Favorites
+                                    <div className="relative group/stat">
+                                        <div className="absolute inset-0 bg-gradient-to-br from-brand-pink to-red-500 rounded-3xl blur-xl opacity-30 group-hover/stat:opacity-50 transition-opacity"></div>
+                                        <div className="relative bg-gradient-to-br from-brand-pink/20 to-red-500/10 backdrop-blur-xl rounded-3xl p-6 border border-brand-pink/30 shadow-xl transform group-hover/stat:scale-105 transition-all duration-300">
+                                            <div className="flex items-center justify-between mb-4">
+                                                <div className="w-14 h-14 bg-gradient-to-br from-brand-pink to-red-500 rounded-2xl flex items-center justify-center shadow-lg">
+                                                    <svg className="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
+                                                    </svg>
+                                                </div>
+                                                <div className="px-3 py-1 bg-brand-pink/20 rounded-full">
+                                                    <span className="text-xs font-bold text-brand-pink">SAVED</span>
+                                                </div>
+                                            </div>
+                                            <div className="text-4xl font-black text-white mb-2">{stats.favorites}</div>
+                                            <div className="text-sm font-semibold text-gray-300 tracking-wide">Favorite Items</div>
                                         </div>
                                     </div>
+                                </div>
                                 </div>
                             </div>
 
