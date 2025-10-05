@@ -961,7 +961,10 @@ const ProductsPage = ({ navigateTo, setOpenAddForm }: { navigateTo: (page: strin
                     .order('created_at', { ascending: false });
                 
                 if (error) {
-                    console.error("❌ ProductsPage: Supabase error:", error);
+                    // Silently handle error if it's just a connection issue on refresh
+                    if (error.message && !error.message.includes('Could not fetch')) {
+                        console.error("❌ ProductsPage: Supabase error:", error);
+                    }
                     setProducts([]);
                     setLoading(false);
                     return;
@@ -984,17 +987,16 @@ const ProductsPage = ({ navigateTo, setOpenAddForm }: { navigateTo: (page: strin
                 
                 setProducts(formattedProducts);
                 setLoading(false);
-                setForceUpdate(prev => prev + 1); // Trigger re-render
                 
             } catch (error) {
-                console.error('Error fetching products:', error);
+                // Silently handle catch errors on refresh
                 setProducts([]);
                 setLoading(false);
             }
         };
         
         fetchProducts();
-    }, [forceUpdate]); // Depend on forceUpdate to trigger re-fetch
+    }, []); // Only fetch once on mount
     
     // Sort and filter products
     const displayedProducts = React.useMemo(() => {
