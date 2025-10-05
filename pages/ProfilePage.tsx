@@ -669,70 +669,47 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo }) => {
                                         </div>
                                     </div>
                                     
-                                    {/* User Info - Centered */}
-                                    <div className="space-y-3">
-                                            <h2 className="text-4xl font-bold text-white">
-                                                {profileData.first_name || 'User'} {profileData.last_name || ''}
-                                            </h2>
-                                            
-                                            <div className="flex items-center justify-center gap-2 text-gray-300">
-                                                <svg className="w-5 h-5 text-nyx-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                                </svg>
-                                                <span className="text-lg">{profileData.email}</span>
-                                            </div>
-                                            
-                                            <div className="flex items-center justify-center gap-2 text-gray-400">
-                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                                </svg>
-                                                <span className="text-sm">Member since {new Date(profileData.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</span>
-                                            </div>
-                                            
-                                            {/* Role Badges */}
-                                            <div className="flex items-center justify-center gap-2 flex-wrap mt-4">
-                                                {(user?.roles || ['user']).map((role, index) => (
-                                                    <span 
-                                                        key={index}
-                                                        className={`px-4 py-2 rounded-xl text-xs font-bold tracking-wider shadow-lg ${
-                                                            role === 'super-admin' ? 'bg-gradient-to-r from-red-500 to-red-600 text-white' :
-                                                            role === 'admin' ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white' :
-                                                            role === 'seller' ? 'bg-gradient-to-r from-green-500 to-green-600 text-white' :
-                                                            role === 'content_writer' ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white' :
-                                                            role === 'Web Developer' ? 'bg-gradient-to-r from-cyan-500 to-cyan-600 text-white' :
-                                                            role === 'UI/UX Designer' ? 'bg-gradient-to-r from-pink-500 to-pink-600 text-white' :
-                                                            'bg-gradient-to-r from-nyx-blue to-brand-purple text-white'
-                                                        }`}
-                                                    >
-                                                        {role.toUpperCase()}
-                                                    </span>
-                                                ))}
-                                            </div>
+                                    {/* User Info - Left Aligned */}
+                                    <div className="flex-1 space-y-3">
+                                        <h2 className="text-4xl font-bold text-white">
+                                            {profileData.first_name || 'User'} {profileData.last_name || ''}
+                                        </h2>
+                                        
+                                        <div className="flex items-center gap-2 text-gray-300">
+                                            <svg className="w-5 h-5 text-nyx-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                            </svg>
+                                            <span className="text-lg">{profileData.email}</span>
                                         </div>
                                         
-                                        {/* Quick Stats */}
-                                        <div className="grid grid-cols-2 gap-4 mt-8 max-w-md mx-auto">
-                                            <div className="bg-gradient-to-br from-nyx-blue/20 to-brand-purple/10 backdrop-blur-sm rounded-2xl p-4 border border-nyx-blue/30">
-                                                <div className="text-3xl font-bold text-white mb-1">{stats.orders}</div>
-                                                <div className="text-sm text-gray-300 flex items-center gap-1">
-                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                                                    </svg>
-                                                    Total Orders
-                                                </div>
-                                            </div>
-                                            <div className="bg-gradient-to-br from-brand-pink/20 to-red-500/10 backdrop-blur-sm rounded-2xl p-4 border border-brand-pink/30">
-                                                <div className="text-3xl font-bold text-white mb-1">{stats.favorites}</div>
-                                                <div className="text-sm text-gray-300 flex items-center gap-1">
-                                                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
-                                                    </svg>
-                                                    Favorites
-                                                </div>
-                                            </div>
+                                        <div className="flex items-center gap-2 text-gray-400">
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            </svg>
+                                            <span className="text-sm">Member since {new Date(profileData.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</span>
                                         </div>
                                         
-                                        {/* Edit Button - Centered */}
+                                        {/* Role Badges */}
+                                        <div className="flex items-center gap-2 flex-wrap mt-4">
+                                            {(user?.roles || ['user']).map((role, index) => (
+                                                <span 
+                                                    key={index}
+                                                    className={`px-4 py-2 rounded-xl text-xs font-bold tracking-wider shadow-lg ${
+                                                        role === 'super-admin' ? 'bg-gradient-to-r from-red-500 to-red-600 text-white' :
+                                                        role === 'admin' ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white' :
+                                                        role === 'seller' ? 'bg-gradient-to-r from-green-500 to-green-600 text-white' :
+                                                        role === 'content_writer' ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white' :
+                                                        role === 'Web Developer' ? 'bg-gradient-to-r from-cyan-500 to-cyan-600 text-white' :
+                                                        role === 'UI/UX Designer' ? 'bg-gradient-to-r from-pink-500 to-pink-600 text-white' :
+                                                        'bg-gradient-to-r from-nyx-blue to-brand-purple text-white'
+                                                    }`}
+                                                >
+                                                    {role.toUpperCase()}
+                                                </span>
+                                            ))}
+                                        </div>
+                                        
+                                        {/* Edit Button - Inline */}
                                         <div className="mt-6">
                                             {!isEditing ? (
                                                 <button
@@ -751,6 +728,28 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo }) => {
                                                     <span className="text-orange-300 font-bold text-lg">✏️ Editing Mode</span>
                                                 </div>
                                             )}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                {/* Quick Stats */}
+                                <div className="grid grid-cols-2 gap-4 mt-8 max-w-md">
+                                    <div className="bg-gradient-to-br from-nyx-blue/20 to-brand-purple/10 backdrop-blur-sm rounded-2xl p-4 border border-nyx-blue/30">
+                                        <div className="text-3xl font-bold text-white mb-1">{stats.orders}</div>
+                                        <div className="text-sm text-gray-300 flex items-center gap-1">
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                                            </svg>
+                                            Total Orders
+                                        </div>
+                                    </div>
+                                    <div className="bg-gradient-to-br from-brand-pink/20 to-red-500/10 backdrop-blur-sm rounded-2xl p-4 border border-brand-pink/30">
+                                        <div className="text-3xl font-bold text-white mb-1">{stats.favorites}</div>
+                                        <div className="text-sm text-gray-300 flex items-center gap-1">
+                                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
+                                            </svg>
+                                            Favorites
                                         </div>
                                     </div>
                                 </div>
