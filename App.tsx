@@ -422,21 +422,21 @@ const ProfileDropdown = ({ navigateTo, isUserMenuOpen, setIsUserMenuOpen, user, 
 
                 {/* Product Management - Admin, Super Admin, Seller */}
                 {((user?.roles?.includes('admin') || user?.roles?.includes('super-admin') || user?.roles?.includes('seller'))) && (
-                    <button
-                        onClick={() => {
-                            setOpenAddForm(true);
-                            setIsUserMenuOpen(false);
-                        }}
+                        <button
+                            onClick={() => {
+                                                setOpenAddForm(true);
+                                setIsUserMenuOpen(false);
+                            }}
                         className="w-full flex items-center gap-3 px-3 py-2.5 text-white hover:bg-white/5 rounded-lg transition-all duration-200 group"
-                    >
+                        >
                         <div className="w-8 h-8 bg-gradient-to-br from-blue-500/20 to-blue-600/20 border border-blue-500/20 rounded-lg flex items-center justify-center group-hover:scale-110 group-hover:border-blue-500/30 transition-all">
                             <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                        </div>
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                            </div>
                         <span className="font-medium text-sm">Manage Products</span>
-                    </button>
+                        </button>
                 )}
 
                 {/* Add Blog Post - Admin, Super Admin */}
@@ -581,7 +581,7 @@ const AuthForm = ({ navigateTo }: { navigateTo: (page: string) => void }) => {
     // Forgot Password State
     const [isForgotPassword, setIsForgotPassword] = useState(false);
     const [forgotPasswordEmail, setForgotPasswordEmail] = useState('');
-    
+
     // Password visibility state
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -945,19 +945,19 @@ const AuthForm = ({ navigateTo }: { navigateTo: (page: string) => void }) => {
                 
                 {!isLogin && (
                     <>
-                        <div className="flex items-center">
-                            <input
-                                id="newsletter"
-                                name="newsletter"
-                                type="checkbox"
-                                checked={newsletterSubscribed}
-                                onChange={(e) => setNewsletterSubscribed(e.target.checked)}
-                                className="h-4 w-4 rounded border-gray-600 bg-nyx-black text-nyx-blue focus:border-nyx-blue"
-                            />
-                            <label htmlFor="newsletter" className="ml-2 block text-sm text-gray-400">
-                                Subscribe to our newsletter for updates.
-                            </label>
-                        </div>
+                    <div className="flex items-center">
+                        <input
+                            id="newsletter"
+                            name="newsletter"
+                            type="checkbox"
+                            checked={newsletterSubscribed}
+                            onChange={(e) => setNewsletterSubscribed(e.target.checked)}
+                            className="h-4 w-4 rounded border-gray-600 bg-nyx-black text-nyx-blue focus:border-nyx-blue"
+                        />
+                        <label htmlFor="newsletter" className="ml-2 block text-sm text-gray-400">
+                            Subscribe to our newsletter for updates.
+                        </label>
+                    </div>
                         
                         <div className="flex items-start">
                             <input
@@ -1268,7 +1268,7 @@ const ProductsPage = ({ navigateTo, setOpenAddForm }: { navigateTo: (page: strin
                 if (error) {
                     // Silently handle error if it's just a connection issue on refresh
                     if (error.message && !error.message.includes('Could not fetch')) {
-                        console.error("❌ ProductsPage: Supabase error:", error);
+                    console.error("❌ ProductsPage: Supabase error:", error);
                     }
                     setProducts([]);
                     setLoading(false);
@@ -1332,18 +1332,18 @@ const ProductsPage = ({ navigateTo, setOpenAddForm }: { navigateTo: (page: strin
                 {/* Subtle background gradient */}
                 <div className="absolute inset-0 bg-gradient-to-b from-nyx-blue/5 via-transparent to-transparent"></div>
                 
-                <div className="container mx-auto px-4 relative z-10">
+            <div className="container mx-auto px-4 relative z-10">
                     <div className="max-w-3xl mx-auto text-center">
                         {/* Small badge */}
                         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-nyx-blue/10 to-brand-purple/10 border border-nyx-blue/20 mb-6">
                             <div className="w-1.5 h-1.5 bg-nyx-blue rounded-full animate-pulse"></div>
                             <span className="text-xs font-medium text-gray-300 tracking-wide">SMART HOME COLLECTION</span>
-                        </div>
+                    </div>
                         
                         {/* Title */}
                         <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
                             NYX <span className="bg-gradient-to-r from-nyx-blue via-brand-purple to-brand-pink text-transparent bg-clip-text">Products</span>
-                        </h1>
+                    </h1>
                         
                         {/* Subtitle */}
                         <p className="text-gray-400 text-lg mb-6">
@@ -1374,7 +1374,7 @@ const ProductsPage = ({ navigateTo, setOpenAddForm }: { navigateTo: (page: strin
                             
                             {/* View Mode Toggle */}
                             <div className="flex items-center gap-1 bg-nyx-gray rounded-lg p-1">
-                                <button
+                            <button
                                     onClick={() => setViewMode('grid')}
                                     className={`p-2 rounded ${
                                         viewMode === 'grid' 
@@ -1382,10 +1382,10 @@ const ProductsPage = ({ navigateTo, setOpenAddForm }: { navigateTo: (page: strin
                                             : 'text-gray-400'
                                     }`}
                                     title="Grid View"
-                                >
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            >
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                                    </svg>
+                                </svg>
                                 </button>
                                 <button
                                     onClick={() => setViewMode('list')}
@@ -1399,21 +1399,21 @@ const ProductsPage = ({ navigateTo, setOpenAddForm }: { navigateTo: (page: strin
                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                                     </svg>
-                                </button>
-                            </div>
-                            
+                            </button>
+            </div>
+
                             {/* Management Button - Only for authorized users */}
-                            {isAuthorized && (
-                                <button
+                                {isAuthorized && (
+                                        <button
                                     onClick={() => setOpenAddForm(true)}
                                     className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/5 text-white rounded-lg hover:bg-white/10 font-medium text-xs border border-white/10"
                                 >
                                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    </svg>
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            </svg>
                                     Manage
-                                </button>
+                                        </button>
                             )}
                         </div>
                     </div>
@@ -1441,15 +1441,15 @@ const ProductsPage = ({ navigateTo, setOpenAddForm }: { navigateTo: (page: strin
                                 <h3 className="text-xl font-semibold text-white mb-2">No Products Found</h3>
                                 <p className="text-gray-400 text-sm mb-6">No products are currently available.</p>
                                 {isAuthorized && (
-                                    <button
-                                        onClick={() => setOpenAddForm(true)}
+                                        <button
+                                            onClick={() => setOpenAddForm(true)}
                                         className="inline-flex items-center gap-2 px-6 py-2.5 bg-nyx-blue text-nyx-black rounded-lg hover:bg-white transition-colors font-medium"
-                                    >
+                                        >
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                                        </svg>
+                                            </svg>
                                         Add Your First Product
-                                    </button>
+                                        </button>
                                 )}
                             </div>
                         </div>
@@ -1459,14 +1459,14 @@ const ProductsPage = ({ navigateTo, setOpenAddForm }: { navigateTo: (page: strin
                                 ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8'
                                 : 'flex flex-col gap-6'
                         }>
-                            {displayedProducts.map(product => (
+                    {displayedProducts.map(product => (
                                 viewMode === 'grid' ? (
-                                    <ProductCard key={product.id} product={product} navigateTo={navigateTo} />
+                        <ProductCard key={product.id} product={product} navigateTo={navigateTo} />
                                 ) : (
                                     <ProductListItem key={product.id} product={product} navigateTo={navigateTo} />
                                 )
-                            ))}
-                        </div>
+                    ))}
+                </div>
                     )}
             </div>
             </section>
@@ -1501,7 +1501,7 @@ const BlogPage = ({ navigateTo }: { navigateTo: (page: string, params?: any) => 
                 if (error) {
                     // Silently handle error if it's just a connection issue on refresh
                     if (error.message && !error.message.includes('Could not fetch')) {
-                        console.error("❌ BlogPage: Supabase error:", error);
+                    console.error("❌ BlogPage: Supabase error:", error);
                     }
                     setBlogPosts([]);
                     setLoading(false);
@@ -1534,8 +1534,8 @@ const BlogPage = ({ navigateTo }: { navigateTo: (page: string, params?: any) => 
     
     // Show BlogManagement if user is authorized and clicked "New Post"
     if (showBlogManagement && isAuthorized) {
-        return (
-            <div className="min-h-screen bg-dark text-white">
+    return (
+        <div className="min-h-screen bg-dark text-white">
                 <div className="container mx-auto px-4 py-8">
                     <button
                         onClick={() => setShowBlogManagement(false)}
@@ -1562,18 +1562,18 @@ const BlogPage = ({ navigateTo }: { navigateTo: (page: string, params?: any) => 
                 {/* Subtle background gradient */}
                 <div className="absolute inset-0 bg-gradient-to-b from-brand-purple/5 via-transparent to-transparent"></div>
                 
-                <div className="container mx-auto px-4 relative z-10">
+            <div className="container mx-auto px-4 relative z-10">
                     <div className="max-w-3xl mx-auto text-center">
                         {/* Small badge */}
                         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-brand-pink/10 to-brand-purple/10 border border-brand-pink/20 mb-6">
                             <div className="w-1.5 h-1.5 bg-brand-pink rounded-full animate-pulse"></div>
                             <span className="text-xs font-medium text-gray-300 tracking-wide">LATEST INSIGHTS</span>
-                        </div>
+                    </div>
                         
                         {/* Title */}
                         <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
                             NYX <span className="bg-gradient-to-r from-brand-pink via-brand-purple to-nyx-blue text-transparent bg-clip-text">Blog</span>
-                        </h1>
+                    </h1>
                         
                         {/* Subtitle */}
                         <p className="text-gray-400 text-lg mb-6">
@@ -1588,20 +1588,20 @@ const BlogPage = ({ navigateTo }: { navigateTo: (page: string, params?: any) => 
                                 </svg>
                                 <span>{blogPosts.length} {blogPosts.length === 1 ? 'Post' : 'Posts'}</span>
                             </div>
-                            {isAuthorized && (
-                                <button
+                    {isAuthorized && (
+                            <button
                                     onClick={() => setShowBlogManagement(true)}
                                     className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/5 text-white rounded-lg hover:bg-white/10 font-medium text-xs border border-white/10"
                                 >
                                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    </svg>
+                                </svg>
                                     Manage Blogs
-                                </button>
-                            )}
-                        </div>
-                    </div>
+                            </button>
+                    )}
+                </div>
+            </div>
                 </div>
             </section>
 
@@ -1774,7 +1774,7 @@ const BlogPostPage = ({ navigateTo, post: postProp }: { navigateTo: (page: strin
         );
     }
 
-    return (
+     return (
         <div className="min-h-screen bg-dark text-white">
             {/* Hero Section */}
             <section className="relative py-24 md:py-32 overflow-hidden">
@@ -2038,7 +2038,7 @@ const LegalPage = ({ navigateTo, slug: slugProp, title: titleProp }: { navigateT
             </div>
 
             <div className="relative z-10 py-24 md:py-32">
-                <div className="container mx-auto px-4">
+            <div className="container mx-auto px-4">
                     <div className="max-w-4xl mx-auto">
                         {/* Header */}
                         <div className="mb-12">
@@ -2049,8 +2049,8 @@ const LegalPage = ({ navigateTo, slug: slugProp, title: titleProp }: { navigateT
                                 <svg className="w-5 h-5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                                 </svg>
-                                Back to Home
-                            </button>
+                        Back to Home
+                    </button>
                             
                             <div className="flex justify-between items-start gap-4">
                                 <div>
@@ -2061,7 +2061,7 @@ const LegalPage = ({ navigateTo, slug: slugProp, title: titleProp }: { navigateT
                                         {title}
                                     </h1>
                                 </div>
-                                {isAuthorized && !isEditing && (
+                        {isAuthorized && !isEditing && (
                                     <button 
                                         onClick={handleEdit} 
                                         className="flex items-center gap-2 px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-nyx-blue/50 text-white rounded-xl transition-all group"
@@ -2070,13 +2070,13 @@ const LegalPage = ({ navigateTo, slug: slugProp, title: titleProp }: { navigateT
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                         </svg>
                                         <span className="hidden sm:inline font-medium">Edit Document</span>
-                                    </button>
-                                )}
-                            </div>
+                            </button>
+                        )}
+                    </div>
                         </div>
 
                         {/* Content */}
-                        {isEditing ? (
+                    {isEditing ? (
                             <div className="space-y-6">
                                 {/* Editor Card */}
                                 <div className="bg-white/[0.02] backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden">
@@ -2091,9 +2091,9 @@ const LegalPage = ({ navigateTo, slug: slugProp, title: titleProp }: { navigateT
                                     </div>
                                     
                                     {/* Editor */}
-                                    <textarea 
-                                        value={editableContent}
-                                        onChange={(e) => setEditableContent(e.target.value)}
+                             <textarea 
+                                value={editableContent}
+                                onChange={(e) => setEditableContent(e.target.value)}
                                         className="w-full min-h-[600px] bg-transparent border-0 p-6 text-white placeholder-gray-500 focus:outline-none resize-none font-mono text-sm leading-relaxed"
                                         placeholder="Start writing your legal document here..."
                                     />
@@ -2136,11 +2136,11 @@ const LegalPage = ({ navigateTo, slug: slugProp, title: titleProp }: { navigateT
                                                     Saving...
                                                 </span>
                                             ) : 'Save Changes'}
-                                        </button>
+                                </button>
                                     </div>
-                                </div>
                             </div>
-                        ) : (
+                        </div>
+                    ) : (
                             <div className="bg-white/[0.02] backdrop-blur-xl rounded-2xl border border-white/10 p-8 md:p-12">
                                 {error && !error.includes('Document not found') ? (
                                     <div className="flex items-center gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400">
@@ -2158,7 +2158,7 @@ const LegalPage = ({ navigateTo, slug: slugProp, title: titleProp }: { navigateT
                                     </div>
                                 )}
                                 
-                                {lastUpdated && (!error || error.includes('Document not found')) && (
+                            {lastUpdated && (!error || error.includes('Document not found')) && (
                                     <div className="mt-12 pt-6 border-t border-white/10">
                                         <p className="text-sm text-gray-500 flex items-center gap-2">
                                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2173,9 +2173,9 @@ const LegalPage = ({ navigateTo, slug: slugProp, title: titleProp }: { navigateT
                                             })}
                                         </p>
                                     </div>
-                                )}
-                            </div>
-                        )}
+                            )}
+                        </div>
+                    )}
                     </div>
                 </div>
             </div>

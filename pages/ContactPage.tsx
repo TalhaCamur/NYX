@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { supabase } from '../contexts/AuthContext';
 
 interface ContactPageProps {
   navigateTo: (page: string) => void;
@@ -13,24 +14,91 @@ const ContactPage: React.FC<ContactPageProps> = ({ navigateTo }) => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [errors, setErrors] = useState<{[key: string]: string}>({});
 
   // Scroll to top when component mounts
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
+  // Form validation
+  const validateForm = () => {
+    const newErrors: {[key: string]: string} = {};
+    
+    if (!formData.name.trim()) {
+      newErrors.name = 'Name is required';
+    } else if (formData.name.trim().length < 2) {
+      newErrors.name = 'Name must be at least 2 characters';
+    }
+    
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = 'Please enter a valid email address';
+    }
+    
+    if (!formData.subject.trim()) {
+      newErrors.subject = 'Subject is required';
+    } else if (formData.subject.trim().length < 5) {
+      newErrors.subject = 'Subject must be at least 5 characters';
+    }
+    
+    if (!formData.message.trim()) {
+      newErrors.message = 'Message is required';
+    } else if (formData.message.trim().length < 10) {
+      newErrors.message = 'Message must be at least 10 characters';
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
     
-    // Simulate form submission
-    setTimeout(() => {
-      setIsSubmitting(false);
+    // Validate form
+    if (!validateForm()) {
+      return;
+    }
+    
+    setIsSubmitting(true);
+    setSubmitStatus('idle');
+    setErrors({});
+    
+    try {
+      // Insert contact message into Supabase
+      const { data, error } = await supabase
+        .from('contact_messages')
+        .insert([
+          {
+            name: formData.name,
+            email: formData.email,
+            subject: formData.subject,
+            message: formData.message,
+            status: 'new',
+            created_at: new Date().toISOString()
+          }
+        ]);
+
+      if (error) {
+        console.error('Error submitting contact form:', error);
+        setSubmitStatus('error');
+        return;
+      }
+
+      // Success
       setSubmitStatus('success');
       setFormData({ name: '', email: '', subject: '', message: '' });
       
+      // Reset success message after 5 seconds
       setTimeout(() => setSubmitStatus('idle'), 5000);
-    }, 1500);
+      
+    } catch (error) {
+      console.error('Error submitting contact form:', error);
+      setSubmitStatus('error');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const contactMethods = [
@@ -180,6 +248,15 @@ const ContactPage: React.FC<ContactPageProps> = ({ navigateTo }) => {
                     </div>
                   )}
 
+                  {submitStatus === 'error' && (
+                    <div className="mb-6 p-4 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 flex items-center gap-3">
+                      <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                      <span>Sorry, there was an error sending your message. Please try again.</span>
+                    </div>
+                  )}
+
                   <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="grid md:grid-cols-2 gap-6">
                       <div>
@@ -191,9 +268,14 @@ const ContactPage: React.FC<ContactPageProps> = ({ navigateTo }) => {
                           required
                           value={formData.name}
                           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                          className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:border-nyx-blue focus:outline-none transition-colors"
-                          placeholder="John Doe"
+                          className={`w-full px-4 py-3 rounded-lg bg-white/5 border text-white placeholder-gray-500 focus:outline-none transition-colors ${
+                            errors.name ? 'border-red-500' : 'border-white/10 focus:border-nyx-blue'
+                          }`}
+                          placeholder=""
                         />
+                        {errors.name && (
+                          <p className="mt-1 text-sm text-red-400">{errors.name}</p>
+                        )}
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -204,9 +286,14 @@ const ContactPage: React.FC<ContactPageProps> = ({ navigateTo }) => {
                           required
                           value={formData.email}
                           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                          className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:border-nyx-blue focus:outline-none transition-colors"
-                          placeholder="john@example.com"
+                          className={`w-full px-4 py-3 rounded-lg bg-white/5 border text-white placeholder-gray-500 focus:outline-none transition-colors ${
+                            errors.email ? 'border-red-500' : 'border-white/10 focus:border-nyx-blue'
+                          }`}
+                          placeholder=""
                         />
+                        {errors.email && (
+                          <p className="mt-1 text-sm text-red-400">{errors.email}</p>
+                        )}
                       </div>
                     </div>
 
@@ -219,9 +306,14 @@ const ContactPage: React.FC<ContactPageProps> = ({ navigateTo }) => {
                         required
                         value={formData.subject}
                         onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                        className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:border-nyx-blue focus:outline-none transition-colors"
-                        placeholder="How can we help you?"
+                        className={`w-full px-4 py-3 rounded-lg bg-white/5 border text-white placeholder-gray-500 focus:outline-none transition-colors ${
+                          errors.subject ? 'border-red-500' : 'border-white/10 focus:border-nyx-blue'
+                        }`}
+                        placeholder=""
                       />
+                      {errors.subject && (
+                        <p className="mt-1 text-sm text-red-400">{errors.subject}</p>
+                      )}
                     </div>
 
                     <div>
@@ -233,9 +325,14 @@ const ContactPage: React.FC<ContactPageProps> = ({ navigateTo }) => {
                         value={formData.message}
                         onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                         rows={6}
-                        className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:border-nyx-blue focus:outline-none transition-colors resize-none"
-                        placeholder="Tell us more about your inquiry..."
+                        className={`w-full px-4 py-3 rounded-lg bg-white/5 border text-white placeholder-gray-500 focus:outline-none transition-colors resize-none ${
+                          errors.message ? 'border-red-500' : 'border-white/10 focus:border-nyx-blue'
+                        }`}
+                        placeholder=""
                       />
+                      {errors.message && (
+                        <p className="mt-1 text-sm text-red-400">{errors.message}</p>
+                      )}
                     </div>
 
                     <button
