@@ -1747,24 +1747,41 @@ const LegalPage = ({ navigateTo, slug, title }: { navigateTo: (page: string) => 
     };
 
     const handleSave = async () => {
+        console.log('🔄 Starting save process...');
+        console.log('📝 Content length:', editableContent.length);
+        console.log('🔑 Slug:', slug);
+        console.log('👤 User:', user?.id);
+        
         setSaveStatus('Saving...');
         try {
             const { data, error } = await supabase
                 .from('legal_documents')
-                .update({ content: editableContent, last_updated: new Date().toISOString() })
+                .update({ 
+                    content: editableContent, 
+                    last_updated: new Date().toISOString(),
+                    updated_by: user?.id 
+                })
                 .eq('slug', slug)
                 .select('last_updated')
                 .single();
             
-            if (error) throw error;
+            console.log('📤 Supabase response:', { data, error });
+            
+            if (error) {
+                console.error('❌ Supabase error:', error);
+                throw error;
+            }
 
+            console.log('✅ Save successful!');
             setDocumentContent(editableContent);
             if(data) setLastUpdated(data.last_updated);
             setSaveStatus('Changes saved successfully!');
             setIsEditing(false);
-            setTimeout(() => setSaveStatus(''), 3000); // Clear status after 3s
+            setTimeout(() => setSaveStatus(''), 3000);
         } catch (err: any) {
-            setSaveStatus(`Error: ${err.message}`);
+            console.error('💥 Save failed:', err);
+            setSaveStatus(`Error: ${err.message || 'Failed to save document'}`);
+            // Keep editing mode open on error
         }
     };
 
