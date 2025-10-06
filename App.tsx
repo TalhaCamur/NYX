@@ -1722,6 +1722,39 @@ const LegalPage = ({ navigateTo, slug: slugProp, title: titleProp }: { navigateT
 
     console.log('🔍 LegalPage loaded with:', { slugProp, slug, title, hash: window.location.hash });
 
+    // Simple Markdown to HTML parser
+    const parseMarkdown = (markdown: string) => {
+        let html = markdown;
+        
+        // Headers (# ## ###)
+        html = html.replace(/^### (.*$)/gim, '<h3 class="text-xl font-bold text-white mt-8 mb-4">$1</h3>');
+        html = html.replace(/^## (.*$)/gim, '<h2 class="text-2xl font-bold text-white mt-10 mb-5">$1</h2>');
+        html = html.replace(/^# (.*$)/gim, '<h1 class="text-3xl font-bold text-white mt-12 mb-6">$1</h1>');
+        
+        // Bold (**text**)
+        html = html.replace(/\*\*(.*?)\*\*/g, '<strong class="text-white font-bold">$1</strong>');
+        
+        // Italic (*text*)
+        html = html.replace(/\*(.*?)\*/g, '<em class="text-gray-300 italic">$1</em>');
+        
+        // Lists (- item)
+        html = html.replace(/^\s*-\s+(.*$)/gim, '<li class="ml-6 mb-2 text-gray-300">• $1</li>');
+        
+        // Wrap consecutive <li> in <ul>
+        html = html.replace(/(<li[^>]*>.*<\/li>\s*)+/g, (match) => {
+            return '<ul class="space-y-2 my-4">' + match + '</ul>';
+        });
+        
+        // Line breaks
+        html = html.replace(/\n\n/g, '</p><p class="mb-4 text-gray-300 leading-relaxed">');
+        html = html.replace(/\n/g, '<br>');
+        
+        // Wrap in paragraph
+        html = '<p class="mb-4 text-gray-300 leading-relaxed">' + html + '</p>';
+        
+        return html;
+    };
+
     useEffect(() => {
         const fetchDocument = async () => {
             setIsLoading(true);
@@ -1935,9 +1968,10 @@ const LegalPage = ({ navigateTo, slug: slugProp, title: titleProp }: { navigateT
                                     </div>
                                 ) : (
                                     <div className="prose prose-invert prose-lg max-w-none">
-                                        <div className="text-gray-300 leading-relaxed" style={{whiteSpace: 'pre-wrap'}}>
-                                            {documentContent}
-                                        </div>
+                                        <div 
+                                            className="text-gray-300 leading-relaxed"
+                                            dangerouslySetInnerHTML={{ __html: parseMarkdown(documentContent) }}
+                                        />
                                     </div>
                                 )}
                                 
