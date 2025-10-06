@@ -43,29 +43,37 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ navigateTo }) => {
         const loadUserAddress = async () => {
             if (user?.id) {
                 try {
+                    console.log('🔍 Loading saved address for user:', user.id);
+                    
                     const { data, error } = await supabase
                         .from('profiles')
                         .select('address')
                         .eq('id', user.id)
                         .single();
                     
+                    console.log('📋 Address query result:', { data, error });
+                    
                     if (error) {
-                        // Silently handle error if address column doesn't exist yet
-                        console.log('ℹ️ Address column may not exist yet in profiles table');
+                        console.log('❌ Error loading address:', error.message);
                         setHadSavedAddress(false);
                         return;
                     }
                     
-                    if (data?.address) {
+                    if (data?.address && data.address.trim()) {
+                        console.log('✅ Found saved address:', data.address);
                         setShippingAddress(data.address);
                         setHadSavedAddress(true);
                     } else {
+                        console.log('ℹ️ No saved address found');
                         setHadSavedAddress(false);
                     }
                 } catch (error) {
-                    // Silently catch any errors
+                    console.error('💥 Error in loadUserAddress:', error);
                     setHadSavedAddress(false);
                 }
+            } else {
+                console.log('ℹ️ No user ID available');
+                setHadSavedAddress(false);
             }
         };
         
@@ -125,16 +133,24 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ navigateTo }) => {
     const saveAddressToProfile = async () => {
         if (user?.id && shippingAddress) {
             try {
+                console.log('💾 Saving address to profile:', shippingAddress);
+                
                 const { error } = await supabase
                     .from('profiles')
-                    .update({ address: shippingAddress })
-                    .eq('id', user.id);
+                    .upsert({ 
+                        id: user.id,
+                        address: shippingAddress,
+                        updated_at: new Date().toISOString()
+                    });
                 
-                if (!error) {
-                    console.log('✅ Address saved to profile');
+                if (error) {
+                    console.error('❌ Error saving address:', error);
+                } else {
+                    console.log('✅ Address saved to profile successfully');
+                    setHadSavedAddress(true);
                 }
             } catch (error) {
-                console.error('Error saving address:', error);
+                console.error('💥 Error in saveAddressToProfile:', error);
             }
         }
         setShowSaveAddressPrompt(false);
@@ -156,10 +172,8 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ navigateTo }) => {
             setPaymentSuccess(true);
             setIsProcessing(false);
             
-            // Clear cart after 2 seconds
-            setTimeout(() => {
-                clearCart();
-            }, 2000);
+            // Clear cart immediately after successful payment
+            clearCart();
         }, 2000);
     };
 
@@ -469,22 +483,36 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ navigateTo }) => {
 
                         {/* Shipping Address */}
                         <div className="mb-6">
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Shipping Address
-                            </label>
+                            <div className="flex items-center justify-between mb-2">
+                                <label className="block text-sm font-medium text-gray-700">
+                                    Shipping Address
+                                </label>
+                                {hadSavedAddress && (
+                                    <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
+                                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                        </svg>
+                                        Auto-filled
+                                    </span>
+                                )}
+                            </div>
                             <textarea
                                 value={shippingAddress}
                                 onChange={(e) => setShippingAddress(e.target.value)}
                                 placeholder="Street address, city, postal code"
                                 rows={3}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                                className={`w-full px-3 py-2 border rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none ${
+                                    hadSavedAddress 
+                                        ? 'border-green-300 bg-green-50' 
+                                        : 'border-gray-300'
+                                }`}
                             />
                             {hadSavedAddress && (
-                                <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
-                                    <svg className="w-3 h-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
+                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
-                                    Using saved address from your profile
+                                    This address was automatically loaded from your profile. You can edit it if needed.
                                 </p>
                             )}
                         </div>
