@@ -119,8 +119,8 @@ const ContactPage: React.FC<ContactPageProps> = ({ navigateTo }) => {
         </svg>
       ),
       title: 'Phone',
-      value: '+1 (555) 123-4567',
-      link: 'tel:+15551234567'
+      value: '+66 0979 801 807',
+      link: 'tel:+660979801807'
     },
     {
       icon: (
@@ -130,7 +130,7 @@ const ContactPage: React.FC<ContactPageProps> = ({ navigateTo }) => {
         </svg>
       ),
       title: 'Office',
-      value: 'San Francisco, CA',
+      value: 'Netherlands, Gulpen',
       link: '#'
     },
     {
