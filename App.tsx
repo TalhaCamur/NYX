@@ -518,6 +518,7 @@ const AuthForm = ({ navigateTo }: { navigateTo: (page: string) => void }) => {
     const [lastName, setLastName] = useState('');
     const [nickname, setNickname] = useState('');
     const [newsletterSubscribed, setNewsletterSubscribed] = useState(false);
+    const [acceptedTerms, setAcceptedTerms] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [message, setMessage] = useState<string | null>(null);
     const [loading, setLoading] = useState(false); // INSTANT LOADING
@@ -889,25 +890,58 @@ const AuthForm = ({ navigateTo }: { navigateTo: (page: string) => void }) => {
                 )}
                 
                 {!isLogin && (
-                    <div className="flex items-center">
-                        <input
-                            id="newsletter"
-                            name="newsletter"
-                            type="checkbox"
-                            checked={newsletterSubscribed}
-                            onChange={(e) => setNewsletterSubscribed(e.target.checked)}
-                            className="h-4 w-4 rounded border-gray-600 bg-nyx-black text-nyx-blue focus:border-nyx-blue"
-                        />
-                        <label htmlFor="newsletter" className="ml-2 block text-sm text-gray-400">
-                            Subscribe to our newsletter for updates.
-                        </label>
-                    </div>
+                    <>
+                        <div className="flex items-center">
+                            <input
+                                id="newsletter"
+                                name="newsletter"
+                                type="checkbox"
+                                checked={newsletterSubscribed}
+                                onChange={(e) => setNewsletterSubscribed(e.target.checked)}
+                                className="h-4 w-4 rounded border-gray-600 bg-nyx-black text-nyx-blue focus:border-nyx-blue"
+                            />
+                            <label htmlFor="newsletter" className="ml-2 block text-sm text-gray-400">
+                                Subscribe to our newsletter for updates.
+                            </label>
+                        </div>
+                        
+                        <div className="flex items-start">
+                            <input
+                                id="terms"
+                                name="terms"
+                                type="checkbox"
+                                checked={acceptedTerms}
+                                onChange={(e) => setAcceptedTerms(e.target.checked)}
+                                className="h-4 w-4 mt-0.5 rounded border-gray-600 bg-nyx-black text-nyx-blue focus:border-nyx-blue"
+                                required
+                            />
+                            <label htmlFor="terms" className="ml-2 block text-sm text-gray-400">
+                                I agree to the{' '}
+                                <button 
+                                    type="button"
+                                    onClick={() => navigateTo('legal/terms')}
+                                    className="text-nyx-blue hover:underline font-medium"
+                                >
+                                    Terms & Conditions
+                                </button>
+                                {' '}and{' '}
+                                <button 
+                                    type="button"
+                                    onClick={() => navigateTo('legal/privacy')}
+                                    className="text-nyx-blue hover:underline font-medium"
+                                >
+                                    Privacy Policy
+                                </button>
+                                <span className="text-red-400 ml-1">*</span>
+                            </label>
+                        </div>
+                    </>
                 )}
                 
                  {error && <p className="text-red-500 text-sm text-center">{error}</p>}
                  {message && <p className="text-green-500 text-sm text-center">{message}</p>}
 
-                <button type="submit" disabled={loading} className="w-full bg-nyx-blue text-nyx-black font-bold py-3 px-8 rounded-full hover:bg-white transition-all duration-300 transform hover:scale-105 disabled:opacity-50">
+                <button type="submit" disabled={loading || (!isLogin && !acceptedTerms)} className="w-full bg-nyx-blue text-nyx-black font-bold py-3 px-8 rounded-full hover:bg-white transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed">
                     {loading ? 'Processing...' : (isLogin ? 'Login' : 'Sign Up')}
                 </button>
             </form>
