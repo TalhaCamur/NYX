@@ -1690,7 +1690,11 @@ const BlogPostPage = ({ navigateTo, post }: { navigateTo: (page: string) => void
 };
 const LegalPage = ({ navigateTo, slug, title }: { navigateTo: (page: string) => void, slug: string, title: string }) => {
     const { user } = useAuth();
-    const isAuthorized = user && (user.roles.includes('admin') || user.roles.includes('super-admin'));
+    const isAuthorized = user && (
+        user.roles.includes('admin') || 
+        user.roles.includes('super-admin') || 
+        user.roles.includes('UI/UX Designer')
+    );
 
     const [documentContent, setDocumentContent] = useState('');
     const [lastUpdated, setLastUpdated] = useState('');
@@ -1775,45 +1779,152 @@ const LegalPage = ({ navigateTo, slug, title }: { navigateTo: (page: string) => 
     }
     
     return (
-        <div className="py-24 md:py-32 bg-dark text-white">
-            <div className="container mx-auto px-4">
-                <div className="max-w-3xl mx-auto">
-                     <button onClick={() => navigateTo('home')} className="flex items-center gap-2 text-brand-purple hover:text-brand-purple/80 mb-8">
-                        <ArrowLeftIcon className="w-5 h-5" />
-                        Back to Home
-                    </button>
-                    <div className="flex justify-between items-start mb-8 gap-4">
-                        <h1 className="text-4xl md:text-5xl font-bold tracking-tight">{title}</h1>
-                        {isAuthorized && !isEditing && (
-                            <button onClick={handleEdit} className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors bg-dark-accent p-3 rounded-lg border border-white/10 flex-shrink-0">
-                                <EditIcon className="w-5 h-5"/>
-                                <span className="hidden sm:inline">Edit</span>
+        <div className="min-h-screen bg-gradient-to-br from-nyx-black via-brand-purple/5 to-nyx-black">
+            {/* Animated Background */}
+            <div className="fixed inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-brand-purple/10 to-nyx-blue/10 rounded-full blur-3xl animate-pulse"></div>
+                <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-r from-nyx-blue/10 to-brand-pink/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+            </div>
+
+            <div className="relative z-10 py-24 md:py-32">
+                <div className="container mx-auto px-4">
+                    <div className="max-w-4xl mx-auto">
+                        {/* Header */}
+                        <div className="mb-12">
+                            <button 
+                                onClick={() => navigateTo('home')} 
+                                className="flex items-center gap-2 text-nyx-blue hover:text-white mb-6 transition-colors group"
+                            >
+                                <svg className="w-5 h-5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                                </svg>
+                                Back to Home
                             </button>
-                        )}
-                    </div>
-                    {isEditing ? (
-                        <div className="space-y-4">
-                             <textarea 
-                                value={editableContent}
-                                onChange={(e) => setEditableContent(e.target.value)}
-                                className="w-full min-h-[500px] bg-dark-accent border border-gray-600 rounded-lg py-3 px-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-purple font-mono"
-                            />
-                            <div className="flex flex-col sm:flex-row justify-end items-center gap-4">
-                               {saveStatus && <p className={`text-sm ${saveStatus.startsWith('Error') ? 'text-red-400' : 'text-green-400'}`}>{saveStatus}</p>}
-                                <button onClick={handleCancel} className="border border-gray-600 text-gray-300 font-medium py-2 px-5 rounded-full hover:border-white hover:text-white transition-all w-full sm:w-auto">Cancel</button>
-                                <button onClick={handleSave} disabled={saveStatus === 'Saving...'} className="bg-brand-purple text-white font-semibold py-2 px-5 rounded-full hover:bg-brand-purple/80 transition-all disabled:opacity-50 w-full sm:w-auto">
-                                    {saveStatus === 'Saving...' ? 'Saving...' : 'Save Changes'}
-                                </button>
+                            
+                            <div className="flex justify-between items-start gap-4">
+                                <div>
+                                    <div className="inline-block px-3 py-1 bg-nyx-blue/10 border border-nyx-blue/20 rounded-full text-nyx-blue text-xs font-semibold mb-4">
+                                        LEGAL DOCUMENT
+                                    </div>
+                                    <h1 className="text-4xl md:text-6xl font-bold tracking-tight bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">
+                                        {title}
+                                    </h1>
+                                </div>
+                                {isAuthorized && !isEditing && (
+                                    <button 
+                                        onClick={handleEdit} 
+                                        className="flex items-center gap-2 px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-nyx-blue/50 text-white rounded-xl transition-all group"
+                                    >
+                                        <svg className="w-5 h-5 text-nyx-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                        <span className="hidden sm:inline font-medium">Edit Document</span>
+                                    </button>
+                                )}
                             </div>
                         </div>
-                    ) : (
-                        <div className="prose prose-invert prose-lg max-w-none text-gray-300">
-                            {error && !error.includes('Document not found') ? <p className="text-red-400">{error}</p> : <p style={{whiteSpace: 'pre-wrap'}}>{documentContent}</p>}
-                            {lastUpdated && (!error || error.includes('Document not found')) && (
-                                <p className="text-sm text-gray-500 mt-8">Last Updated: {new Date(lastUpdated).toLocaleString()}</p>
-                            )}
-                        </div>
-                    )}
+
+                        {/* Content */}
+                        {isEditing ? (
+                            <div className="space-y-6">
+                                {/* Editor Card */}
+                                <div className="bg-white/[0.02] backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden">
+                                    {/* Toolbar */}
+                                    <div className="bg-white/[0.03] border-b border-white/10 px-6 py-4">
+                                        <div className="flex items-center gap-2 text-sm text-gray-400">
+                                            <svg className="w-5 h-5 text-nyx-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            <span>You can use Markdown formatting: **bold**, *italic*, # headings, - lists</span>
+                                        </div>
+                                    </div>
+                                    
+                                    {/* Editor */}
+                                    <textarea 
+                                        value={editableContent}
+                                        onChange={(e) => setEditableContent(e.target.value)}
+                                        className="w-full min-h-[600px] bg-transparent border-0 p-6 text-white placeholder-gray-500 focus:outline-none resize-none font-mono text-sm leading-relaxed"
+                                        placeholder="Start writing your legal document here..."
+                                    />
+                                </div>
+
+                                {/* Actions */}
+                                <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-white/[0.02] backdrop-blur-xl rounded-2xl border border-white/10 p-6">
+                                    {saveStatus && (
+                                        <p className={`text-sm font-medium ${saveStatus.startsWith('Error') ? 'text-red-400' : 'text-green-400'} flex items-center gap-2`}>
+                                            {saveStatus.startsWith('Error') ? (
+                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                            ) : (
+                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                                </svg>
+                                            )}
+                                            {saveStatus}
+                                        </p>
+                                    )}
+                                    <div className="flex gap-3 w-full sm:w-auto">
+                                        <button 
+                                            onClick={handleCancel} 
+                                            className="flex-1 sm:flex-none px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-xl transition-all font-medium"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button 
+                                            onClick={handleSave} 
+                                            disabled={saveStatus === 'Saving...'} 
+                                            className="flex-1 sm:flex-none px-6 py-3 bg-gradient-to-r from-nyx-blue to-brand-purple text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-nyx-blue/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            {saveStatus === 'Saving...' ? (
+                                                <span className="flex items-center gap-2">
+                                                    <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                    </svg>
+                                                    Saving...
+                                                </span>
+                                            ) : 'Save Changes'}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="bg-white/[0.02] backdrop-blur-xl rounded-2xl border border-white/10 p-8 md:p-12">
+                                {error && !error.includes('Document not found') ? (
+                                    <div className="flex items-center gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400">
+                                        <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        {error}
+                                    </div>
+                                ) : (
+                                    <div className="prose prose-invert prose-lg max-w-none">
+                                        <div className="text-gray-300 leading-relaxed" style={{whiteSpace: 'pre-wrap'}}>
+                                            {documentContent}
+                                        </div>
+                                    </div>
+                                )}
+                                
+                                {lastUpdated && (!error || error.includes('Document not found')) && (
+                                    <div className="mt-12 pt-6 border-t border-white/10">
+                                        <p className="text-sm text-gray-500 flex items-center gap-2">
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            Last Updated: {new Date(lastUpdated).toLocaleDateString('en-US', { 
+                                                year: 'numeric', 
+                                                month: 'long', 
+                                                day: 'numeric',
+                                                hour: '2-digit',
+                                                minute: '2-digit'
+                                            })}
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>
