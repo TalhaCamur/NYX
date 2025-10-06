@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Product } from '../types';
 
 export interface CartItem extends Product {
@@ -15,13 +15,35 @@ interface CartContextType {
   getCartTotalPrice: () => number;
   openCart: () => void;
   closeCart: () => void;
+  clearCart: () => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+// localStorage key
+const CART_STORAGE_KEY = 'nyx-cart-items';
+
 export const CartProvider = ({ children }: { children: ReactNode }) => {
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  // Initialize cart from localStorage
+  const [cartItems, setCartItems] = useState<CartItem[]>(() => {
+    try {
+      const savedCart = localStorage.getItem(CART_STORAGE_KEY);
+      return savedCart ? JSON.parse(savedCart) : [];
+    } catch (error) {
+      console.error('Error loading cart from localStorage:', error);
+      return [];
+    }
+  });
   const [isCartOpen, setIsCartOpen] = useState(false);
+
+  // Save cart to localStorage whenever it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems));
+    } catch (error) {
+      console.error('Error saving cart to localStorage:', error);
+    }
+  }, [cartItems]);
 
   const openCart = () => setIsCartOpen(true);
   const closeCart = () => setIsCartOpen(false);
@@ -62,8 +84,12 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       return cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
   };
 
+  const clearCart = () => {
+    setCartItems([]);
+  };
+
   return (
-    <CartContext.Provider value={{ cartItems, isCartOpen, addToCart, removeFromCart, updateItemQuantity, getCartTotalQuantity, getCartTotalPrice, openCart, closeCart }}>
+    <CartContext.Provider value={{ cartItems, isCartOpen, addToCart, removeFromCart, updateItemQuantity, getCartTotalQuantity, getCartTotalPrice, openCart, closeCart, clearCart }}>
       {children}
     </CartContext.Provider>
   );
