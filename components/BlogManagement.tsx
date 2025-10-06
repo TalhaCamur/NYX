@@ -68,8 +68,6 @@ export const BlogManagement: React.FC<BlogManagementProps> = ({ onUpdate }) => {
       // Add optional fields only if they have values
       if (formData.featuredImage) postData.featured_image = formData.featuredImage;
       if (formData.tags) postData.tags = formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag);
-      if (formData.seoTitle) postData.seo_title = formData.seoTitle;
-      if (formData.seoDescription) postData.seo_description = formData.seoDescription;
 
       console.log('📤 Sending to database:', postData);
 
