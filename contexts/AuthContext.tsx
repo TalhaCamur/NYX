@@ -554,15 +554,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
     }, [user]);
     
-    const signInWithProvider = useCallback(async (provider: 'google') => {
-        const { error } = await supabase.auth.signInWithOAuth({
-            provider,
-            options: {
-                redirectTo: 'https://talhacamur.github.io/NYX/',
-            },
-        });
-        if (error) throw error;
-    }, []);
     
     const sendPasswordResetEmail = useCallback(async (email: string) => {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
