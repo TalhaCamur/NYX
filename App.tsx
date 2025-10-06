@@ -1619,8 +1619,7 @@ const BlogPage = ({ navigateTo }: { navigateTo: (page: string, params?: any) => 
                                                 <span className="text-xs text-gray-400">By {post.author}</span>
                                             </div>
                                             <a 
-                                                href="#" 
-                                                onClick={(e) => { e.preventDefault(); navigateTo('blog-post', { post: post }); }} 
+                                                href={`#blog-post/${post.id}`}
                                                 className="group/link flex items-center gap-2 text-nyx-blue hover:text-cyan-400 font-semibold text-sm transition-colors"
                                             >
                                     Read More
@@ -1640,7 +1639,70 @@ const BlogPage = ({ navigateTo }: { navigateTo: (page: string, params?: any) => 
         </div>
     );
 };
-const BlogPostPage = ({ navigateTo, post }: { navigateTo: (page: string) => void, post?: BlogPost }) => {
+const BlogPostPage = ({ navigateTo, post: postProp }: { navigateTo: (page: string) => void, post?: BlogPost }) => {
+    const [post, setPost] = useState<BlogPost | null>(postProp || null);
+    const [loading, setLoading] = useState(!postProp);
+
+    // Get post ID from URL if not provided via props
+    useEffect(() => {
+        if (postProp) {
+            setPost(postProp);
+            setLoading(false);
+            return;
+        }
+
+        // Parse ID from URL (#blog-post/123)
+        const hash = window.location.hash.slice(1);
+        const parts = hash.split('/');
+        if (parts[0] === 'blog-post' && parts[1]) {
+            const postId = parts[1];
+            
+            // Fetch post from Supabase
+            const fetchPost = async () => {
+                try {
+                    const { data, error } = await supabase
+                        .from('blog_posts')
+                        .select('*')
+                        .eq('id', postId)
+                        .single();
+
+                    if (error) throw error;
+                    if (data) {
+                        setPost({
+                            id: data.id,
+                            title: data.title,
+                            excerpt: data.excerpt,
+                            content: data.content,
+                            imageUrl: data.featured_image || 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d',
+                            author: data.author_name || 'NYX Team',
+                            date: data.created_at,
+                            category: data.category || 'Technology'
+                        });
+                    }
+                } catch (err) {
+                    console.error('Error fetching blog post:', err);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            fetchPost();
+        } else {
+            setLoading(false);
+        }
+    }, [postProp]);
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-dark text-white flex items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-nyx-blue mx-auto mb-4"></div>
+                    <p className="text-gray-400">Loading post...</p>
+                </div>
+            </div>
+        );
+    }
+
     // Handle missing post
     if (!post) {
         return (
@@ -2402,6 +2464,16 @@ const App = () => {
                 page: 'legal', 
                 params: { slug, title: titles[slug] || 'Legal Document' }
             };
+        }
+        
+        // Handle blog-post with ID (e.g., #blog-post/123)
+        if (hash.startsWith('blog-post/')) {
+            return { page: 'blog-post', params: null };
+        }
+        
+        // Handle product-detail with ID (e.g., #product-detail/123)
+        if (hash.startsWith('product-detail/')) {
+            return { page: 'product-detail', params: null };
         }
         
         return { page: hash, params: null };
