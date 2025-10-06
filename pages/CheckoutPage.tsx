@@ -10,17 +10,10 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ navigateTo }) => {
     const { cartItems, getCartTotalPrice, clearCart } = useCart();
     const { user } = useAuth();
     
-    // Scroll to top on mount
-    useEffect(() => {
-        window.scrollTo(0, 0);
-    }, []);
-
-    // Redirect if cart is empty (but not after successful payment)
-    useEffect(() => {
-        if ((!cartItems || cartItems.length === 0) && !paymentSuccess) {
-            navigateTo('products');
-        }
-    }, [cartItems, navigateTo, paymentSuccess]);
+    // Payment states (moved up to avoid reference error)
+    const [isProcessing, setIsProcessing] = useState(false);
+    const [paymentSuccess, setPaymentSuccess] = useState(false);
+    const [orderNumber, setOrderNumber] = useState('');
 
     // Form states
     const [email, setEmail] = useState(user?.email || '');
@@ -32,11 +25,18 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ navigateTo }) => {
     const [country, setCountry] = useState('Turkey');
     const [hadSavedAddress, setHadSavedAddress] = useState(false);
     const [showSaveAddressPrompt, setShowSaveAddressPrompt] = useState(false);
-    
-    // Payment states
-    const [isProcessing, setIsProcessing] = useState(false);
-    const [paymentSuccess, setPaymentSuccess] = useState(false);
-    const [orderNumber, setOrderNumber] = useState('');
+
+    // Scroll to top on mount
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
+
+    // Redirect if cart is empty (but not after successful payment)
+    useEffect(() => {
+        if ((!cartItems || cartItems.length === 0) && !paymentSuccess) {
+            navigateTo('products');
+        }
+    }, [cartItems, navigateTo, paymentSuccess]);
 
     // Load user's saved address on mount
     useEffect(() => {
