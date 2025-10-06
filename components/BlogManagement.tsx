@@ -61,7 +61,6 @@ export const BlogManagement: React.FC<BlogManagementProps> = ({ onUpdate }) => {
         excerpt: formData.excerpt,
         content: formData.content,
         status: formData.status,
-        slug: formData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
         author_name: user?.nickname || user?.email?.split('@')[0] || 'NYX Team'
       };
 
