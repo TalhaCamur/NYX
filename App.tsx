@@ -1705,7 +1705,21 @@ const LegalPage = ({ navigateTo, slug: slugProp, title: titleProp }: { navigateT
         return null;
     };
 
-    const slug = slugProp || getSlugFromUrl() || 'terms';
+    // Normalize slug - support both formats
+    const normalizeSlug = (s: string) => {
+        const slugMap: { [key: string]: string } = {
+            'privacy-policy': 'privacy',
+            'terms-of-service': 'terms',
+            'terms-and-conditions': 'terms',
+            'return-policy': 'returns',
+            'shipping-policy': 'shipping'
+        };
+        return slugMap[s] || s;
+    };
+
+    const rawSlug = slugProp || getSlugFromUrl() || 'terms';
+    const slug = normalizeSlug(rawSlug);
+    
     const titleMap: { [key: string]: string } = {
         'terms': 'Terms & Conditions',
         'privacy': 'Privacy Policy',
