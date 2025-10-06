@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth, supabase } from '../contexts/AuthContext';
+import { OrderManagement } from '../components/OrderManagement';
 
 interface ProfilePageProps {
     navigateTo: (page: string, params?: any) => void;
@@ -1085,96 +1086,12 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo }) => {
                         </div>
                     )}
 
-                    {/* Orders Tab - Minimalist */}
+                    {/* Orders Tab - Order Management */}
                     {activeTab === 'orders' && (
                         <div className="space-y-6">
-                            {/* Clean Stats */}
-                            <div className="grid md:grid-cols-2 gap-4">
-                                <div className="bg-white/[0.03] backdrop-blur-xl rounded-2xl border border-white/10 p-6 text-center hover:border-white/20 transition-all">
-                                    <div className="text-3xl font-bold text-white mb-1">{stats.orders}</div>
-                                    <p className="text-sm text-gray-400">Orders Placed</p>
-                                </div>
-                                <div className="bg-white/[0.03] backdrop-blur-xl rounded-2xl border border-white/10 p-6 text-center hover:border-white/20 transition-all">
-                                    <div className="text-3xl font-bold text-white mb-1">{stats.favorites}</div>
-                                    <p className="text-sm text-gray-400">Favorites</p>
-                                </div>
-                            </div>
-
-                            {/* Clean Recent Activity */}
                             <div className="bg-white/[0.03] backdrop-blur-xl rounded-2xl border border-white/10 p-8 hover:border-white/20 transition-all">
-                                <h3 className="text-xl font-bold text-white mb-6">Recent Activity</h3>
-                                <div className="space-y-3">
-                                    {recentActivity.length > 0 ? (
-                                        recentActivity.map((activity, index) => (
-                                            <div key={index} className="flex items-center gap-4 p-4 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-all">
-                                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                                                    activity.type === 'order' ? 'bg-blue-500/20 text-blue-400' :
-                                                    activity.type === 'profile' ? 'bg-green-500/20 text-green-400' :
-                                                    activity.type === 'account' ? 'bg-orange-500/20 text-orange-400' :
-                                                    'bg-gray-500/20 text-gray-400'
-                                                }`}>
-                                                    {activity.icon === 'shopping-bag' && (
-                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                                                        </svg>
-                                                    )}
-                                                    {activity.icon === 'user' && (
-                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                                        </svg>
-                                                    )}
-                                                    {activity.icon === 'user-plus' && (
-                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-                                                        </svg>
-                                                    )}
-                                                </div>
-                                                <div className="flex-1">
-                                                    <p className="text-white font-medium">{activity.title}</p>
-                                                    <p className="text-gray-400 text-sm">{activity.description}</p>
-                                                    <p className="text-gray-500 text-xs mt-1">
-                                                        {new Date(activity.date).toLocaleDateString('en-US', { 
-                                                            month: 'short', 
-                                                            day: 'numeric',
-                                                            year: 'numeric',
-                                                            hour: '2-digit',
-                                                            minute: '2-digit'
-                                                        })}
-                                                    </p>
-                                                </div>
-                                                <span className={`text-sm font-medium px-2 py-1 rounded-full ${
-                                                    activity.status === 'completed' ? 'bg-green-500/20 text-green-400' :
-                                                    activity.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400' :
-                                                    activity.status === 'cancelled' ? 'bg-red-500/20 text-red-400' :
-                                                    'bg-gray-500/20 text-gray-400'
-                                                }`}>
-                                                    {activity.status}
-                                                </span>
-                                            </div>
-                                        ))
-                                    ) : (
-                                        <div className="text-center py-8">
-                                            <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
-                                                <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                                                </svg>
-                                            </div>
-                                            <p className="text-gray-400">No recent activity</p>
-                                            <p className="text-gray-500 text-sm">Your orders and activities will appear here</p>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-
-                            {/* Clean Order Tracking */}
-                            <div className="bg-white/[0.03] backdrop-blur-xl rounded-2xl border border-white/10 p-8 hover:border-white/20 transition-all">
-                                <h3 className="text-xl font-bold text-white mb-4">Order Tracking</h3>
-                                <div className="text-center py-8">
-                                    <p className="text-gray-400 mb-4">Monitor your order status and delivery progress</p>
-                                    <button className="px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white rounded-xl transition-all">
-                                        View All Orders
-                                    </button>
-                                </div>
+                                <h3 className="text-xl font-bold text-white mb-6">Your Orders</h3>
+                                <OrderManagement onClose={() => {}} />
                             </div>
                         </div>
                     )}
