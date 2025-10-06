@@ -121,7 +121,7 @@ interface AuthContextType {
     logout: () => Promise<void>;
     updateUser: (userId: string, updates: Partial<Pick<User, 'firstName' | 'lastName' | 'nickname' | 'profilePicture'>>) => Promise<User>;
     changePassword: (userId: string, currentPassword: string, newPassword: string) => Promise<void>;
-    signInWithProvider: (provider: 'google') => Promise<void>;
+    signInWithProvider: (provider: 'google' | 'facebook' | 'apple') => Promise<void>;
     sendPasswordResetEmail: (email: string) => Promise<void>;
     updatePassword: (newPassword: string) => Promise<void>;
     fetchAllUsers: () => Promise<User[]>;
@@ -620,6 +620,33 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (error) throw error;
     }, [user]);
     
+    const signInWithProvider = useCallback(async (provider: 'google' | 'facebook' | 'apple') => {
+        try {
+            console.log(`🔐 Signing in with ${provider}...`);
+            
+            const { data, error } = await supabase.auth.signInWithOAuth({
+                provider: provider,
+                options: {
+                    redirectTo: `${window.location.origin}/`,
+                    queryParams: {
+                        access_type: 'offline',
+                        prompt: 'consent',
+                    },
+                }
+            });
+
+            if (error) {
+                console.error(`❌ ${provider} sign-in error:`, error);
+                throw error;
+            }
+
+            console.log(`✅ ${provider} sign-in initiated successfully`);
+        } catch (error) {
+            console.error(`💥 ${provider} sign-in failed:`, error);
+            throw error;
+        }
+    }, []);
+
     const deleteUserAccount = useCallback(async () => {
         if(!user) throw new Error("Not logged in.");
         
