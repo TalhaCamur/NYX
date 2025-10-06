@@ -7,7 +7,7 @@ interface CheckoutPageProps {
 }
 
 const CheckoutPage: React.FC<CheckoutPageProps> = ({ navigateTo }) => {
-    const { cart, getCartTotal, clearCart } = useCart();
+    const { cartItems, getCartTotalPrice, clearCart } = useCart();
     const { user } = useAuth();
     
     // Scroll to top on mount
@@ -17,10 +17,10 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ navigateTo }) => {
 
     // Redirect if cart is empty
     useEffect(() => {
-        if (cart.length === 0) {
+        if (!cartItems || cartItems.length === 0) {
             navigateTo('products');
         }
-    }, [cart, navigateTo]);
+    }, [cartItems, navigateTo]);
 
     // Form states
     const [cardNumber, setCardNumber] = useState('');
@@ -127,15 +127,15 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ navigateTo }) => {
                         <div className="bg-white/[0.03] backdrop-blur-xl rounded-2xl border border-white/10 p-8 mb-6">
                             <h3 className="text-xl font-bold text-white mb-4">Order Summary</h3>
                             <div className="space-y-3">
-                                {cart.map((item) => (
+                                {cartItems && cartItems.map((item) => (
                                     <div key={item.id} className="flex justify-between text-gray-300">
                                         <span>{item.name} x {item.quantity}</span>
-                                        <span>${(item.price * item.quantity).toFixed(2)}</span>
+                                        <span>€{(item.price * item.quantity).toFixed(2)}</span>
                                     </div>
                                 ))}
                                 <div className="border-t border-white/10 pt-3 flex justify-between text-white font-bold text-lg">
                                     <span>Total</span>
-                                    <span>${getCartTotal().toFixed(2)}</span>
+                                    <span>€{getCartTotalPrice().toFixed(2)}</span>
                                 </div>
                             </div>
                         </div>
@@ -343,10 +343,10 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ navigateTo }) => {
                                 
                                 {/* Cart Items */}
                                 <div className="space-y-4 mb-6">
-                                    {cart.map((item) => (
+                                    {cartItems && cartItems.map((item) => (
                                         <div key={item.id} className="flex gap-4">
                                             <img
-                                                src={item.imageUrl}
+                                                src={item.images?.[0] || item.imageUrl}
                                                 alt={item.name}
                                                 className="w-20 h-20 object-cover rounded-lg"
                                             />
@@ -354,7 +354,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ navigateTo }) => {
                                                 <h4 className="text-white font-semibold">{item.name}</h4>
                                                 <p className="text-gray-400 text-sm">Quantity: {item.quantity}</p>
                                                 <p className="text-nyx-blue font-semibold mt-1">
-                                                    ${(item.price * item.quantity).toFixed(2)}
+                                                    €{(item.price * item.quantity).toFixed(2)}
                                                 </p>
                                             </div>
                                         </div>
@@ -365,7 +365,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ navigateTo }) => {
                                 <div className="border-t border-white/10 pt-4 space-y-2">
                                     <div className="flex justify-between text-gray-400">
                                         <span>Subtotal</span>
-                                        <span>${getCartTotal().toFixed(2)}</span>
+                                        <span>€{getCartTotalPrice().toFixed(2)}</span>
                                     </div>
                                     <div className="flex justify-between text-gray-400">
                                         <span>Shipping</span>
@@ -373,11 +373,11 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ navigateTo }) => {
                                     </div>
                                     <div className="flex justify-between text-gray-400">
                                         <span>Tax (18%)</span>
-                                        <span>${(getCartTotal() * 0.18).toFixed(2)}</span>
+                                        <span>€{(getCartTotalPrice() * 0.18).toFixed(2)}</span>
                                     </div>
                                     <div className="border-t border-white/10 pt-2 flex justify-between text-white font-bold text-xl">
                                         <span>Total</span>
-                                        <span>${(getCartTotal() * 1.18).toFixed(2)}</span>
+                                        <span>€{(getCartTotalPrice() * 1.18).toFixed(2)}</span>
                                     </div>
                                 </div>
 
