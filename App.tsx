@@ -336,43 +336,46 @@ const ProfileDropdown = ({ navigateTo, isUserMenuOpen, setIsUserMenuOpen, user, 
         <div
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
-            className="fixed top-16 right-4 w-80 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl z-50 overflow-hidden"
+            className="fixed top-16 right-4 w-80 bg-gradient-to-br from-nyx-black/95 via-gray-900/95 to-nyx-black/95 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl shadow-black/50 z-50 overflow-hidden"
             style={{
                 animation: 'bubbleSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
                 transform: 'translateZ(0)',
                 willChange: 'transform, opacity'
             }}
         >
-            {/* Header Section */}
-            <div className="p-6 border-b border-white/10 bg-white/5">
-                <div className="flex items-center gap-4 mb-4">
-                    <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center">
-                        <span className="text-white font-bold text-lg">
-                            {profileData?.nickname?.substring(0, 2).toUpperCase() || user?.user_metadata?.full_name?.split(' ').map(n => n[0]).join('') || user?.email?.split('@')[0].substring(0, 2).toUpperCase() || 'U'}
+            {/* Subtle gradient overlay */}
+            <div className="absolute inset-0 bg-gradient-to-br from-nyx-blue/5 via-transparent to-brand-purple/5 pointer-events-none"></div>
+            
+            {/* Header Section - Minimalist */}
+            <div className="relative p-5 border-b border-white/5">
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-gradient-to-br from-nyx-blue to-brand-purple rounded-xl flex items-center justify-center shadow-lg">
+                        <span className="text-white font-bold text-sm">
+                            {profileData?.nickname?.substring(0, 2).toUpperCase() || user?.user_metadata?.full_name?.split(' ').map(n => n[0]).join('') || user?.email?.split('@')[0].substring(0, 2).toUpperCase() || 'NY'}
                         </span>
                     </div>
-                    <div className="flex-1">
-                        <h3 className="text-white font-semibold text-lg">
+                    <div className="flex-1 min-w-0">
+                        <h3 className="text-white font-semibold text-base truncate">
                             {profileData?.nickname || user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User'}
                         </h3>
-                        <p className="text-gray-300 text-sm">{user?.email || 'user@example.com'}</p>
-                        <div className="flex gap-1 mt-1">
+                        <p className="text-gray-400 text-xs truncate">{user?.email || 'user@example.com'}</p>
+                        <div className="flex gap-1 mt-1.5">
                             {(user?.roles || ['user']).slice(0, 2).map((role, index) => (
                                 <span 
                                     key={index}
-                                    className={`px-2 py-0.5 text-xs rounded-full ${
-                                        role === 'super-admin' ? 'bg-red-500/20 text-red-300' :
-                                        role === 'admin' ? 'bg-purple-500/20 text-purple-300' :
-                                        role === 'seller' ? 'bg-green-500/20 text-green-300' :
-                                        role === 'content_writer' ? 'bg-orange-500/20 text-orange-300' :
-                                        'bg-blue-500/20 text-blue-300'
+                                    className={`px-2 py-0.5 text-[10px] font-medium rounded-md ${
+                                        role === 'super-admin' ? 'bg-red-500/10 text-red-400 border border-red-500/20' :
+                                        role === 'admin' ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20' :
+                                        role === 'seller' ? 'bg-green-500/10 text-green-400 border border-green-500/20' :
+                                        role === 'content_writer' ? 'bg-orange-500/10 text-orange-400 border border-orange-500/20' :
+                                        'bg-blue-500/10 text-blue-400 border border-blue-500/20'
                                     }`}
                                 >
                                     {role.toUpperCase()}
                                 </span>
                             ))}
                             {(user?.roles || []).length > 2 && (
-                                <span className="px-2 py-0.5 text-xs rounded-full bg-gray-500/20 text-gray-300">
+                                <span className="px-2 py-0.5 text-[10px] font-medium rounded-md bg-gray-500/10 text-gray-400 border border-gray-500/20">
                                     +{(user?.roles || []).length - 2}
                                 </span>
                             )}
@@ -381,22 +384,22 @@ const ProfileDropdown = ({ navigateTo, isUserMenuOpen, setIsUserMenuOpen, user, 
                 </div>
             </div>
             
-            {/* Menu Items */}
-            <div className="p-4 space-y-2">
+            {/* Menu Items - Minimalist */}
+            <div className="relative p-3 space-y-1">
                 {/* Profile */}
                 <button
                     onClick={() => {
                         navigateTo('profile');
                         setIsUserMenuOpen(false);
                     }}
-                    className="w-full flex items-center gap-3 p-3 text-white hover:bg-white/10 rounded-xl transition-all duration-200 group"
+                    className="w-full flex items-center gap-3 px-3 py-2.5 text-white hover:bg-white/5 rounded-lg transition-all duration-200 group"
                 >
-                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500/20 to-blue-600/20 border border-blue-500/20 rounded-lg flex items-center justify-center group-hover:scale-110 group-hover:border-blue-500/30 transition-all">
+                        <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                         </svg>
                     </div>
-                    <span className="font-medium">Profile</span>
+                    <span className="font-medium text-sm">Profile</span>
                 </button>
 
                 {/* Admin Dashboard */}
@@ -406,76 +409,58 @@ const ProfileDropdown = ({ navigateTo, isUserMenuOpen, setIsUserMenuOpen, user, 
                             navigateTo('admin');
                             setIsUserMenuOpen(false);
                         }}
-                        className="w-full flex items-center gap-3 p-3 text-white hover:bg-white/10 rounded-xl transition-all duration-200 group"
+                        className="w-full flex items-center gap-3 px-3 py-2.5 text-white hover:bg-white/5 rounded-lg transition-all duration-200 group"
                     >
-                        <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className="w-8 h-8 bg-gradient-to-br from-purple-500/20 to-purple-600/20 border border-purple-500/20 rounded-lg flex items-center justify-center group-hover:scale-110 group-hover:border-purple-500/30 transition-all">
+                            <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </div>
-                        <span className="font-medium">Admin Dashboard</span>
+                        <span className="font-medium text-sm">Admin Dashboard</span>
                     </button>
                 )}
 
                 {/* Product Management - Admin, Super Admin, Seller */}
                 {((user?.roles?.includes('admin') || user?.roles?.includes('super-admin') || user?.roles?.includes('seller'))) && (
-                    <>
-                        <button
-                            onClick={() => {
-                                                setOpenAddForm(true);
-                                setIsUserMenuOpen(false);
-                            }}
-                            className="w-full flex items-center gap-3 p-3 text-white hover:bg-white/10 rounded-xl transition-all duration-200 group"
-                        >
-                            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
-                            </div>
-                            <span className="font-medium">Manage Products</span>
-                        </button>
-                        
-                        <button
-                            onClick={() => {
-                                setOpenAddForm(true);
-                                                setOpenAddForm(true);
-                                setIsUserMenuOpen(false);
-                            }}
-                            className="w-full flex items-center gap-3 p-3 text-white hover:bg-white/10 rounded-xl transition-all duration-200 group"
-                        >
-                            <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                </svg>
-                            </div>
-                            <span className="font-medium">Add New Product</span>
-                        </button>
-                    </>
+                    <button
+                        onClick={() => {
+                            setOpenAddForm(true);
+                            setIsUserMenuOpen(false);
+                        }}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 text-white hover:bg-white/5 rounded-lg transition-all duration-200 group"
+                    >
+                        <div className="w-8 h-8 bg-gradient-to-br from-blue-500/20 to-blue-600/20 border border-blue-500/20 rounded-lg flex items-center justify-center group-hover:scale-110 group-hover:border-blue-500/30 transition-all">
+                            <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                        </div>
+                        <span className="font-medium text-sm">Manage Products</span>
+                    </button>
                 )}
 
                 {/* Add Blog Post - Admin, Super Admin */}
                 {((user?.roles?.includes('admin') || user?.roles?.includes('super-admin'))) && (
                     <button
                         onClick={() => {
-                            // Add blog post functionality
+                            navigateTo('blog');
                             setIsUserMenuOpen(false);
                         }}
-                        className="w-full flex items-center gap-3 p-3 text-white hover:bg-white/10 rounded-xl transition-all duration-200 group"
+                        className="w-full flex items-center gap-3 px-3 py-2.5 text-white hover:bg-white/5 rounded-lg transition-all duration-200 group"
                     >
-                        <div className="w-8 h-8 bg-orange-600 rounded-lg flex items-center justify-center">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className="w-8 h-8 bg-gradient-to-br from-orange-500/20 to-orange-600/20 border border-orange-500/20 rounded-lg flex items-center justify-center group-hover:scale-110 group-hover:border-orange-500/30 transition-all">
+                            <svg className="w-4 h-4 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                             </svg>
                         </div>
-                        <span className="font-medium">Add Blog Post</span>
+                        <span className="font-medium text-sm">Add Blog Post</span>
                     </button>
                 )}
 
-                {/* Divider */}
-                <div className="border-t border-white/10 my-2"></div>
+                {/* Divider - Subtle */}
+                <div className="border-t border-white/5 my-2"></div>
 
-                {/* Logout */}
+                {/* Logout - Minimalist */}
                 <button
                     onClick={async () => {
                         try {
@@ -486,14 +471,14 @@ const ProfileDropdown = ({ navigateTo, isUserMenuOpen, setIsUserMenuOpen, user, 
                         }
                         setIsUserMenuOpen(false);
                     }}
-                    className="w-full flex items-center gap-3 p-3 text-red-400 hover:bg-red-500/10 rounded-xl transition-all duration-200 group"
+                    className="w-full flex items-center gap-3 px-3 py-2.5 text-red-400 hover:bg-red-500/5 rounded-lg transition-all duration-200 group"
                 >
-                    <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-8 h-8 bg-gradient-to-br from-red-500/10 to-red-600/10 border border-red-500/20 rounded-lg flex items-center justify-center group-hover:scale-110 group-hover:border-red-500/30 transition-all">
+                        <svg className="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                         </svg>
                     </div>
-                    <span className="font-medium">Logout</span>
+                    <span className="font-medium text-sm">Logout</span>
                 </button>
             </div>
         </div>
