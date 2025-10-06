@@ -1,26 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../contexts/AuthContext';
 
-// Google OAuth configuration
-const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
-
-// TypeScript declarations for Google Identity Services
-declare global {
-  interface Window {
-    google: {
-      accounts: {
-        id: {
-          initialize: (config: {
-            client_id: string;
-            callback: (response: { credential: string }) => void;
-          }) => void;
-          prompt: () => void;
-        };
-      };
-    };
-  }
-}
-
 interface ContactPageProps {
   navigateTo: (page: string) => void;
 }
@@ -35,78 +15,11 @@ const ContactPage: React.FC<ContactPageProps> = ({ navigateTo }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [errors, setErrors] = useState<{[key: string]: string}>({});
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-  const [isGoogleSignedIn, setIsGoogleSignedIn] = useState(false);
 
   // Scroll to top when component mounts
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-
-  // Load Google OAuth script
-  useEffect(() => {
-    const loadGoogleScript = () => {
-      if (window.google) return;
-      
-      const script = document.createElement('script');
-      script.src = 'https://accounts.google.com/gsi/client';
-      script.async = true;
-      script.defer = true;
-      document.head.appendChild(script);
-    };
-
-    loadGoogleScript();
-  }, []);
-
-  // Google Sign-In function using Google Identity Services
-  const handleGoogleSignIn = async () => {
-    setIsGoogleLoading(true);
-    
-    try {
-      // Check if Google Client ID is configured
-      if (!GOOGLE_CLIENT_ID) {
-        throw new Error('Google Client ID not configured');
-      }
-
-      // Initialize Google Identity Services
-      if (!window.google) {
-        throw new Error('Google Identity Services not loaded');
-      }
-
-      // Use Google Identity Services for simpler authentication
-      const client = window.google.accounts.id.initialize({
-        client_id: GOOGLE_CLIENT_ID,
-        callback: (response: any) => {
-          try {
-            // Decode the JWT token to get user info
-            const payload = JSON.parse(atob(response.credential.split('.')[1]));
-            
-            // Update form data with Google profile information
-            setFormData(prev => ({
-              ...prev,
-              name: payload.name || '',
-              email: payload.email || ''
-            }));
-            
-            setIsGoogleSignedIn(true);
-            setSubmitStatus('idle');
-            setIsGoogleLoading(false);
-          } catch (error) {
-            console.error('Error getting user profile:', error);
-            setSubmitStatus('error');
-            setIsGoogleLoading(false);
-          }
-        }
-      });
-
-      // Trigger the sign-in popup
-      client.prompt();
-    } catch (error) {
-      console.error('Google Sign-In error:', error);
-      setSubmitStatus('error');
-      setIsGoogleLoading(false);
-    }
-  };
 
   // Form validation
   const validateForm = () => {
