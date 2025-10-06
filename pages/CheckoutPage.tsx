@@ -15,12 +15,12 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ navigateTo }) => {
         window.scrollTo(0, 0);
     }, []);
 
-    // Redirect if cart is empty
+    // Redirect if cart is empty (but not after successful payment)
     useEffect(() => {
-        if (!cartItems || cartItems.length === 0) {
+        if ((!cartItems || cartItems.length === 0) && !paymentSuccess) {
             navigateTo('products');
         }
-    }, [cartItems, navigateTo]);
+    }, [cartItems, navigateTo, paymentSuccess]);
 
     // Form states
     const [email, setEmail] = useState(user?.email || '');
