@@ -105,42 +105,92 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ navigateTo }) => {
     // Payment success screen
     if (paymentSuccess) {
         return (
-            <div className="min-h-screen bg-white flex items-center justify-center p-4">
-                <div className="max-w-md w-full text-center">
-                    <div className="mb-6">
-                        <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                            </svg>
-                        </div>
-                        <h1 className="text-2xl font-semibold text-gray-900 mb-2">Payment successful</h1>
-                        <p className="text-gray-600">Your order has been confirmed</p>
-                        <p className="text-sm text-gray-500 mt-2">Order #{orderNumber}</p>
-                    </div>
-
-                    <div className="bg-gray-50 rounded-lg p-6 mb-6 text-left">
-                        <h3 className="text-sm font-semibold text-gray-900 mb-3">Order summary</h3>
-                        {cartItems && cartItems.map((item) => (
-                            <div key={item.id} className="flex justify-between text-sm mb-2">
-                                <span className="text-gray-600">{item.name} × {item.quantity}</span>
-                                <span className="text-gray-900">€{(item.price * item.quantity).toFixed(2)}</span>
+            <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-50 flex items-center justify-center p-4">
+                <div className="max-w-lg w-full">
+                    {/* Success Card */}
+                    <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
+                        {/* Premium Header with Gradient */}
+                        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-10 text-center">
+                            <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                                <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                </svg>
                             </div>
-                        ))}
-                        <div className="border-t border-gray-200 mt-3 pt-3 flex justify-between text-base font-semibold">
-                            <span className="text-gray-900">Total</span>
-                            <span className="text-gray-900">€{getCartTotalPrice().toFixed(2)}</span>
+                            <h1 className="text-3xl font-bold text-white mb-2">Payment Successful!</h1>
+                            <p className="text-blue-100">Thank you for your purchase</p>
+                        </div>
+
+                        {/* Order Details */}
+                        <div className="px-8 py-6 border-b border-gray-100">
+                            <div className="flex items-center justify-between mb-4">
+                                <span className="text-sm font-medium text-gray-500">Order Number</span>
+                                <span className="text-sm font-semibold text-gray-900 font-mono">#{orderNumber}</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <span className="text-sm font-medium text-gray-500">Confirmation Email</span>
+                                <span className="text-sm font-medium text-blue-600">{user?.email}</span>
+                            </div>
+                        </div>
+
+                        {/* Order Summary */}
+                        <div className="px-8 py-6">
+                            <h3 className="text-base font-semibold text-gray-900 mb-4">Order Summary</h3>
+                            <div className="space-y-3 mb-4">
+                                {cartItems && cartItems.map((item) => (
+                                    <div key={item.id} className="flex items-center gap-3">
+                                        <img 
+                                            src={item.images?.[0] || item.imageUrl} 
+                                            alt={item.name}
+                                            className="w-12 h-12 object-cover rounded-lg border border-gray-200"
+                                        />
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-sm font-medium text-gray-900 truncate">{item.name}</p>
+                                            <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
+                                        </div>
+                                        <span className="text-sm font-semibold text-gray-900">€{(item.price * item.quantity).toFixed(2)}</span>
+                                    </div>
+                                ))}
+                            </div>
+                            
+                            {/* Total */}
+                            <div className="border-t border-gray-200 pt-4 space-y-2">
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-gray-600">Subtotal</span>
+                                    <span className="text-gray-900">€{getCartTotalPrice().toFixed(2)}</span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-gray-600">VAT (18%)</span>
+                                    <span className="text-gray-900">€{(getCartTotalPrice() * 0.18).toFixed(2)}</span>
+                                </div>
+                                <div className="flex justify-between text-lg font-bold pt-2 border-t border-gray-200">
+                                    <span className="text-gray-900">Total</span>
+                                    <span className="text-gray-900">€{(getCartTotalPrice() * 1.18).toFixed(2)}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="px-8 py-6 bg-gray-50 space-y-3">
+                            <button
+                                onClick={() => navigateTo('products')}
+                                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold py-3.5 px-4 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl"
+                            >
+                                Continue Shopping
+                            </button>
+                            <button
+                                onClick={() => navigateTo('profile')}
+                                className="w-full bg-white text-gray-700 font-medium py-3.5 px-4 rounded-xl hover:bg-gray-50 transition-all border border-gray-200"
+                            >
+                                View My Orders
+                            </button>
                         </div>
                     </div>
 
-                    <button
-                        onClick={() => navigateTo('products')}
-                        className="w-full bg-blue-600 text-white font-medium py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors mb-3"
-                    >
-                        Continue shopping
-                    </button>
-                    
-                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-sm text-yellow-800">
-                        ⚠️ Test mode: No real payment was processed
+                    {/* Additional Info */}
+                    <div className="mt-6 text-center">
+                        <p className="text-sm text-gray-600">
+                            Need help? <button onClick={() => navigateTo('contact')} className="text-blue-600 hover:text-blue-700 font-medium">Contact Support</button>
+                        </p>
                     </div>
                 </div>
             </div>
@@ -150,31 +200,27 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ navigateTo }) => {
     const cardBrand = getCardBrand(cardNumber);
 
     return (
-        <div className="min-h-screen bg-white">
-            {/* Stripe-like header */}
-            <div className="border-b border-gray-200">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-                    <button
-                        onClick={() => navigateTo('products')}
-                        className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1"
-                    >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                        </svg>
-                        Back
-                    </button>
-                </div>
-            </div>
-
-            {/* Test mode banner */}
-            <div className="bg-yellow-50 border-b border-yellow-200">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-                    <p className="text-sm text-yellow-800 flex items-center gap-2">
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                        </svg>
-                        <span><strong>Test mode:</strong> Use any 16-digit card number (e.g., 4242 4242 4242 4242)</span>
-                    </p>
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
+            {/* Premium header with logo */}
+            <div className="border-b border-gray-200 bg-white/80 backdrop-blur-sm sticky top-0 z-10">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
+                    <div className="flex items-center justify-between">
+                        <button
+                            onClick={() => navigateTo('products')}
+                            className="text-gray-600 hover:text-gray-900 text-sm font-medium flex items-center gap-2 transition-colors"
+                        >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                            </svg>
+                            Back
+                        </button>
+                        <div className="flex items-center gap-2">
+                            <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
+                            <span className="text-sm font-semibold text-gray-900">Secure Checkout</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -325,7 +371,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ navigateTo }) => {
                         <button
                             onClick={handlePayment}
                             disabled={!cardNumber || !expiryDate || !cvc || !cardholderName || isProcessing || cardNumber.replace(/\D/g, '').length !== 16}
-                            className="w-full bg-blue-600 text-white font-medium py-3 px-4 rounded-md hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold py-4 px-4 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg hover:shadow-xl disabled:shadow-none"
                         >
                             {isProcessing ? (
                                 <>
@@ -333,25 +379,32 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ navigateTo }) => {
                                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                     </svg>
-                                    Processing...
+                                    Processing Payment...
                                 </>
                             ) : (
-                                `Pay €${(getCartTotalPrice() * 1.18).toFixed(2)}`
+                                <>
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                    </svg>
+                                    Pay €{(getCartTotalPrice() * 1.18).toFixed(2)}
+                                </>
                             )}
                         </button>
 
-                        {/* Powered by Stripe-like footer */}
-                        <div className="mt-6 flex items-center justify-center gap-2 text-xs text-gray-500">
-                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                            </svg>
-                            <span>Powered by NYX Payments (Test Mode)</span>
+                        {/* Security footer */}
+                        <div className="mt-6 flex items-center justify-center gap-3 text-xs text-gray-500">
+                            <div className="flex items-center gap-1">
+                                <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                </svg>
+                                <span>256-bit SSL encryption</span>
+                            </div>
                         </div>
                     </div>
 
                     {/* Right side - Order summary */}
                     <div className="lg:pl-8">
-                        <div className="bg-gray-50 rounded-lg p-6 sticky top-8">
+                        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 sticky top-24">
                             <h2 className="text-lg font-semibold text-gray-900 mb-4">Order summary</h2>
                             
                             {/* Cart items */}
