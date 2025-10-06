@@ -26,6 +26,9 @@ export const BlogManagement: React.FC<BlogManagementProps> = ({ onUpdate }) => {
     seoTitle: '',
     seoDescription: ''
   });
+  
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadedImageUrl, setUploadedImageUrl] = useState('');
 
   useEffect(() => {
     fetchBlogPosts();
@@ -110,6 +113,51 @@ export const BlogManagement: React.FC<BlogManagementProps> = ({ onUpdate }) => {
     }
   };
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Check file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Image size must be less than 5MB');
+      return;
+    }
+
+    // Check file type
+    if (!file.type.startsWith('image/')) {
+      alert('Please upload an image file');
+      return;
+    }
+
+    setUploadingImage(true);
+    
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+      const filePath = `blog-images/${fileName}`;
+
+      const { error: uploadError, data } = await supabase.storage
+        .from('blog-images')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('blog-images')
+        .getPublicUrl(filePath);
+
+      setUploadedImageUrl(publicUrl);
+      setFormData({ ...formData, featuredImage: publicUrl });
+      
+    } catch (error: any) {
+      console.error('Error uploading image:', error);
+      alert(`Failed to upload image: ${error.message}`);
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
   const resetForm = () => {
     setFormData({
       title: '',
@@ -121,20 +169,23 @@ export const BlogManagement: React.FC<BlogManagementProps> = ({ onUpdate }) => {
       seoTitle: '',
       seoDescription: ''
     });
+    setUploadedImageUrl('');
   };
 
   const handleEdit = (post: any) => {
     setEditingPost(post);
+    const imageUrl = post.featured_image || post.imageUrl || '';
     setFormData({
       title: post.title,
       excerpt: post.excerpt || '',
       content: post.content,
-      featuredImage: post.featured_image || post.imageUrl || '',
+      featuredImage: imageUrl,
       status: post.status || 'draft',
       tags: post.tags?.join(', ') || '',
       seoTitle: post.seo_title || post.seoTitle || '',
       seoDescription: post.seo_description || post.seoDescription || ''
     });
+    setUploadedImageUrl(imageUrl);
     setShowAddForm(true);
   };
 
@@ -255,53 +306,109 @@ export const BlogManagement: React.FC<BlogManagementProps> = ({ onUpdate }) => {
             <div className="relative">
               {/* Premium Glass Card */}
               <div className="bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-xl rounded-2xl border border-white/10 p-8 shadow-2xl">
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  {/* Title */}
+                <form onSubmit={handleSubmit} className="space-y-8">
+                  
+                  {/* 1. HEADER (Main Title) */}
                   <div>
-                    <label className="block text-sm font-semibold text-gray-300 mb-3 tracking-wide">TITLE *</label>
+                    <label className="block text-sm font-semibold text-gray-300 mb-3 tracking-wide uppercase">
+                      📌 Header (Main Title) *
+                    </label>
                     <input
                       type="text"
                       value={formData.title}
                       onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl py-3.5 px-4 text-white placeholder-gray-500 focus:border-nyx-blue focus:ring-2 focus:ring-nyx-blue/20 focus:outline-none transition-all"
-                      placeholder="Enter your blog post title..."
+                      className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-5 text-white text-xl font-semibold placeholder-gray-500 focus:border-nyx-blue focus:ring-2 focus:ring-nyx-blue/20 focus:outline-none transition-all"
+                      placeholder="Enter the main headline that appears at the top..."
                       required
                     />
+                    <p className="text-xs text-gray-500 mt-2">This will be the large header at the top of your blog post</p>
                   </div>
 
-                  {/* Excerpt */}
+                  {/* 2. FEATURED IMAGE UPLOAD */}
                   <div>
-                    <label className="block text-sm font-semibold text-gray-300 mb-3 tracking-wide">EXCERPT</label>
+                    <label className="block text-sm font-semibold text-gray-300 mb-3 tracking-wide uppercase">
+                      🖼️ Featured Image
+                    </label>
+                    
+                    {/* Upload Button */}
+                    <div className="relative">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                        id="blog-image-upload"
+                        disabled={uploadingImage}
+                      />
+                      <label
+                        htmlFor="blog-image-upload"
+                        className={`flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-xl cursor-pointer transition-all ${
+                          uploadingImage
+                            ? 'border-gray-600 bg-gray-900/50 cursor-wait'
+                            : uploadedImageUrl || formData.featuredImage
+                            ? 'border-nyx-blue/50 bg-nyx-blue/5 hover:bg-nyx-blue/10'
+                            : 'border-white/10 bg-white/5 hover:bg-white/10 hover:border-nyx-blue/50'
+                        }`}
+                      >
+                        {uploadingImage ? (
+                          <div className="text-center">
+                            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-nyx-blue mx-auto mb-3"></div>
+                            <p className="text-sm text-gray-400">Uploading image...</p>
+                          </div>
+                        ) : uploadedImageUrl || formData.featuredImage ? (
+                          <div className="relative w-full h-full p-4">
+                            <img
+                              src={uploadedImageUrl || formData.featuredImage}
+                              alt="Preview"
+                              className="w-full h-full object-cover rounded-lg"
+                            />
+                            <div className="absolute inset-0 bg-black/60 opacity-0 hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
+                              <p className="text-white text-sm font-semibold">Click to change image</p>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="text-center py-8">
+                            <svg className="w-12 h-12 text-gray-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <p className="text-sm text-gray-400 mb-1">Click to upload image</p>
+                            <p className="text-xs text-gray-500">PNG, JPG, GIF up to 5MB</p>
+                          </div>
+                        )}
+                      </label>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-2">This image appears below the header in your blog post</p>
+                  </div>
+
+                  {/* 3. SUBHEADING */}
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-300 mb-3 tracking-wide uppercase">
+                      📝 Subheading
+                    </label>
                     <textarea
                       value={formData.excerpt}
                       onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
                       className="w-full bg-white/5 border border-white/10 rounded-xl py-3.5 px-4 text-white placeholder-gray-500 focus:border-nyx-blue focus:ring-2 focus:ring-nyx-blue/20 focus:outline-none transition-all resize-none h-24"
-                      placeholder="Brief summary of your post..."
+                      placeholder="A brief, catchy subtitle or excerpt (2-3 sentences)..."
                     />
+                    <p className="text-xs text-gray-500 mt-2">Short summary that appears below the image</p>
                   </div>
 
-                  {/* Content */}
+                  {/* 4. MAIN CONTENT */}
                   <div>
-                    <label className="block text-sm font-semibold text-gray-300 mb-3 tracking-wide">CONTENT *</label>
+                    <label className="block text-sm font-semibold text-gray-300 mb-3 tracking-wide uppercase">
+                      ✍️ Main Content *
+                    </label>
                     <textarea
                       value={formData.content}
                       onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl py-3.5 px-4 text-white placeholder-gray-500 focus:border-nyx-blue focus:ring-2 focus:ring-nyx-blue/20 focus:outline-none transition-all resize-none h-48"
-                      placeholder="Write your amazing content here..."
+                      className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-5 text-white placeholder-gray-500 focus:border-nyx-blue focus:ring-2 focus:ring-nyx-blue/20 focus:outline-none transition-all resize-none h-96"
+                      placeholder="Write your full article content here...
+
+You can use paragraphs, line breaks, and formatting as needed."
                       required
                     />
-                  </div>
-
-                  {/* Featured Image */}
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-300 mb-3 tracking-wide">FEATURED IMAGE</label>
-                    <input
-                      type="url"
-                      value={formData.featuredImage}
-                      onChange={(e) => setFormData({ ...formData, featuredImage: e.target.value })}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl py-3.5 px-4 text-white placeholder-gray-500 focus:border-nyx-blue focus:ring-2 focus:ring-nyx-blue/20 focus:outline-none transition-all"
-                      placeholder="https://example.com/image.jpg"
-                    />
+                    <p className="text-xs text-gray-500 mt-2">The main body of your blog post</p>
                   </div>
 
                   {/* Status & Tags Grid */}
