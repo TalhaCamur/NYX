@@ -919,7 +919,7 @@ const AuthForm = ({ navigateTo }: { navigateTo: (page: string) => void }) => {
                                 I agree to the{' '}
                                 <button 
                                     type="button"
-                                    onClick={() => navigateTo('legal/terms')}
+                                    onClick={() => navigateTo('legal', { slug: 'terms', title: 'Terms & Conditions' })}
                                     className="text-nyx-blue hover:underline font-medium"
                                 >
                                     Terms & Conditions
@@ -927,7 +927,7 @@ const AuthForm = ({ navigateTo }: { navigateTo: (page: string) => void }) => {
                                 {' '}and{' '}
                                 <button 
                                     type="button"
-                                    onClick={() => navigateTo('legal/privacy')}
+                                    onClick={() => navigateTo('legal', { slug: 'privacy', title: 'Privacy Policy' })}
                                     className="text-nyx-blue hover:underline font-medium"
                                 >
                                     Privacy Policy
