@@ -917,21 +917,23 @@ const AuthForm = ({ navigateTo }: { navigateTo: (page: string) => void }) => {
                             />
                             <label htmlFor="terms" className="ml-2 block text-sm text-gray-400">
                                 I agree to the{' '}
-                                <button 
-                                    type="button"
-                                    onClick={() => navigateTo('legal', { slug: 'terms', title: 'Terms & Conditions' })}
+                                <a 
+                                    href="https://talhacamur.github.io/NYX/#legal/terms"
                                     className="text-nyx-blue hover:underline font-medium"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
                                 >
                                     Terms & Conditions
-                                </button>
+                                </a>
                                 {' '}and{' '}
-                                <button 
-                                    type="button"
-                                    onClick={() => navigateTo('legal', { slug: 'privacy', title: 'Privacy Policy' })}
+                                <a 
+                                    href="https://talhacamur.github.io/NYX/#legal/privacy"
                                     className="text-nyx-blue hover:underline font-medium"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
                                 >
                                     Privacy Policy
-                                </button>
+                                </a>
                                 <span className="text-red-400 ml-1">*</span>
                             </label>
                         </div>
@@ -2141,13 +2143,29 @@ const AdminDashboardPage = () => {
 // Main App Component
 const App = () => {
     // Initialize from URL hash
-    const getInitialPage = () => {
+    const getInitialPageAndParams = () => {
         const hash = window.location.hash.slice(1); // Remove '#'
-        return hash || 'home';
+        if (!hash) return { page: 'home', params: null };
+        
+        // Handle legal pages with slug (e.g., #legal/terms)
+        if (hash.startsWith('legal/')) {
+            const slug = hash.split('/')[1];
+            const titles: { [key: string]: string } = {
+                'terms': 'Terms & Conditions',
+                'privacy': 'Privacy Policy'
+            };
+            return { 
+                page: 'legal', 
+                params: { slug, title: titles[slug] || 'Legal Document' }
+            };
+        }
+        
+        return { page: hash, params: null };
     };
     
-    const [currentPage, setCurrentPage] = useState(getInitialPage());
-    const [pageParams, setPageParams] = useState<any>(null);
+    const initial = getInitialPageAndParams();
+    const [currentPage, setCurrentPage] = useState(initial.page);
+    const [pageParams, setPageParams] = useState<any>(initial.params);
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
     const [openAddForm, setOpenAddForm] = useState(false);
     
@@ -2155,8 +2173,20 @@ const App = () => {
     React.useEffect(() => {
         const handleHashChange = () => {
             const hash = window.location.hash.slice(1) || 'home';
-            setCurrentPage(hash);
-            setPageParams(null);
+            
+            // Handle legal pages with slug
+            if (hash.startsWith('legal/')) {
+                const slug = hash.split('/')[1];
+                const titles: { [key: string]: string } = {
+                    'terms': 'Terms & Conditions',
+                    'privacy': 'Privacy Policy'
+                };
+                setCurrentPage('legal');
+                setPageParams({ slug, title: titles[slug] || 'Legal Document' });
+            } else {
+                setCurrentPage(hash);
+                setPageParams(null);
+            }
         };
         
         window.addEventListener('hashchange', handleHashChange);
