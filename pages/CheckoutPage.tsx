@@ -321,7 +321,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ navigateTo }) => {
                                         <select
                                             value={country}
                                             onChange={(e) => setCountry(e.target.value)}
-                                            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:border-nyx-blue focus:outline-none transition-all"
+                                            className="w-full px-4 py-3 bg-nyx-black border border-white/10 rounded-xl text-white focus:outline-none cursor-pointer"
                                         >
                                             <option value="Turkey">Turkey</option>
                                             <option value="United States">United States</option>
