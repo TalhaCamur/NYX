@@ -4,20 +4,17 @@ import { supabase } from '../contexts/AuthContext';
 // Google OAuth configuration
 const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
-// TypeScript declarations for Google OAuth
+// TypeScript declarations for Google Identity Services
 declare global {
   interface Window {
     google: {
       accounts: {
-        oauth2: {
-          initCodeClient: (config: {
+        id: {
+          initialize: (config: {
             client_id: string;
-            scope: string;
-            ux_mode: string;
-            callback: (response: { code: string }) => void;
-          }) => {
-            requestCode: () => void;
-          };
+            callback: (response: { credential: string }) => void;
+          }) => void;
+          prompt: () => void;
         };
       };
     };
@@ -61,7 +58,7 @@ const ContactPage: React.FC<ContactPageProps> = ({ navigateTo }) => {
     loadGoogleScript();
   }, []);
 
-  // Google Sign-In function
+  // Google Sign-In function using Google Identity Services
   const handleGoogleSignIn = async () => {
     setIsGoogleLoading(true);
     
@@ -71,58 +68,39 @@ const ContactPage: React.FC<ContactPageProps> = ({ navigateTo }) => {
         throw new Error('Google Client ID not configured');
       }
 
-      // Initialize Google OAuth
+      // Initialize Google Identity Services
       if (!window.google) {
-        throw new Error('Google OAuth not loaded');
+        throw new Error('Google Identity Services not loaded');
       }
 
-      const client = window.google.accounts.oauth2.initCodeClient({
+      // Use Google Identity Services for simpler authentication
+      const client = window.google.accounts.id.initialize({
         client_id: GOOGLE_CLIENT_ID,
-        scope: 'openid profile email',
-        ux_mode: 'popup',
-        callback: async (response: any) => {
+        callback: (response: any) => {
           try {
-            // Exchange authorization code for user info
-            const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-              },
-              body: new URLSearchParams({
-                client_id: GOOGLE_CLIENT_ID,
-                code: response.code,
-                grant_type: 'authorization_code',
-                redirect_uri: window.location.origin,
-              }),
-            });
-
-            const tokenData = await tokenResponse.json();
+            // Decode the JWT token to get user info
+            const payload = JSON.parse(atob(response.credential.split('.')[1]));
             
-            if (tokenData.access_token) {
-              // Get user profile information
-              const profileResponse = await fetch(`https://www.googleapis.com/oauth2/v2/userinfo?access_token=${tokenData.access_token}`);
-              const profileData = await profileResponse.json();
-              
-              // Update form data with Google profile information
-              setFormData(prev => ({
-                ...prev,
-                name: profileData.name || '',
-                email: profileData.email || ''
-              }));
-              
-              setIsGoogleSignedIn(true);
-              setSubmitStatus('idle');
-            }
+            // Update form data with Google profile information
+            setFormData(prev => ({
+              ...prev,
+              name: payload.name || '',
+              email: payload.email || ''
+            }));
+            
+            setIsGoogleSignedIn(true);
+            setSubmitStatus('idle');
+            setIsGoogleLoading(false);
           } catch (error) {
             console.error('Error getting user profile:', error);
             setSubmitStatus('error');
-          } finally {
             setIsGoogleLoading(false);
           }
-        },
+        }
       });
 
-      client.requestCode();
+      // Trigger the sign-in popup
+      client.prompt();
     } catch (error) {
       console.error('Google Sign-In error:', error);
       setSubmitStatus('error');
