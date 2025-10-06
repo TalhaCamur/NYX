@@ -1688,13 +1688,29 @@ const BlogPostPage = ({ navigateTo, post }: { navigateTo: (page: string) => void
         </div>
      );
 };
-const LegalPage = ({ navigateTo, slug, title }: { navigateTo: (page: string) => void, slug: string, title: string }) => {
+const LegalPage = ({ navigateTo, slug: slugProp, title: titleProp }: { navigateTo: (page: string) => void, slug?: string, title?: string }) => {
     const { user } = useAuth();
     const isAuthorized = user && (
         user.roles.includes('admin') || 
         user.roles.includes('super-admin') || 
         user.roles.includes('UI/UX Designer')
     );
+
+    // Fallback: Parse slug from URL if not provided
+    const getSlugFromUrl = () => {
+        const hash = window.location.hash.slice(1);
+        if (hash.startsWith('legal/')) {
+            return hash.split('/')[1];
+        }
+        return null;
+    };
+
+    const slug = slugProp || getSlugFromUrl() || 'terms';
+    const titleMap: { [key: string]: string } = {
+        'terms': 'Terms & Conditions',
+        'privacy': 'Privacy Policy'
+    };
+    const title = titleProp || titleMap[slug] || 'Legal Document';
 
     const [documentContent, setDocumentContent] = useState('');
     const [lastUpdated, setLastUpdated] = useState('');
@@ -1703,6 +1719,8 @@ const LegalPage = ({ navigateTo, slug, title }: { navigateTo: (page: string) => 
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
     const [saveStatus, setSaveStatus] = useState('');
+
+    console.log('🔍 LegalPage loaded with:', { slugProp, slug, title, hash: window.location.hash });
 
     useEffect(() => {
         const fetchDocument = async () => {
