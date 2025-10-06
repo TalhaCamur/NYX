@@ -62,7 +62,6 @@ export const BlogManagement: React.FC<BlogManagementProps> = ({ onUpdate }) => {
         content: formData.content,
         status: formData.status,
         slug: formData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-        published_at: formData.status === 'published' ? new Date().toISOString() : null,
         author_name: user?.nickname || user?.email?.split('@')[0] || 'NYX Team'
       };
 
