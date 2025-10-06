@@ -165,16 +165,108 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ navigateTo }) => {
         
         setIsProcessing(true);
         
-        // Simulate payment processing
-        setTimeout(() => {
+        try {
+            // Simulate payment processing
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
             const fakeOrderNumber = 'NYX' + Date.now().toString().slice(-10);
             setOrderNumber(fakeOrderNumber);
+            
+            // Save order to database
+            await saveOrderToDatabase(fakeOrderNumber);
+            
             setPaymentSuccess(true);
             setIsProcessing(false);
             
             // Clear cart immediately after successful payment
             clearCart();
-        }, 2000);
+        } catch (error) {
+            console.error('Payment processing error:', error);
+            setIsProcessing(false);
+            // Handle error - show error message to user
+        }
+    };
+
+    // Save order to database
+    const saveOrderToDatabase = async (orderNumber: string) => {
+        if (!user?.id || !cartItems || cartItems.length === 0) {
+            throw new Error('Missing user or cart data');
+        }
+
+        try {
+            console.log('💾 Saving order to database...');
+            
+            // Calculate totals
+            const subtotal = getCartTotalPrice();
+            const taxAmount = subtotal * 0.21; // 21% VAT
+            const shippingAmount = subtotal >= 50 ? 0 : 5.99; // Free shipping over €50
+            const totalAmount = subtotal + taxAmount + shippingAmount;
+
+            // Create order
+            const { data: orderData, error: orderError } = await supabase
+                .from('orders')
+                .insert({
+                    order_number: orderNumber,
+                    user_id: user.id,
+                    status: 'pending',
+                    subtotal: subtotal,
+                    tax_amount: taxAmount,
+                    shipping_amount: shippingAmount,
+                    total_amount: totalAmount,
+                    payment_status: 'completed',
+                    payment_method: 'test_card',
+                    shipping_address: {
+                        address: shippingAddress,
+                        country: country
+                    },
+                    billing_address: {
+                        address: shippingAddress,
+                        country: country
+                    },
+                    tracking_number: '',
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                })
+                .select()
+                .single();
+
+            if (orderError) {
+                console.error('❌ Order creation error:', orderError);
+                throw orderError;
+            }
+
+            console.log('✅ Order created:', orderData.id);
+
+            // Create order items
+            const orderItems = cartItems.map(item => ({
+                order_id: orderData.id,
+                product_id: item.id,
+                quantity: item.quantity,
+                unit_price: item.price,
+                total_price: item.price * item.quantity,
+                product_snapshot: {
+                    name: item.name,
+                    price: item.price,
+                    image: item.image,
+                    description: item.description
+                }
+            }));
+
+            const { error: itemsError } = await supabase
+                .from('order_items')
+                .insert(orderItems);
+
+            if (itemsError) {
+                console.error('❌ Order items creation error:', itemsError);
+                throw itemsError;
+            }
+
+            console.log('✅ Order items created successfully');
+            
+        } catch (error) {
+            console.error('💥 Error saving order:', error);
+            throw error;
+        }
     };
 
     // Address save prompt modal
