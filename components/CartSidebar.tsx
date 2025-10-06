@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 import { useCart } from '../contexts/CartContext';
-import { Checkout } from './Checkout';
 import CloseIcon from './icons/CloseIcon';
 import TrashIcon from './icons/TrashIcon';
 
 const CartSidebar = ({ navigateTo }: { navigateTo: (page: string, params?: any) => void }) => {
     const { isCartOpen, closeCart, cartItems, removeFromCart, updateItemQuantity, getCartTotalPrice } = useCart();
     const [agreedToTerms, setAgreedToTerms] = useState(false);
-    const [showCheckout, setShowCheckout] = useState(false);
 
     if (!isCartOpen) return null;
 
@@ -107,7 +105,10 @@ const CartSidebar = ({ navigateTo }: { navigateTo: (page: string, params?: any) 
                             </label>
                         </div>
                         <button 
-                            onClick={() => setShowCheckout(true)}
+                            onClick={() => {
+                                closeCart();
+                                navigateTo('checkout');
+                            }}
                             disabled={!agreedToTerms}
                             className="w-full bg-nyx-blue text-nyx-black font-bold py-3 px-8 rounded-full hover:bg-white transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100"
                         >
@@ -116,16 +117,6 @@ const CartSidebar = ({ navigateTo }: { navigateTo: (page: string, params?: any) 
                     </footer>
                 )}
             </aside>
-            {showCheckout && (
-                <Checkout
-                    onClose={() => setShowCheckout(false)}
-                    onSuccess={() => {
-                        setShowCheckout(false);
-                        closeCart();
-                        alert('Order placed successfully!');
-                    }}
-                />
-            )}
         </>
     );
 };
