@@ -1640,8 +1640,25 @@ const BlogPage = ({ navigateTo }: { navigateTo: (page: string, params?: any) => 
         </div>
     );
 };
-const BlogPostPage = ({ navigateTo, post }: { navigateTo: (page: string) => void, post: BlogPost }) => {
-     return (
+const BlogPostPage = ({ navigateTo, post }: { navigateTo: (page: string) => void, post?: BlogPost }) => {
+    // Handle missing post
+    if (!post) {
+        return (
+            <div className="min-h-screen bg-dark text-white flex items-center justify-center">
+                <div className="text-center">
+                    <h1 className="text-2xl font-bold mb-4">Blog Post Not Found</h1>
+                    <button 
+                        onClick={() => navigateTo('blog')}
+                        className="bg-nyx-blue text-nyx-black px-6 py-2 rounded-lg font-semibold hover:bg-white transition-colors"
+                    >
+                        Back to Blog
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
+    return (
         <div className="min-h-screen bg-dark text-white">
             {/* Hero Section */}
             <section className="relative py-24 md:py-32 overflow-hidden">
