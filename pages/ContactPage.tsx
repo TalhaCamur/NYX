@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../contexts/AuthContext';
 
 // Google OAuth configuration
-const GOOGLE_CLIENT_ID = 'AIzaSyC62mHqgCl2KfbfUYTlJ-hKSIruGQZZSfY';
+const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
 // TypeScript declarations for Google OAuth
 declare global {
@@ -66,6 +66,11 @@ const ContactPage: React.FC<ContactPageProps> = ({ navigateTo }) => {
     setIsGoogleLoading(true);
     
     try {
+      // Check if Google Client ID is configured
+      if (!GOOGLE_CLIENT_ID) {
+        throw new Error('Google Client ID not configured');
+      }
+
       // Initialize Google OAuth
       if (!window.google) {
         throw new Error('Google OAuth not loaded');
