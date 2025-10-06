@@ -47,27 +47,31 @@ export const OrderManagement: React.FC<OrderManagementProps> = ({ onClose }) => 
 
   const fetchOrders = async () => {
     try {
+      console.log('🔍 Fetching orders...');
+      
       const { data, error } = await supabase
         .from('orders')
         .select(`
           *,
-          profiles!orders_user_id_fkey(first_name, last_name, email),
           order_items(*)
         `)
         .order('created_at', { ascending: false });
+      
+      console.log('📋 Orders query result:', { data, error });
       
       if (error) throw error;
       
       const formattedOrders = data?.map(order => ({
         ...order,
-        customer_name: order.profiles ? `${order.profiles.first_name} ${order.profiles.last_name}` : 'Guest',
-        customer_email: order.profiles?.email || 'N/A',
+        customer_name: 'You', // Simplified for now
+        customer_email: 'N/A',
         items: order.order_items || []
       })) || [];
       
+      console.log('✅ Formatted orders:', formattedOrders);
       setOrders(formattedOrders);
     } catch (error) {
-      console.error('Error fetching orders:', error);
+      console.error('❌ Error fetching orders:', error);
     } finally {
       setLoading(false);
     }
