@@ -1708,7 +1708,9 @@ const LegalPage = ({ navigateTo, slug: slugProp, title: titleProp }: { navigateT
     const slug = slugProp || getSlugFromUrl() || 'terms';
     const titleMap: { [key: string]: string } = {
         'terms': 'Terms & Conditions',
-        'privacy': 'Privacy Policy'
+        'privacy': 'Privacy Policy',
+        'shipping': 'Shipping Policy',
+        'returns': 'Return Policy'
     };
     const title = titleProp || titleMap[slug] || 'Legal Document';
 
@@ -1757,6 +1759,7 @@ const LegalPage = ({ navigateTo, slug: slugProp, title: titleProp }: { navigateT
 
     useEffect(() => {
         const fetchDocument = async () => {
+            console.log('📄 Fetching document for slug:', slug);
             setIsLoading(true);
             setError('');
             setSaveStatus('');
@@ -1767,17 +1770,25 @@ const LegalPage = ({ navigateTo, slug: slugProp, title: titleProp }: { navigateT
                     .eq('slug', slug)
                     .single();
 
-                if (error && error.code !== 'PGRST116') throw error;
+                console.log('📥 Fetch response:', { data, error, slug });
+
+                if (error && error.code !== 'PGRST116') {
+                    console.error('❌ Fetch error:', error);
+                    throw error;
+                }
                 if (data) {
+                    console.log('✅ Document found, content length:', data.content?.length);
                     setDocumentContent(data.content || "This document has not been written yet.");
                     setLastUpdated(data.last_updated);
                 } else {
+                    console.warn('⚠️ No document found for slug:', slug);
                     setDocumentContent("This document has not been written yet.");
-                    setError('Document not found.');
+                    setError('Document not found. Please add content in Supabase.');
                 }
             } catch (err: any) {
+                console.error('💥 Fetch failed:', err);
                 setError(err.message || 'Failed to fetch document.');
-                setDocumentContent('Content could not be loaded.');
+                setDocumentContent('Content could not be loaded. Please check Supabase.');
             } finally {
                 setIsLoading(false);
             }
@@ -2332,7 +2343,9 @@ const App = () => {
             const slug = hash.split('/')[1];
             const titles: { [key: string]: string } = {
                 'terms': 'Terms & Conditions',
-                'privacy': 'Privacy Policy'
+                'privacy': 'Privacy Policy',
+                'shipping': 'Shipping Policy',
+                'returns': 'Return Policy'
             };
             return { 
                 page: 'legal', 
@@ -2359,7 +2372,9 @@ const App = () => {
                 const slug = hash.split('/')[1];
                 const titles: { [key: string]: string } = {
                     'terms': 'Terms & Conditions',
-                    'privacy': 'Privacy Policy'
+                    'privacy': 'Privacy Policy',
+                    'shipping': 'Shipping Policy',
+                    'returns': 'Return Policy'
                 };
                 setCurrentPage('legal');
                 setPageParams({ slug, title: titles[slug] || 'Legal Document' });
