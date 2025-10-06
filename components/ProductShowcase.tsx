@@ -20,9 +20,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, navigateTo })
     : 0;
 
   return (
-    <div 
-      className="product-card cursor-pointer group"
-      onClick={() => navigateTo('product-detail', { product })}
+    <a 
+      href={`#product-detail/${product.id}`}
+      className="product-card cursor-pointer group block"
     >
       <div className="aspect-square overflow-hidden relative">
         <img 
@@ -77,7 +77,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, navigateTo })
           </button>
         </div>
       </div>
-    </div>
+    </a>
   );
 };
 
@@ -95,9 +95,9 @@ export const ProductListItem: React.FC<ProductCardProps> = ({ product, navigateT
     : 0;
 
   return (
-    <div 
-      className="bg-nyx-gray/30 backdrop-blur-sm rounded-xl border border-white/10 hover:border-nyx-blue/50 transition-all duration-300 cursor-pointer group overflow-hidden"
-      onClick={() => navigateTo('product-detail', { product })}
+    <a 
+      href={`#product-detail/${product.id}`}
+      className="bg-nyx-gray/30 backdrop-blur-sm rounded-xl border border-white/10 hover:border-nyx-blue/50 transition-all duration-300 cursor-pointer group overflow-hidden block"
     >
       <div className="flex flex-col md:flex-row">
         {/* Image */}
@@ -174,6 +174,6 @@ export const ProductListItem: React.FC<ProductCardProps> = ({ product, navigateT
           </div>
         </div>
       </div>
-    </div>
+    </a>
   );
 };

@@ -24,13 +24,82 @@ import { OrderManagement } from './components/OrderManagement';
 import { CouponManagement } from './components/CouponManagement';
 
 // Product Detail Page Component
-const ProductDetailPage = ({ navigateTo, product }: { navigateTo: (page: string, params?: any) => void, product?: Product }) => {
+const ProductDetailPage = ({ navigateTo, product: productProp }: { navigateTo: (page: string, params?: any) => void, product?: Product }) => {
   const { addToCart } = useCart();
+  const [product, setProduct] = useState<Product | null>(productProp || null);
+  const [loading, setLoading] = useState(!productProp);
+  
+  // Get product ID from URL if not provided via props
+  useEffect(() => {
+    if (productProp) {
+      setProduct(productProp);
+      setLoading(false);
+      return;
+    }
+
+    // Parse ID from URL (#product-detail/123)
+    const hash = window.location.hash.slice(1);
+    const parts = hash.split('/');
+    if (parts[0] === 'product-detail' && parts[1]) {
+      const productId = parts[1];
+      
+      // Fetch product from Supabase
+      const fetchProduct = async () => {
+        try {
+          const { data, error } = await supabase
+            .from('products')
+            .select('*')
+            .eq('id', productId)
+            .single();
+
+          if (error) throw error;
+          if (data) {
+            setProduct({
+              id: data.id,
+              name: data.name,
+              tag_line: data.tag_line,
+              description: data.description,
+              price: data.price,
+              original_price: data.original_price,
+              stock: data.stock,
+              sku: data.sku,
+              images: data.images || [],
+              specs: data.specs || {},
+              features: data.features || [],
+              is_visible: data.is_visible,
+              is_featured: data.is_featured,
+              created_at: data.created_at,
+              imageUrl: data.images?.[0] || 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&fit=crop'
+            });
+          }
+        } catch (err) {
+          console.error('Error fetching product:', err);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchProduct();
+    } else {
+      setLoading(false);
+    }
+  }, [productProp]);
   
   // Scroll to top when component mounts
   React.useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-dark text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-nyx-blue mx-auto mb-4"></div>
+          <p className="text-gray-400">Loading product...</p>
+        </div>
+      </div>
+    );
+  }
   
   if (!product) {
     return (
@@ -2501,6 +2570,14 @@ const App = () => {
                 };
                 setCurrentPage('legal');
                 setPageParams({ slug, title: titles[slug] || 'Legal Document' });
+            } else if (hash.startsWith('blog-post/')) {
+                // Handle blog-post with ID
+                setCurrentPage('blog-post');
+                setPageParams(null);
+            } else if (hash.startsWith('product-detail/')) {
+                // Handle product-detail with ID
+                setCurrentPage('product-detail');
+                setPageParams(null);
             } else {
                 setCurrentPage(hash);
                 setPageParams(null);

@@ -146,20 +146,44 @@ const Footer: React.FC<FooterProps> = ({ navigateTo }) => {
                 </button>
               </li>
               <li>
-                <button
-                  onClick={() => navigateTo('legal', { slug: 'privacy-policy', title: 'Privacy Policy' })}
+                <a
+                  href="https://talhacamur.github.io/NYX/#legal/privacy"
                   className="text-gray-400 hover:text-nyx-blue transition-colors text-sm"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
                   Privacy Policy
-                </button>
+                </a>
               </li>
               <li>
-                <button
-                  onClick={() => navigateTo('legal', { slug: 'terms-of-service', title: 'Terms of Service' })}
+                <a
+                  href="https://talhacamur.github.io/NYX/#legal/terms"
                   className="text-gray-400 hover:text-nyx-blue transition-colors text-sm"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
-                  Terms of Service
-                </button>
+                  Terms & Conditions
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://talhacamur.github.io/NYX/#legal/shipping"
+                  className="text-gray-400 hover:text-nyx-blue transition-colors text-sm"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Shipping Policy
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://talhacamur.github.io/NYX/#legal/returns"
+                  className="text-gray-400 hover:text-nyx-blue transition-colors text-sm"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Return Policy
+                </a>
               </li>
             </ul>
           </div>
