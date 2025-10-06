@@ -49,14 +49,22 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ navigateTo }) => {
                         .eq('id', user.id)
                         .single();
                     
-                    if (!error && data?.address) {
+                    if (error) {
+                        // Silently handle error if address column doesn't exist yet
+                        console.log('ℹ️ Address column may not exist yet in profiles table');
+                        setHadSavedAddress(false);
+                        return;
+                    }
+                    
+                    if (data?.address) {
                         setShippingAddress(data.address);
                         setHadSavedAddress(true);
                     } else {
                         setHadSavedAddress(false);
                     }
                 } catch (error) {
-                    console.error('Error loading address:', error);
+                    // Silently catch any errors
+                    setHadSavedAddress(false);
                 }
             }
         };
