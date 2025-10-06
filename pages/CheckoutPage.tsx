@@ -14,6 +14,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ navigateTo }) => {
     const [isProcessing, setIsProcessing] = useState(false);
     const [paymentSuccess, setPaymentSuccess] = useState(false);
     const [orderNumber, setOrderNumber] = useState('');
+    const [paymentError, setPaymentError] = useState<string | null>(null);
 
     // Form states
     const [email, setEmail] = useState(user?.email || '');
@@ -158,6 +159,9 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ navigateTo }) => {
 
     // Handle payment (TEST MODE - NO REAL PAYMENT)
     const handlePayment = async () => {
+        // Clear previous errors
+        setPaymentError(null);
+        
         // Check if user entered a new address
         if (!hadSavedAddress && shippingAddress && user?.id) {
             setShowSaveAddressPrompt(true);
@@ -166,24 +170,30 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ navigateTo }) => {
         setIsProcessing(true);
         
         try {
+            console.log('🚀 Starting payment process...');
+            
             // Simulate payment processing
             await new Promise(resolve => setTimeout(resolve, 2000));
             
             const fakeOrderNumber = 'NYX' + Date.now().toString().slice(-10);
             setOrderNumber(fakeOrderNumber);
             
+            console.log('💳 Payment simulation completed, saving order...');
+            
             // Save order to database
             await saveOrderToDatabase(fakeOrderNumber);
+            
+            console.log('✅ Order saved successfully, showing success screen');
             
             setPaymentSuccess(true);
             setIsProcessing(false);
             
             // Clear cart immediately after successful payment
             clearCart();
-        } catch (error) {
-            console.error('Payment processing error:', error);
+        } catch (error: any) {
+            console.error('❌ Payment processing error:', error);
+            setPaymentError(error.message || 'Payment failed. Please try again.');
             setIsProcessing(false);
-            // Handle error - show error message to user
         }
     };
 
@@ -632,6 +642,25 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ navigateTo }) => {
                                 </>
                             )}
                         </button>
+
+                        {/* Error message */}
+                        {paymentError && (
+                            <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                                <div className="flex items-center gap-2">
+                                    <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <span className="text-red-700 font-medium">Payment Error</span>
+                                </div>
+                                <p className="text-red-600 text-sm mt-1">{paymentError}</p>
+                                <button
+                                    onClick={() => setPaymentError(null)}
+                                    className="text-red-500 hover:text-red-700 text-sm mt-2 underline"
+                                >
+                                    Dismiss
+                                </button>
+                            </div>
+                        )}
 
                         {/* Security footer */}
                         <div className="mt-6 flex items-center justify-center gap-3 text-xs text-gray-500">
