@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useCart } from '../contexts/CartContext';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth, supabase } from '../contexts/AuthContext';
 
 interface CheckoutPageProps {
     navigateTo: (page: string, params?: any) => void;
@@ -28,12 +28,41 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ navigateTo }) => {
     const [expiryDate, setExpiryDate] = useState('');
     const [cvc, setCvc] = useState('');
     const [cardholderName, setCardholderName] = useState('');
+    const [shippingAddress, setShippingAddress] = useState('');
     const [country, setCountry] = useState('Turkey');
+    const [hadSavedAddress, setHadSavedAddress] = useState(false);
+    const [showSaveAddressPrompt, setShowSaveAddressPrompt] = useState(false);
     
     // Payment states
     const [isProcessing, setIsProcessing] = useState(false);
     const [paymentSuccess, setPaymentSuccess] = useState(false);
     const [orderNumber, setOrderNumber] = useState('');
+
+    // Load user's saved address on mount
+    useEffect(() => {
+        const loadUserAddress = async () => {
+            if (user?.id) {
+                try {
+                    const { data, error } = await supabase
+                        .from('profiles')
+                        .select('address')
+                        .eq('id', user.id)
+                        .single();
+                    
+                    if (!error && data?.address) {
+                        setShippingAddress(data.address);
+                        setHadSavedAddress(true);
+                    } else {
+                        setHadSavedAddress(false);
+                    }
+                } catch (error) {
+                    console.error('Error loading address:', error);
+                }
+            }
+        };
+        
+        loadUserAddress();
+    }, [user]);
 
     // Format card number (XXXX XXXX XXXX XXXX)
     const formatCardNumber = (value: string) => {
@@ -84,8 +113,32 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ navigateTo }) => {
         return 'unknown';
     };
 
+    // Save address to profile
+    const saveAddressToProfile = async () => {
+        if (user?.id && shippingAddress) {
+            try {
+                const { error } = await supabase
+                    .from('profiles')
+                    .update({ address: shippingAddress })
+                    .eq('id', user.id);
+                
+                if (!error) {
+                    console.log('✅ Address saved to profile');
+                }
+            } catch (error) {
+                console.error('Error saving address:', error);
+            }
+        }
+        setShowSaveAddressPrompt(false);
+    };
+
     // Handle payment (TEST MODE - NO REAL PAYMENT)
     const handlePayment = async () => {
+        // Check if user entered a new address
+        if (!hadSavedAddress && shippingAddress && user?.id) {
+            setShowSaveAddressPrompt(true);
+        }
+        
         setIsProcessing(true);
         
         // Simulate payment processing
@@ -102,11 +155,49 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ navigateTo }) => {
         }, 2000);
     };
 
+    // Address save prompt modal
+    const AddressSavePrompt = () => {
+        if (!showSaveAddressPrompt) return null;
+        
+        return (
+            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 animate-scale-in">
+                    <div className="text-center mb-6">
+                        <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                        </div>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">Save this address?</h3>
+                        <p className="text-gray-600 text-sm">Would you like to save this shipping address to your profile for faster checkout next time?</p>
+                    </div>
+                    <div className="flex gap-3">
+                        <button
+                            onClick={() => setShowSaveAddressPrompt(false)}
+                            className="flex-1 px-4 py-3 bg-gray-100 text-gray-700 font-medium rounded-xl hover:bg-gray-200 transition-colors"
+                        >
+                            No, thanks
+                        </button>
+                        <button
+                            onClick={saveAddressToProfile}
+                            className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg"
+                        >
+                            Yes, save it
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
     // Payment success screen
     if (paymentSuccess) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-50 flex items-center justify-center p-4">
-                <div className="max-w-lg w-full">
+            <>
+                <AddressSavePrompt />
+                <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-50 flex items-center justify-center p-4">
+                    <div className="max-w-lg w-full">
                     {/* Success Card */}
                     <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
                         {/* Premium Header with Gradient */}
@@ -194,6 +285,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ navigateTo }) => {
                     </div>
                 </div>
             </div>
+            </>
         );
     }
 
@@ -367,10 +459,32 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ navigateTo }) => {
                             </select>
                         </div>
 
+                        {/* Shipping Address */}
+                        <div className="mb-6">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Shipping Address
+                            </label>
+                            <textarea
+                                value={shippingAddress}
+                                onChange={(e) => setShippingAddress(e.target.value)}
+                                placeholder="Street address, city, postal code"
+                                rows={3}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                            />
+                            {hadSavedAddress && (
+                                <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
+                                    <svg className="w-3 h-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    Using saved address from your profile
+                                </p>
+                            )}
+                        </div>
+
                         {/* Pay button */}
                         <button
                             onClick={handlePayment}
-                            disabled={!cardNumber || !expiryDate || !cvc || !cardholderName || isProcessing || cardNumber.replace(/\D/g, '').length !== 16}
+                            disabled={!cardNumber || !expiryDate || !cvc || !cardholderName || !shippingAddress || isProcessing || cardNumber.replace(/\D/g, '').length !== 16}
                             className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold py-4 px-4 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg hover:shadow-xl disabled:shadow-none"
                         >
                             {isProcessing ? (

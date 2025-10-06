@@ -1033,6 +1033,32 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo }) => {
                                             </p>
                                         )}
                                     </div>
+                                    <div>
+                                        <label className="block text-sm font-semibold text-gray-300 mb-3 tracking-wide">Shipping Address</label>
+                                        {isEditing ? (
+                                            <textarea
+                                                value={editData.address || ''}
+                                                onChange={(e) => handleInputChange('address', e.target.value)}
+                                                className="w-full p-3 bg-white/5 rounded-lg text-white placeholder-gray-400 no-focus resize-none"
+                                                style={{
+                                                    outline: 'none !important',
+                                                    border: 'none !important',
+                                                    boxShadow: 'none !important',
+                                                    ring: 'none !important',
+                                                    '--tw-ring-width': '0 !important',
+                                                    '--tw-ring-color': 'transparent !important',
+                                                    '--tw-ring-offset-width': '0 !important',
+                                                    '--tw-ring-offset-color': 'transparent !important'
+                                                }}
+                                                placeholder="Enter full shipping address (street, city, postal code, country)"
+                                                rows={3}
+                                            />
+                                        ) : (
+                                            <p className="text-gray-300 p-3 bg-white/5 rounded-lg whitespace-pre-wrap">
+                                                {profileData.address || 'No address saved'}
+                                            </p>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
 
